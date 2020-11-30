@@ -15,13 +15,15 @@ Ap_dynamicsAudioProcessor::Ap_dynamicsAudioProcessor()
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                       .withInput  ("Input", juce::AudioChannelSet::stereo(), true)
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
 #endif
+, apvts (*this, nullptr, "Parameters", createParameters())
 {
+    apvts.state.addListener (this);
 }
 
 Ap_dynamicsAudioProcessor::~Ap_dynamicsAudioProcessor()
@@ -93,8 +95,9 @@ void Ap_dynamicsAudioProcessor::changeProgramName (int index, const juce::String
 //==============================================================================
 void Ap_dynamicsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    update();
+    reset();
+    isActive_ = true;
 }
 
 void Ap_dynamicsAudioProcessor::releaseResources()
@@ -129,30 +132,33 @@ bool Ap_dynamicsAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 
 void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+    if (!isActive_) return;
+    if (mustUpdateProcessing_) update();
+
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    auto numSamples = buffer.getNumSamples();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
 
-        // ..do something to the data...
+        for (int sample = 0; sample < numSamples; ++sample) {
+            switch (compType_) {
+                case feedfoward:
+                    channelData[sample] = applyFFCompression(channelData[sample]);
+                    break;
+                case feedback:
+                    channelData[sample] = applyFBCompression(channelData[sample]);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
 
@@ -164,21 +170,194 @@ bool Ap_dynamicsAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* Ap_dynamicsAudioProcessor::createEditor()
 {
-    return new Ap_dynamicsAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor (*this);
 }
 
 //==============================================================================
 void Ap_dynamicsAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    // Save state information to xml -> binary to retrieve on startup
+    juce::ValueTree copyState = apvts.copyState();
+    std::unique_ptr<juce::XmlElement> xml = copyState.createXml();
+    copyXmlToBinary (*xml, destData);
 }
 
 void Ap_dynamicsAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xml = getXmlFromBinary (data, sizeInBytes);
+    juce::ValueTree copyState = juce::ValueTree::fromXml (*xml);
+    apvts.replaceState (copyState);
+}
+
+float Ap_dynamicsAudioProcessor::applyFFCompression(float sample)
+{
+    auto alphaA = exp(-log(9) / (getSampleRate() * attack_));
+    auto alphaR = exp(-log(9) / (getSampleRate() * release_));
+
+    float gainSmooth = 0;
+    float gain_sc = 0;
+
+    auto x_uni = abs(sample);
+    auto x_dB = 20 * log10(x_uni);
+    if (x_dB < -96)
+        x_dB = -96;
+    // Static Characteristics
+    if (x_dB > (threshold_ + kneeWidth_ / 2))
+        gain_sc = threshold_ + (x_dB - threshold_) / ratio_; // Perform downwards compression
+    else if (x_dB > (threshold_ - kneeWidth_ / 2))
+        gain_sc = x_dB + ((1 / ratio_ - 1) * powf((x_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
+    else
+        gain_sc = x_dB;
+
+    float gainChange_dB = gain_sc - x_dB;
+
+    // Smooth gain change
+    if (gainChange_dB < prevGainSmooth_) {
+        // attack mode
+        gainSmooth = ((1 - alphaA) * gainChange_dB) + (alphaA * prevGainSmooth_);
+    } else {
+        // release mode
+        gainSmooth = ((1 - alphaR) * gainChange_dB) + (alphaR * prevGainSmooth_);
+    }
+
+    // Convert back to linear amplitude scalar
+    auto lin_a = powf(10, gainSmooth / 20);
+    float x_out = lin_a * sample;
+
+    prevGainSmooth_ = gainSmooth;
+
+    // Apply Compression
+    return x_out;
+}
+
+float Ap_dynamicsAudioProcessor::applyFBCompression(float sample)
+{
+    auto alphaA = exp(-log(9) / (getSampleRate() * attack_));
+    auto alphaR = exp(-log(9) / (getSampleRate() * release_));
+
+    float gainSmooth = 0;
+    float gain_sc = 0;
+
+    auto y_uni = abs(y_prev_);
+    auto y_dB = 20 * log10(y_uni);
+    if (y_dB < -96)
+        y_dB = -96;
+    // Static Characteristics
+    if (y_dB > (threshold_ + kneeWidth_ / 2))
+        gain_sc = threshold_ + (y_dB - threshold_) / ratio_; // Perform downwards compression
+    else if (y_dB > (threshold_ - kneeWidth_ / 2))
+        gain_sc = y_dB + ((1 / ratio_ - 1) * powf((y_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_); // Compression with ramp
+    else
+        gain_sc = y_dB;
+
+    float gainChange_dB = gain_sc - y_dB;
+
+    // Smooth gain change
+    if (gainChange_dB < prevGainSmooth_) {
+        // attack mode
+        gainSmooth = ((1 - alphaA) * gainChange_dB) + (alphaA * prevGainSmooth_);
+    } else {
+        // release mode
+        gainSmooth = ((1 - alphaR) * gainChange_dB) + (alphaR * prevGainSmooth_);
+    }
+
+    // Convert back to linear amplitude scalar
+    auto lin_a = powf(10, gainSmooth / 20);
+    float y_out = lin_a * sample;
+
+    y_prev_ = y_out;
+    prevGainSmooth_ = gainSmooth;
+
+    // Apply Compression
+    return y_out;
+}
+
+void Ap_dynamicsAudioProcessor::prepare(double sampleRate, int samplesPerBlock)
+{
+}
+
+void Ap_dynamicsAudioProcessor::update()
+{
+    mustUpdateProcessing_ = false;
+    
+    threshold_ = apvts.getRawParameterValue("THR")->load();
+    ratio_ = apvts.getRawParameterValue("RAT")->load();
+    kneeWidth_ = apvts.getRawParameterValue("KW")->load();
+    attack_ = apvts.getRawParameterValue("ATT")->load();
+    release_ = apvts.getRawParameterValue("REL")->load();
+}
+
+void Ap_dynamicsAudioProcessor::reset()
+{
+    prevGainSmooth_ = 0;
+    y_prev_ = 0;
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::createParameters()
+{
+    // Create parameter layout for apvts
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
+
+    auto valueToTextFunction = [](float val, int len) { return juce::String(val, len); };
+    auto textToValueFunction = [](const juce::String& text) { return text.getFloatValue(); };
+
+    // **Threshold**
+    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
+            "THR",
+            "Threshold",
+            juce::NormalisableRange<float>(-96.0f, 0.0f, 0.1f),
+            0.0f,
+            "dBFS",
+            juce::AudioProcessorParameter::genericParameter,
+            valueToTextFunction,
+            textToValueFunction
+    ));
+    // **Ratio**
+    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
+            "RAT",
+            "Ratio",
+            juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f),
+            0.0f,
+            "",
+            juce::AudioProcessorParameter::genericParameter,
+            valueToTextFunction,
+            textToValueFunction
+    ));
+    // **Knee Width**
+    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
+            "KW",
+            "Knee Width",
+            juce::NormalisableRange<float>(0.0f, 10.0f, 0.1f),
+            6.0f,
+            "dB",
+            juce::AudioProcessorParameter::genericParameter,
+            valueToTextFunction,
+            textToValueFunction
+    ));
+    // **Attack**
+    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
+            "ATT",
+            "Attack",
+            juce::NormalisableRange<float>(0.0f, 2.0f, 0.01f),
+            0.05f,
+            "s",
+            juce::AudioProcessorParameter::genericParameter,
+            valueToTextFunction,
+            textToValueFunction
+    ));
+    // **Release**
+    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
+            "REL",
+            "Release",
+            juce::NormalisableRange<float>(0.0f, 2.0f, 0.01f),
+            0.25f,
+            "s",
+            juce::AudioProcessorParameter::genericParameter,
+            valueToTextFunction,
+            textToValueFunction
+    ));
+
+    return { parameters.begin(), parameters.end() };
 }
 
 //==============================================================================
