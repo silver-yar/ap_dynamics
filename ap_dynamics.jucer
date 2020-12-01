@@ -5,6 +5,10 @@
               companyName="audio pirate">
   <MAINGROUP id="Sy3GVJ" name="ap_dynamics">
     <GROUP id="{EDFDECA6-21B2-2E2E-F4BB-E88C8EE0426B}" name="Source">
+      <FILE id="Bq3dp1" name="APStyle.cpp" compile="1" resource="0" file="Source/APStyle.cpp"/>
+      <FILE id="RPACTX" name="APStyle.h" compile="0" resource="0" file="Source/APStyle.h"/>
+      <FILE id="TvLFUf" name="APPlot.cpp" compile="1" resource="0" file="Source/APPlot.cpp"/>
+      <FILE id="eV7N0E" name="APPlot.h" compile="0" resource="0" file="Source/APPlot.h"/>
       <FILE id="ql0IYV" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="pLhd4J" name="PluginProcessor.h" compile="0" resource="0"

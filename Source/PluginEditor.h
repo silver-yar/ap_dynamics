@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "APPlot.h"
 
 //==============================================================================
 /**
@@ -23,11 +24,18 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+    void setupSlider (std::unique_ptr<juce::Slider>& slider, std::unique_ptr<juce::Label>& label,
+                      const juce::String& name, const juce::String& suffix = "s");
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
     Ap_dynamicsAudioProcessor& audioProcessor;
+
+    std::unique_ptr<juce::ComboBox> dynType_;
+    std::unique_ptr<APPlot> plot_;
+    std::unique_ptr<juce::Slider> thresholdSlider_, ratioSlider_, kneeSlider_, attackSlider_, releaseSlider_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, 
+    ratioAttachment_, kneeAttachment_, attackAttachment_, releaseAttachment_;
+    std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, kneeLabel_, attackLabel_, releaseLabel_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Ap_dynamicsAudioProcessorEditor)
 };

@@ -170,7 +170,7 @@ bool Ap_dynamicsAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* Ap_dynamicsAudioProcessor::createEditor()
 {
-    return new juce::GenericAudioProcessorEditor (*this);
+    return new Ap_dynamicsAudioProcessorEditor (*this);
 }
 
 //==============================================================================
