@@ -12,7 +12,7 @@
 #include "APPlot.h"
 
 //==============================================================================
-APPlot::APPlot()
+APPlot::APPlot(Ap_dynamicsAudioProcessor& p) : audioProcessor (p)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
@@ -35,9 +35,10 @@ void APPlot::paint (juce::Graphics& g)
     g.fillRect(graphBounds);
     g.setColour(juce::Colour(0xff00a9a9));
 
-    drawGrid(g, graphBounds);
-    drawXAxis(g, graphBounds);
-    drawYAxis(g, graphBounds);
+    drawGrid (g, graphBounds);
+//    drawXAxis (g, graphBounds);
+//    drawYAxis (g, graphBounds);
+    drawPlot (g, graphBounds);
 }
 
 void APPlot::resized()
@@ -102,8 +103,28 @@ void APPlot::drawYAxis(juce::Graphics& g, juce::Rectangle<int> axisBounds)
     }
 }
 
-void APPlot::plotLine(juce::Graphics& g, juce::Rectangle<int> plotBounds)
+void APPlot::drawPlot(juce::Graphics& g, juce::Rectangle<int> plotBounds)
 {
+    auto input = audioProcessor.getInputBuffer();
+    auto output = audioProcessor.getOutputBuffer();
+    float min_dB = audioProcessor.getMinDB();
+    auto width = plotBounds.getWidth() + 20;
+    auto height = plotBounds.getHeight() + 20;
+
     g.setColour(juce::Colours::white);
     juce::Path p;
+    p.startNewSubPath(plotBounds.getX(), height);
+
+    for (auto sample = 0; sample < audioProcessor.getInputBuffer().size(); ++sample)
+    {
+//        DBG(juce::String(input[sample]) + ", " + juce::String(output[sample]));
+        auto x_in = juce::jmap (input[sample], min_dB, 0.0f,
+        (float) plotBounds.getX(), (float) width);
+        auto y_out = juce::jmap (output[sample], min_dB, 0.0f,
+        (float) height, (float) plotBounds.getY());
+        p.lineTo(x_in, y_out);
+    }
+
+    //p.closeSubPath();
+    g.strokePath(p, juce::PathStrokeType (1));
 }

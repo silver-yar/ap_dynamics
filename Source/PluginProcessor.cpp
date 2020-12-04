@@ -24,6 +24,8 @@ Ap_dynamicsAudioProcessor::Ap_dynamicsAudioProcessor()
 , apvts (*this, nullptr, "Parameters", createParameters())
 {
     apvts.state.addListener (this);
+    inputAmps_.resize(pBufferSize_);
+    outputAmps_.resize(pBufferSize_);
 }
 
 Ap_dynamicsAudioProcessor::~Ap_dynamicsAudioProcessor()
@@ -138,28 +140,60 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    auto numChannels = juce::jmin (totalNumInputChannels, totalNumOutputChannels);
     auto numSamples = buffer.getNumSamples();
 
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+    auto sumMaxVal = 0.0f;
+    auto currentMaxVal = meterGlobalMaxVal.load();
+
+    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
+        buffer.clear(i, 0, buffer.getNumSamples());
+//        inputAmps_.clear(i, 0, inputAmps_.getNumSamples());
+//        outputAmps_.clear(i, 0, outputAmps_.getNumSamples());
+    }
+
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
+//        auto* input = inputAmps_.getWritePointer(channel);
+//        auto* output = outputAmps_.getWritePointer(channel);
+        auto channelMaxVal = 0.0f;
 
         for (int sample = 0; sample < numSamples; ++sample) {
-            switch (compType_) {
-                case feedfoward:
+//            input[sample] = channelData[sample];
+            switch ((int) apvts.getRawParameterValue("CT")->load()) {
+                case 0:
                     channelData[sample] = applyFFCompression(channelData[sample]);
                     break;
-                case feedback:
+                case 1:
                     channelData[sample] = applyFBCompression(channelData[sample]);
+                    break;
+                case 2:
+                    channelData[sample] = applyRMSCompression(channelData[sample]);
                     break;
                 default:
                     break;
             }
+//            output[sample] = channelData[sample];
         }
+
+        // Find max value in buffer channel
+        for (int sample = 0; sample < numSamples; ++sample)
+        {
+            auto rectifiedVal = std::abs (channelData[sample]);
+            if (channelMaxVal < rectifiedVal) channelMaxVal = rectifiedVal;
+            if (currentMaxVal < rectifiedVal) currentMaxVal = rectifiedVal;
+        }
+
+        makeup_[channel].applyGain (channelData, numSamples);
+
+        sumMaxVal += channelMaxVal; // Sum of channel 0 and channel 1 max values
+
+        meterGlobalMaxVal.store (currentMaxVal);
     }
+
+    meterLocalMaxVal.store (sumMaxVal / (float) numChannels);
 }
 
 //==============================================================================
@@ -199,8 +233,8 @@ float Ap_dynamicsAudioProcessor::applyFFCompression(float sample)
 
     auto x_uni = abs(sample);
     auto x_dB = 20 * log10(x_uni);
-    if (x_dB < -96)
-        x_dB = -96;
+    if (x_dB < mindB_)
+        x_dB = mindB_;
     // Static Characteristics
     if (x_dB > (threshold_ + kneeWidth_ / 2))
         gain_sc = threshold_ + (x_dB - threshold_) / ratio_; // Perform downwards compression
@@ -208,6 +242,8 @@ float Ap_dynamicsAudioProcessor::applyFFCompression(float sample)
         gain_sc = x_dB + ((1 / ratio_ - 1) * powf((x_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
     else
         gain_sc = x_dB;
+
+    fillPlotBuffer(x_dB, gain_sc);
 
     float gainChange_dB = gain_sc - x_dB;
 
@@ -240,8 +276,8 @@ float Ap_dynamicsAudioProcessor::applyFBCompression(float sample)
 
     auto y_uni = abs(y_prev_);
     auto y_dB = 20 * log10(y_uni);
-    if (y_dB < -96)
-        y_dB = -96;
+    if (y_dB < mindB_)
+        y_dB = mindB_;
     // Static Characteristics
     if (y_dB > (threshold_ + kneeWidth_ / 2))
         gain_sc = threshold_ + (y_dB - threshold_) / ratio_; // Perform downwards compression
@@ -249,6 +285,8 @@ float Ap_dynamicsAudioProcessor::applyFBCompression(float sample)
         gain_sc = y_dB + ((1 / ratio_ - 1) * powf((y_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_); // Compression with ramp
     else
         gain_sc = y_dB;
+
+    fillPlotBuffer(y_dB, gain_sc);
 
     float gainChange_dB = gain_sc - y_dB;
 
@@ -272,6 +310,64 @@ float Ap_dynamicsAudioProcessor::applyFBCompression(float sample)
     return y_out;
 }
 
+float Ap_dynamicsAudioProcessor::applyRMSCompression(float sample)
+{
+    auto alphaA = exp(-log(9) / (getSampleRate() * attack_));
+    auto alphaR = exp(-log(9) / (getSampleRate() * release_));
+
+    float gainSmooth = 0;
+    float gain_sc = 0;
+
+    auto x_uni = abs(sample);
+    auto x_dB = 20 * log10(x_uni);
+    if (x_dB < mindB_)
+        x_dB = mindB_;
+    // Static Characteristics
+    if (x_dB > (threshold_ + kneeWidth_ / 2))
+        gain_sc = threshold_ + (x_dB - threshold_) / ratio_; // Perform downwards compression
+    else if (x_dB > (threshold_ - kneeWidth_ / 2))
+        gain_sc = x_dB + ((1 / ratio_ - 1) * powf((x_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
+    else
+        gain_sc = x_dB;
+
+    fillPlotBuffer(x_dB, gain_sc);
+
+    float gainChange_dB = gain_sc - x_dB;
+
+    // Smooth gain change (RMS Approximation)
+    if (gainChange_dB < prevGainSmooth_) {
+        // attack mode
+        gainSmooth = -sqrt(((1 - alphaA) * powf(gainChange_dB,2))
+                + (alphaA * powf(prevGainSmooth_, 2)));
+    } else {
+        // release mode
+        gainSmooth = -sqrt(((1 - alphaR) * powf(gainChange_dB,2))
+                           + (alphaR * powf(prevGainSmooth_, 2)));
+    }
+
+    // Convert back to linear amplitude scalar
+    auto lin_a = powf(10, gainSmooth / 20);
+    float x_out = lin_a * sample;
+
+    prevGainSmooth_ = gainSmooth;
+
+    // Apply Compression
+    return x_out;
+}
+
+void Ap_dynamicsAudioProcessor::fillPlotBuffer(float x_dB, float gain_sc)
+{
+    if (counter_ < pBufferSize_)
+    {
+        inputAmps_.set(counter_, x_dB);
+        outputAmps_.set(counter_, gain_sc);
+    } else {
+        counter_ = 0;
+        inputAmps_.set(counter_, x_dB);
+        outputAmps_.set(counter_, gain_sc);
+    }
+}
+
 void Ap_dynamicsAudioProcessor::prepare(double sampleRate, int samplesPerBlock)
 {
 }
@@ -285,12 +381,25 @@ void Ap_dynamicsAudioProcessor::update()
     kneeWidth_ = apvts.getRawParameterValue("KW")->load();
     attack_ = apvts.getRawParameterValue("ATT")->load();
     release_ = apvts.getRawParameterValue("REL")->load();
+
+    for (int channel = 0; channel < 2; ++channel) {
+        makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain(
+                apvts.getRawParameterValue("MU")->load()
+                ));
+    }
 }
 
 void Ap_dynamicsAudioProcessor::reset()
 {
     prevGainSmooth_ = 0;
     y_prev_ = 0;
+
+    for (int channel = 0; channel < 2; ++channel) {
+        makeup_[channel].reset(getSampleRate(), 0.050);
+    }
+
+    meterLocalMaxVal.store (0.0f);
+    meterGlobalMaxVal.store (0.0f);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::createParameters()
@@ -352,6 +461,31 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
             juce::NormalisableRange<float>(0.0f, 2.0f, 0.01f),
             0.25f,
             "s",
+            juce::AudioProcessorParameter::genericParameter,
+            valueToTextFunction,
+            textToValueFunction
+    ));
+    // **Dynamic Range Processor Type**
+    parameters.emplace_back(std::make_unique<juce::AudioParameterChoice>(
+            "DRT",
+            "Dynamic Range Type",
+            juce::StringArray { "Compressor", "Expander" },
+            0
+            ));
+    // **Compression Type**
+    parameters.emplace_back(std::make_unique<juce::AudioParameterChoice>(
+            "CT",
+            "Compression Type",
+            juce::StringArray { "Feedforward", "Feedback", "RMS" },
+            0
+    ));
+    // **Makeup Gain Parameter** - in dB
+    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
+            "MU",
+            "Makeup",
+            juce::NormalisableRange<float>(-40.0f, 40.0f),
+            0.0f,
+            "dB",
             juce::AudioProcessorParameter::genericParameter,
             valueToTextFunction,
             textToValueFunction

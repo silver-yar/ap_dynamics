@@ -4,6 +4,10 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               companyName="audio pirate">
   <MAINGROUP id="Sy3GVJ" name="ap_dynamics">
+    <GROUP id="{51C09136-CC53-80CE-892F-F27B65CEA6E4}" name="Resources">
+      <FILE id="YqqlR6" name="ap_logo_groovees.png" compile="0" resource="1"
+            file="Resources/ap_logo_groovees.png"/>
+    </GROUP>
     <GROUP id="{EDFDECA6-21B2-2E2E-F4BB-E88C8EE0426B}" name="Source">
       <FILE id="Bq3dp1" name="APStyle.cpp" compile="1" resource="0" file="Source/APStyle.cpp"/>
       <FILE id="RPACTX" name="APStyle.h" compile="0" resource="0" file="Source/APStyle.h"/>

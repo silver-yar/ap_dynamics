@@ -11,6 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "PluginProcessor.h"
 
 //==============================================================================
 /*
@@ -18,7 +19,7 @@
 class APPlot  : public juce::Component
 {
 public:
-    APPlot();
+    APPlot(Ap_dynamicsAudioProcessor&);
     ~APPlot() override;
 
     void paint (juce::Graphics&) override;
@@ -26,8 +27,10 @@ public:
     void drawGrid (juce::Graphics&, juce::Rectangle<int>);
     void drawXAxis (juce::Graphics&, juce::Rectangle<int>);
     void drawYAxis (juce::Graphics&, juce::Rectangle<int>);
-    void plotLine (juce::Graphics&, juce::Rectangle<int>);
+    void drawPlot (juce::Graphics&, juce::Rectangle<int>);
 
 private:
+    Ap_dynamicsAudioProcessor& audioProcessor;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (APPlot)
 };
