@@ -34,8 +34,8 @@ public:
 private:
     Ap_dynamicsAudioProcessor& audioProcessor;
 
-    juce::Image logo_ {juce::ImageCache::getFromMemory(BinaryData::ap_logo_groovees_png,
-                                          BinaryData::ap_logo_groovees_pngSize)};
+    //juce::Image logo_ {juce::ImageCache::getFromMemory(BinaryData::ap_logo_groovees_png,
+                                          //BinaryData::ap_logo_groovees_pngSize)};
 
     std::unique_ptr<juce::ComboBox> dynType_, compType_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> dynAttachment_, compAttachment_;
@@ -43,11 +43,12 @@ private:
     std::unique_ptr<APPlot> plot_;
 
     std::unique_ptr<juce::Slider> thresholdSlider_, ratioSlider_, kneeSlider_, attackSlider_,
-        releaseSlider_, makeupSlider_;
+        releaseSlider_, makeupSlider_, toneSlider_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, 
-        ratioAttachment_, kneeAttachment_, attackAttachment_, releaseAttachment_, makeupAttachment_;
+        ratioAttachment_, kneeAttachment_, attackAttachment_, releaseAttachment_,
+        makeupAttachment_, toneAttachment_;
     std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, kneeLabel_, attackLabel_,
-        releaseLabel_, makeupLabel_;
+        releaseLabel_, makeupLabel_, toneLabel_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Ap_dynamicsAudioProcessorEditor)
 };

@@ -56,6 +56,9 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
     setupSlider(makeupSlider_, makeupLabel_, "Makeup", "dB");
     makeupAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
             (audioProcessor.apvts, "MU", *makeupSlider_);
+    setupSlider(toneSlider_, toneLabel_, "Tone", "dB");
+    makeupAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
+            (audioProcessor.apvts, "TN", *toneSlider_);
 
     auto min_width = 500;
     auto min_height = 500;
@@ -80,8 +83,8 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
     g.drawFittedText("Menu", menuTextBounds, juce::Justification::centred, 1);
     g.drawLine(menuEnd, 10, menuEnd, getHeight() - 10);
 
-    auto logoBounds = juce::Rectangle<float> (0, getHeight() * 0.70f, menuEnd, getHeight() * 0.25f);
-    g.drawImage(logo_, logoBounds, juce::RectanglePlacement::centred);
+//    auto logoBounds = juce::Rectangle<float> (0, getHeight() * 0.70f, menuEnd, getHeight() * 0.25f);
+//    g.drawImage(logo_, logoBounds, juce::RectanglePlacement::centred);
 
     // Volume Meter
     auto hasClipped = juce::Decibels::gainToDecibels (audioProcessor.meterLocalMaxVal.load()) >= 0.0f;
@@ -115,18 +118,20 @@ void Ap_dynamicsAudioProcessorEditor::resized()
     auto compTypeBounds = juce::Rectangle<int> (0, getHeight() * .25f, menuEnd, getHeight() * .05f);
     compTypeBounds.reduce(10, 0);
 
-    thresholdSlider_ -> setBounds(rightPane.getTopLeft().getX() + 20,rightPane.getTopLeft().getY() + 20,
+    thresholdSlider_ -> setBounds(rightPane.getTopLeft().getX() + 10,rightPane.getTopLeft().getY() + 20,
                                   rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-    ratioSlider_ -> setBounds(rightPane.getTopLeft().getX() + 20,rightPane.getTopLeft().getY() + 70,
+    ratioSlider_ -> setBounds(rightPane.getTopLeft().getX() + 10,rightPane.getTopLeft().getY() + 70,
                                   rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-    kneeSlider_ -> setBounds(rightPane.getTopLeft().getX() + 20,rightPane.getTopLeft().getY() + 120,
+    kneeSlider_ -> setBounds(rightPane.getTopLeft().getX() + 10,rightPane.getTopLeft().getY() + 120,
                                   rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-    attackSlider_ -> setBounds(rightPane.getTopLeft().getX() + 120,rightPane.getTopLeft().getY() + 20,
+    attackSlider_ -> setBounds(rightPane.getTopLeft().getX() + 110,rightPane.getTopLeft().getY() + 20,
                                   rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-    releaseSlider_ -> setBounds(rightPane.getTopLeft().getX() + 120,rightPane.getTopLeft().getY() + 70,
+    releaseSlider_ -> setBounds(rightPane.getTopLeft().getX() + 110,rightPane.getTopLeft().getY() + 70,
                                   rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-    makeupSlider_ -> setBounds(rightPane.getTopLeft().getX() + 120,rightPane.getTopLeft().getY() + 120,
+    makeupSlider_ -> setBounds(rightPane.getTopLeft().getX() + 110,rightPane.getTopLeft().getY() + 120,
                                 rightPane.getWidth() * .25, rightPane.getHeight() * .1);
+    toneSlider_ -> setBounds(rightPane.getTopLeft().getX() + 110,rightPane.getTopLeft().getY() + 170,
+                               rightPane.getWidth() * .25, rightPane.getHeight() * .1);
 
     plot_ -> setBounds(plotBounds);
     dynType_ -> setBounds(dynTypeBounds);

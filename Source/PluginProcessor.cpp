@@ -175,18 +175,22 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
                 default:
                     break;
             }
-//            output[sample] = channelData[sample];
         }
+
+        makeup_[channel].applyGain (channelData, numSamples);
+        tone_[channel].processSamples (channelData, numSamples);
 
         // Find max value in buffer channel
         for (int sample = 0; sample < numSamples; ++sample)
         {
+            channelData[sample] = applyPiecewiseOverdrive(channelData[sample]);
+
             auto rectifiedVal = std::abs (channelData[sample]);
             if (channelMaxVal < rectifiedVal) channelMaxVal = rectifiedVal;
             if (currentMaxVal < rectifiedVal) currentMaxVal = rectifiedVal;
         }
 
-        makeup_[channel].applyGain (channelData, numSamples);
+//        makeup_[channel].applyGain (channelData, numSamples);
 
         sumMaxVal += channelMaxVal; // Sum of channel 0 and channel 1 max values
 
@@ -355,6 +359,24 @@ float Ap_dynamicsAudioProcessor::applyRMSCompression(float sample)
     return x_out;
 }
 
+float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) {
+    float x_uni = abs(sample);
+    float out = 0;
+
+    if (x_uni <= 1/3)
+    {
+        out = 2 * sample;
+    }
+    if (x_uni >= 2/3)
+    {
+        out = sin(sample);
+    }
+    else {
+        out = sin(sample) * (3 - powf(2 - 3 * x_uni, 2)) / 3;
+    }
+    return out;
+}
+
 void Ap_dynamicsAudioProcessor::fillPlotBuffer(float x_dB, float gain_sc)
 {
     if (counter_ < pBufferSize_)
@@ -383,6 +405,12 @@ void Ap_dynamicsAudioProcessor::update()
     release_ = apvts.getRawParameterValue("REL")->load();
 
     for (int channel = 0; channel < 2; ++channel) {
+        tone_[channel].setCoefficients (juce::IIRCoefficients::makeLowPass (
+                getSampleRate(), apvts.getRawParameterValue("TN")->load())
+                );
+        makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain(
+                apvts.getRawParameterValue("IG")->load()
+        ));
         makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain(
                 apvts.getRawParameterValue("MU")->load()
                 ));
@@ -395,6 +423,8 @@ void Ap_dynamicsAudioProcessor::reset()
     y_prev_ = 0;
 
     for (int channel = 0; channel < 2; ++channel) {
+        tone_[channel].reset();
+        inputGain_[channel].reset(getSampleRate(), 0.050);
         makeup_[channel].reset(getSampleRate(), 0.050);
     }
 
@@ -479,13 +509,35 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
             juce::StringArray { "Feedforward", "Feedback", "RMS" },
             0
     ));
+    // **Input Gain Parameter** - in dB
+    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
+            "IG",
+            "Input Gain",
+            juce::NormalisableRange<float>(-40.0f, 40.0f,0.01f),
+            0.0f,
+            "dB",
+            juce::AudioProcessorParameter::genericParameter,
+            valueToTextFunction,
+            textToValueFunction
+    ));
     // **Makeup Gain Parameter** - in dB
     parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
             "MU",
             "Makeup",
-            juce::NormalisableRange<float>(-40.0f, 40.0f),
+            juce::NormalisableRange<float>(-40.0f, 40.0f,0.01f),
             0.0f,
             "dB",
+            juce::AudioProcessorParameter::genericParameter,
+            valueToTextFunction,
+            textToValueFunction
+    ));
+    // **Low Pass Filter Parameter** - in Hz
+    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
+            "TN",
+            "Tone",
+            juce::NormalisableRange<float>(20.0f, 22000.0f, 10.0f, 0.2f),
+            22000.0f,
+            "Hz",
             juce::AudioProcessorParameter::genericParameter,
             valueToTextFunction,
             textToValueFunction
