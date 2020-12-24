@@ -7,6 +7,10 @@
     <GROUP id="{51C09136-CC53-80CE-892F-F27B65CEA6E4}" name="Resources">
       <FILE id="YqqlR6" name="ap_logo_groovees.png" compile="0" resource="1"
             file="Resources/ap_logo_groovees.png"/>
+      <FILE id="V54AF7" name="Jazz_Ball_Regular.ttf" compile="0" resource="1"
+            file="Resources/Jazz_Ball_Regular.ttf"/>
+      <FILE id="RMh9GK" name="liq_dyn_text.png" compile="0" resource="1"
+            file="Resources/liq_dyn_text.png"/>
     </GROUP>
     <GROUP id="{EDFDECA6-21B2-2E2E-F4BB-E88C8EE0426B}" name="Source">
       <FILE id="Bq3dp1" name="APStyle.cpp" compile="1" resource="0" file="Source/APStyle.cpp"/>

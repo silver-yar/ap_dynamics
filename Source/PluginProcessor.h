@@ -91,8 +91,8 @@ private:
 
 
     float threshold_, ratio_, kneeWidth_, attack_, release_ = 0;
-    juce::LinearSmoothedValue<float> inputGain_ [2] { 0.0f };
-    juce::LinearSmoothedValue<float> makeup_ [2] { 0.0f };
+//    juce::LinearSmoothedValue<float> inputGain_ [2] { 0.0f };
+    juce::LinearSmoothedValue<float> makeup_ [2];
     juce::IIRFilter tone_ [2];
     int mindB_ = -144;
     float prevGainSmooth_ = 0;

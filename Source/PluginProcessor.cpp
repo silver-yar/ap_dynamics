@@ -177,8 +177,8 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
             }
         }
 
-        makeup_[channel].applyGain (channelData, numSamples);
         tone_[channel].processSamples (channelData, numSamples);
+        makeup_[channel].applyGain (channelData, numSamples);
 
         // Find max value in buffer channel
         for (int sample = 0; sample < numSamples; ++sample)
@@ -409,9 +409,6 @@ void Ap_dynamicsAudioProcessor::update()
                 getSampleRate(), apvts.getRawParameterValue("TN")->load())
                 );
         makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain(
-                apvts.getRawParameterValue("IG")->load()
-        ));
-        makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain(
                 apvts.getRawParameterValue("MU")->load()
                 ));
     }
@@ -424,7 +421,6 @@ void Ap_dynamicsAudioProcessor::reset()
 
     for (int channel = 0; channel < 2; ++channel) {
         tone_[channel].reset();
-        inputGain_[channel].reset(getSampleRate(), 0.050);
         makeup_[channel].reset(getSampleRate(), 0.050);
     }
 
@@ -508,17 +504,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
             "Compression Type",
             juce::StringArray { "Feedforward", "Feedback", "RMS" },
             0
-    ));
-    // **Input Gain Parameter** - in dB
-    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
-            "IG",
-            "Input Gain",
-            juce::NormalisableRange<float>(-40.0f, 40.0f,0.01f),
-            0.0f,
-            "dB",
-            juce::AudioProcessorParameter::genericParameter,
-            valueToTextFunction,
-            textToValueFunction
     ));
     // **Makeup Gain Parameter** - in dB
     parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(

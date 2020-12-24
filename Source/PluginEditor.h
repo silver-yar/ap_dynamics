@@ -34,8 +34,10 @@ public:
 private:
     Ap_dynamicsAudioProcessor& audioProcessor;
 
-    //juce::Image logo_ {juce::ImageCache::getFromMemory(BinaryData::ap_logo_groovees_png,
-                                          //BinaryData::ap_logo_groovees_pngSize)};
+    juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::liq_dyn_text_png,
+                                                         BinaryData::liq_dyn_text_pngSize)};
+    juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::Jazz_Ball_Regular_ttf,
+                                                                BinaryData::Jazz_Ball_Regular_ttfSize)};
 
     std::unique_ptr<juce::ComboBox> dynType_, compType_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> dynAttachment_, compAttachment_;
