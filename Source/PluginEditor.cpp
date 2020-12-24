@@ -13,30 +13,10 @@
 Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    dynType_ = std::make_unique<juce::ComboBox>("dynType");
-    dynType_ -> addItem("Compressor", 1);
-    dynType_ -> addItem("Expander", 2);
-    dynType_ -> setColour(juce::ComboBox::backgroundColourId, juce::Colour(0x00000000));
-    dynType_ -> setColour(juce::ComboBox::outlineColourId, juce::Colour(0xff00a9a9));
-    dynType_ -> setColour(juce::ComboBox::textColourId, juce::Colour(0xff00a9a9));
-    dynType_ -> setColour(juce::ComboBox::arrowColourId, juce::Colour(0xff00a9a9));
-    dynAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>
-            (audioProcessor.apvts, "DRT", *dynType_);
-    addAndMakeVisible(dynType_.get());
-    compType_ = std::make_unique<juce::ComboBox>("compType");
-    compType_ -> addItem("Feedforward", 1);
-    compType_ -> addItem("Feedback", 2);
-    compType_ -> addItem("RMS", 3);
-    compType_ -> setColour(juce::ComboBox::backgroundColourId, juce::Colour(0x00000000));
-    compType_ -> setColour(juce::ComboBox::outlineColourId, juce::Colour(0xff00a9a9));
-    compType_ -> setColour(juce::ComboBox::textColourId, juce::Colour(0xff00a9a9));
-    compType_ -> setColour(juce::ComboBox::arrowColourId, juce::Colour(0xff00a9a9));
-    compAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>
-            (audioProcessor.apvts, "CT", *compType_);
-    addAndMakeVisible(compType_.get());
-
-    plot_ = std::make_unique<APPlot>(audioProcessor);
-    addAndMakeVisible(plot_.get());
+//    plot_ = std::make_unique<APPlot>(audioProcessor);
+//    addAndMakeVisible(plot_.get());
+    buttonMenu_ = std::make_unique<ButtonMenu> (audioProcessor);
+    addAndMakeVisible(buttonMenu_.get());
 
     setupSlider(thresholdSlider_, thresholdLabel_, "Threshold", "dBFS");
     thresholdAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
@@ -120,11 +100,11 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
 void Ap_dynamicsAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
-    // bounds.removeFromBottom (getHeight() * 0.4);
-    auto graphArea = bounds.removeFromBottom(getHeight() * 0.4);
+    bounds.removeFromBottom (getHeight() * 0.4);
+    // auto graphArea = bounds.removeFromBottom(getHeight() * 0.4);
     // auto plotArea = graphArea.removeFromRight(getWidth() * 0.3);
     bounds.removeFromTop (40);
-    bounds.removeFromRight(100);
+    auto menuBounds = bounds.removeFromRight(100);
 
     juce::Grid grid;
     using Track = juce::Grid::TrackInfo;
@@ -150,7 +130,7 @@ void Ap_dynamicsAudioProcessorEditor::resized()
     grid.templateRows = { Track (Fr (1))};
     grid.columnGap = juce::Grid::Px (10);
     grid.performLayout (bounds.reduced(20));
-
+    buttonMenu_ -> setBounds (menuBounds);
 //    auto bounds = getLocalBounds();
 //    auto rightPane = bounds.removeFromRight(getWidth() * 0.6f);
 //    auto plotBounds = rightPane.removeFromTop(getHeight() * 0.6f);
@@ -191,13 +171,13 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<juce::Slider> 
                                              juce::Slider::TextEntryBoxPosition::TextBoxAbove);
     slider -> setTextValueSuffix(" " + suffix);
     slider -> setColour (juce::Slider::trackColourId, juce::Colours::darkgrey.withAlpha(0.7f));
-    slider -> setColour (juce::Slider::textBoxTextColourId, juce::Colours::yellow);
+    slider -> setColour (juce::Slider::textBoxTextColourId, juce::Colours::snow);
     label = std::make_unique<juce::Label> ("", name);
     label -> setJustificationType(juce::Justification::centred);
-    label -> setText (name, juce::dontSendNotification);
+    label -> setText (name.toLowerCase(), juce::dontSendNotification);
     label -> setBorderSize(juce::BorderSize<int> (10));
-    label -> setColour (juce::Label::textColourId, juce::Colours::yellow);
-    label -> setFont (myFont_.withHeight (20.0f));
+    label -> setColour (juce::Label::textColourId, juce::Colours::snow);
+    label -> setFont (myFont_.withHeight (16.0f));
     label -> attachToComponent(slider.get(), false);
 
     addAndMakeVisible(slider.get());

@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "APPlot.h"
+#include "ButtonMenu.h"
 
 //==============================================================================
 /**
@@ -36,12 +37,10 @@ private:
 
     juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::liq_dyn_text_png,
                                                          BinaryData::liq_dyn_text_pngSize)};
-    juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::Jazz_Ball_Regular_ttf,
-                                                                BinaryData::Jazz_Ball_Regular_ttfSize)};
+    juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::Antipasto_Med_ttf,
+                                                                BinaryData::Antipasto_Med_ttfSize)};
 
-    std::unique_ptr<juce::ComboBox> dynType_, compType_;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> dynAttachment_, compAttachment_;
-
+    std::unique_ptr<ButtonMenu> buttonMenu_;
     std::unique_ptr<APPlot> plot_;
 
     std::unique_ptr<juce::Slider> thresholdSlider_, ratioSlider_, kneeSlider_, attackSlider_,
