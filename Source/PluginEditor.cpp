@@ -13,10 +13,12 @@
 Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-//    plot_ = std::make_unique<APPlot>(audioProcessor);
-//    addAndMakeVisible(plot_.get());
+    plot_ = std::make_unique<APPlot>(audioProcessor);
+    addAndMakeVisible(plot_.get());
     buttonMenu_ = std::make_unique<ButtonMenu> (audioProcessor);
     addAndMakeVisible(buttonMenu_.get());
+    waveformWindow_ = std::make_unique<WaveformWindow> (audioProcessor);
+    addAndMakeVisible (waveformWindow_.get());
 
     setupSlider(thresholdSlider_, thresholdLabel_, "Threshold", "dBFS");
     thresholdAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
@@ -67,17 +69,8 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
     auto plotArea = graphArea.removeFromRight(getWidth() * 0.3);
 
     g.setColour(juce::Colours::aquamarine);
-    g.drawRect(graphArea.reduced(10), 1);
+    //g.drawRect(graphArea.reduced(10), 1);
     g.drawRect(plotArea.reduced(10), 1);
-
-//    auto menuEnd = getWidth() * 0.3f;
-//    auto menuTextBounds = juce::Rectangle<int> (0, getHeight() * .05f, menuEnd, getHeight() * .05f);
-//    g.setColour(juce::Colour(0xff00a9a9));
-//    g.drawFittedText("Menu", menuTextBounds, juce::Justification::centred, 1);
-//    g.drawLine(menuEnd, 10, menuEnd, getHeight() - 10);
-
-//    auto logoBounds = juce::Rectangle<float> (0, getHeight() * 0.70f, menuEnd, getHeight() * 0.25f);
-//    g.drawImage(logo_, logoBounds, juce::RectanglePlacement::centred);
 
     // Volume Meter
 //    auto hasClipped = juce::Decibels::gainToDecibels (audioProcessor.meterLocalMaxVal.load()) >= 0.0f;
@@ -100,11 +93,11 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
 void Ap_dynamicsAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
-    bounds.removeFromBottom (getHeight() * 0.4);
-    // auto graphArea = bounds.removeFromBottom(getHeight() * 0.4);
-    // auto plotArea = graphArea.removeFromRight(getWidth() * 0.3);
+    //bounds.removeFromBottom (getHeight() * 0.4);
+    auto wfBounds = bounds.removeFromBottom(getHeight() * 0.4);
+    auto plotBounds = wfBounds.removeFromRight(getWidth() * 0.3);
     bounds.removeFromTop (40);
-    auto menuBounds = bounds.removeFromRight(100);
+    auto menuBounds = bounds.removeFromRight(120);
 
     juce::Grid grid;
     using Track = juce::Grid::TrackInfo;
@@ -129,38 +122,11 @@ void Ap_dynamicsAudioProcessorEditor::resized()
     };
     grid.templateRows = { Track (Fr (1))};
     grid.columnGap = juce::Grid::Px (10);
-    grid.performLayout (bounds.reduced(20));
+    grid.performLayout (bounds.reduced(10));
+
     buttonMenu_ -> setBounds (menuBounds);
-//    auto bounds = getLocalBounds();
-//    auto rightPane = bounds.removeFromRight(getWidth() * 0.6f);
-//    auto plotBounds = rightPane.removeFromTop(getHeight() * 0.6f);
-//    plotBounds.reduce(10, 10);
-//
-//    auto menuEnd = getWidth() * 0.3f;
-//
-//    auto dynTypeBounds = juce::Rectangle<int> (0, getHeight() * .15f, menuEnd, getHeight() * .05f);
-//    dynTypeBounds.reduce(10, 0);
-//    auto compTypeBounds = juce::Rectangle<int> (0, getHeight() * .25f, menuEnd, getHeight() * .05f);
-//    compTypeBounds.reduce(10, 0);
-//
-//    thresholdSlider_ -> setBounds(rightPane.getTopLeft().getX() + 10,rightPane.getTopLeft().getY() + 20,
-//                                  rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-//    ratioSlider_ -> setBounds(rightPane.getTopLeft().getX() + 10,rightPane.getTopLeft().getY() + 70,
-//                                  rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-//    kneeSlider_ -> setBounds(rightPane.getTopLeft().getX() + 10,rightPane.getTopLeft().getY() + 120,
-//                                  rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-//    attackSlider_ -> setBounds(rightPane.getTopLeft().getX() + 110,rightPane.getTopLeft().getY() + 20,
-//                                  rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-//    releaseSlider_ -> setBounds(rightPane.getTopLeft().getX() + 110,rightPane.getTopLeft().getY() + 70,
-//                                  rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-//    makeupSlider_ -> setBounds(rightPane.getTopLeft().getX() + 110,rightPane.getTopLeft().getY() + 120,
-//                                rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-//    toneSlider_ -> setBounds(rightPane.getTopLeft().getX() + 110,rightPane.getTopLeft().getY() + 170,
-//                               rightPane.getWidth() * .25, rightPane.getHeight() * .1);
-//
-//    plot_ -> setBounds(plotBounds);
-//    dynType_ -> setBounds(dynTypeBounds);
-//    compType_ -> setBounds(compTypeBounds);
+    waveformWindow_ -> setBounds (wfBounds.reduced(10));
+    plot_ -> setBounds (plotBounds.reduced(10));
 }
 
 void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<juce::Slider> &slider,
@@ -169,6 +135,7 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<juce::Slider> 
                                                   const juce::String &suffix) {
     slider = std::make_unique<juce::Slider> (juce::Slider::SliderStyle::LinearBarVertical,
                                              juce::Slider::TextEntryBoxPosition::TextBoxAbove);
+    slider -> setLookAndFeel(&apSliderLook_);
     slider -> setTextValueSuffix(" " + suffix);
     slider -> setColour (juce::Slider::trackColourId, juce::Colours::darkgrey.withAlpha(0.7f));
     slider -> setColour (juce::Slider::textBoxTextColourId, juce::Colours::snow);

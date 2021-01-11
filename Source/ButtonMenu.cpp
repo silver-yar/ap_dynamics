@@ -14,29 +14,32 @@
 //==============================================================================
 ButtonMenu::ButtonMenu(Ap_dynamicsAudioProcessor& p) : audioProcessor (p)
 {
-    dynType_ = std::make_unique<juce::ComboBox>("dynType");
-    dynType_ -> addItem("Compressor", 1);
-    dynType_ -> addItem("Expander", 2);
-//    dynType_ -> setColour(juce::ComboBox::backgroundColourId, juce::Colour(0x00000000));
-//    dynType_ -> setColour(juce::ComboBox::outlineColourId, juce::Colour(0xff00a9a9));
-//    dynType_ -> setColour(juce::ComboBox::textColourId, juce::Colour(0xff00a9a9));
-//    dynType_ -> setColour(juce::ComboBox::arrowColourId, juce::Colour(0xff00a9a9));
-    dynAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>
-            (audioProcessor.apvts, "DRT", *dynType_);
-    addAndMakeVisible(dynType_.get());
-    compType_ = std::make_unique<juce::ComboBox>("compType");
-    compType_ -> addItem("Feedforward", 1);
-    compType_ -> addItem("Feedback", 2);
-    compType_ -> addItem("RMS", 3);
-//    compType_ -> setColour(juce::ComboBox::backgroundColourId, juce::Colour(0x00000000));
-//    compType_ -> setColour(juce::ComboBox::outlineColourId, juce::Colour(0xff00a9a9));
-//    compType_ -> setColour(juce::ComboBox::textColourId, juce::Colour(0xff00a9a9));
-//    compType_ -> setColour(juce::ComboBox::arrowColourId, juce::Colour(0xff00a9a9));
-    compAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>
-            (audioProcessor.apvts, "CT", *compType_);
-    addAndMakeVisible(compType_.get());
+    dynToggle_.setButtonType(APToggleButton::Multi);
+    dynToggle_.setMultiText({"Compressor", "Expander"});
+    dynToggle_.onButtonClicked = []() {
 
-    overdriveToggle_.setButtonText("Overdrive");
+    };
+    addAndMakeVisible(dynToggle_);
+
+    compToggle_.setButtonType(APToggleButton::Multi);
+    juce::Array<juce::String> options = { "Feedforward", "Feedback", "RMS" };
+    compToggle_.setMultiText(options);
+    compToggle_.onButtonClicked = [&, this]() {
+        if (compToggle_.intToggle < 2) {
+            compToggle_.intToggle++;
+            audioProcessor.setCompTypeID(compToggle_.intToggle);
+        } else {
+            compToggle_.intToggle = 0;
+        }
+    };
+    addAndMakeVisible(compToggle_);
+
+    overdriveToggle_.setButtonType(APToggleButton::Boolean);
+    overdriveToggle_.onButtonClicked = [this]() {
+        audioProcessor.setOverdrive(!audioProcessor.getOverdrive());
+        overdriveToggle_.boolToggle = audioProcessor.getOverdrive();
+    };
+    overdriveToggle_.setBoolText("Overdrive");
     addAndMakeVisible(overdriveToggle_);
 }
 
@@ -54,8 +57,8 @@ void ButtonMenu::resized()
     using Track = juce::Grid::TrackInfo;
     using Fr = juce::Grid::Fr;
 
-    grid.items.add (juce::GridItem (dynType_.get()));
-    grid.items.add (juce::GridItem (compType_.get()));
+    grid.items.add (juce::GridItem (dynToggle_));
+    grid.items.add (juce::GridItem (compToggle_));
     grid.items.add (juce::GridItem (overdriveToggle_));
 
     grid.templateColumns = {
@@ -67,5 +70,7 @@ void ButtonMenu::resized()
             Track (Fr (1))
     };
     grid.rowGap = juce::Grid::Px (30);
-    grid.performLayout (getLocalBounds().reduced(10));
+    grid.performLayout (getLocalBounds().withTrimmedRight(10)
+                                        .reduced(10)
+                                        );
 }

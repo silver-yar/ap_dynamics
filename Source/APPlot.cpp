@@ -25,20 +25,26 @@ APPlot::~APPlot()
 
 void APPlot::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (juce::Colours::darkgrey.withAlpha(0.7f));
 
-    g.setColour(juce::Colour(0xff003232));
-    auto margin = 20;
-    auto graphWidth = getLocalBounds().getHeight() - (margin * 2);
-    auto graphBounds = juce::Rectangle<int> (margin, margin, graphWidth, graphWidth)
-            .withCentre(getLocalBounds().getCentre());
+    g.setColour(juce::Colours::darkgrey);
+    // TODO: Fix graph bounds
+//    auto margin = 20;
+//    auto graphWidth = getLocalBounds().getHeight() - (margin * 2);
+//    auto graphBounds = juce::Rectangle<int> (margin, margin, graphWidth, graphWidth)
+//            .withCentre(getLocalBounds().getCentre());
+    auto graphBounds = getLocalBounds().reduced(30, 20);
     g.fillRect(graphBounds);
     g.setColour(juce::Colour(0xff00a9a9));
 
-    drawGrid (g, graphBounds);
-//    drawXAxis (g, graphBounds);
-//    drawYAxis (g, graphBounds);
     drawPlot (g, graphBounds);
+    g.setFont(10.0f);
+    g.drawFittedText("-144", graphBounds.getX() - 25, graphBounds.getBottom() + 2,
+                     25, 5, juce::Justification::centredLeft, 1);
+    g.drawFittedText("0dB", graphBounds.getX() - 25, graphBounds.getY() - 2,
+                     25, 5, juce::Justification::centred, 1);
+    g.drawFittedText("0dB", graphBounds.getRight(), graphBounds.getBottom() + 2,
+                     25, 5, juce::Justification::centredLeft, 1);
 }
 
 void APPlot::resized()
@@ -57,10 +63,10 @@ void APPlot::drawGrid(juce::Graphics& g, juce::Rectangle<int> graphBounds)
     auto margin = 20;
     for (auto i = 1; i < (1 / gridSize); ++i)
     {
-        auto vline = juce::Rectangle<float> (width * (i * gridSize) + margin, margin,
+        auto vline = juce::Rectangle<float> (width * (i * gridSize) + 30, margin,
                                             1, bounds.getHeight());
         g.fillRect(vline);
-        auto hline = juce::Rectangle<float> (margin, bounds.getHeight() * (i * gridSize) + margin,
+        auto hline = juce::Rectangle<float> (30, bounds.getHeight() * (i * gridSize) + margin,
                                              bounds.getWidth(), 1);
         g.fillRect(hline);
 //        g.drawLine(width * (i * gridSize) + margin, margin,
@@ -105,26 +111,30 @@ void APPlot::drawYAxis(juce::Graphics& g, juce::Rectangle<int> axisBounds)
 
 void APPlot::drawPlot(juce::Graphics& g, juce::Rectangle<int> plotBounds)
 {
+    // TODO: Fix to draw point on linear representation of compression function
     auto input = audioProcessor.getInputBuffer();
     auto output = audioProcessor.getOutputBuffer();
-    float min_dB = audioProcessor.getMinDB();
-    auto width = plotBounds.getWidth() + 20;
-    auto height = plotBounds.getHeight() + 20;
+    float mindB = audioProcessor.getMinDB();
+    // auto width = plotBounds.getWidth();
+    // auto height = plotBounds.getHeight();
+    float x_dB = juce::jmap(audioProcessor.getCurrXdB(), mindB, 0.0f,
+                            (float) plotBounds.getX(), (float) plotBounds.getRight());
+    float gainsc = juce::jmap(audioProcessor.getCurrGainSC(), mindB, 0.0f,
+                              (float) plotBounds.getBottom(), (float) plotBounds.getY());
 
     g.setColour(juce::Colours::white);
     juce::Path p;
-    p.startNewSubPath(plotBounds.getX(), height);
-
-    for (auto sample = 0; sample < audioProcessor.getInputBuffer().size(); ++sample)
-    {
-//        DBG(juce::String(input[sample]) + ", " + juce::String(output[sample]));
-        auto x_in = juce::jmap (input[sample], min_dB, 0.0f,
-        (float) plotBounds.getX(), (float) width);
-        auto y_out = juce::jmap (output[sample], min_dB, 0.0f,
-        (float) height, (float) plotBounds.getY());
-        p.lineTo(x_in, y_out);
+    p.startNewSubPath(plotBounds.getX(), plotBounds.getBottom());
+    if (input.size() > 0) {
+        for (auto sample = 0; sample < audioProcessor.getInputBuffer().size(); ++sample) {
+            auto x_in = juce::jmap(input[sample], mindB, 0.0f,
+                                   (float) plotBounds.getX(), (float) plotBounds.getRight());
+            auto y_out = juce::jmap(output[sample], mindB, 0.0f,
+                                    (float) plotBounds.getBottom(), (float) plotBounds.getY());
+            p.lineTo(x_in, y_out);
+        }
+        p.addStar(juce::Point<float>(x_dB, gainsc),
+                5, 4.0f, 4.0f);
+        g.strokePath(p, juce::PathStrokeType(1));
     }
-
-    //p.closeSubPath();
-    g.strokePath(p, juce::PathStrokeType (1));
 }

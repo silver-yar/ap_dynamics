@@ -162,7 +162,7 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
         for (int sample = 0; sample < numSamples; ++sample) {
 //            input[sample] = channelData[sample];
-            switch ((int) apvts.getRawParameterValue("CT")->load()) {
+            switch (compTypeID_) {
                 case 0:
                     channelData[sample] = applyFFCompression(channelData[sample]);
                     break;
@@ -183,7 +183,8 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         // Find max value in buffer channel
         for (int sample = 0; sample < numSamples; ++sample)
         {
-            channelData[sample] = applyPiecewiseOverdrive(channelData[sample]);
+            if (isOverdrived_)
+                channelData[sample] = applyPiecewiseOverdrive(channelData[sample]);
 
             auto rectifiedVal = std::abs (channelData[sample]);
             if (channelMaxVal < rectifiedVal) channelMaxVal = rectifiedVal;
@@ -198,6 +199,7 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     }
 
     meterLocalMaxVal.store (sumMaxVal / (float) numChannels);
+    waveform_ = buffer;
 }
 
 //==============================================================================
@@ -227,7 +229,7 @@ void Ap_dynamicsAudioProcessor::setStateInformation (const void* data, int sizeI
     apvts.replaceState (copyState);
 }
 
-float Ap_dynamicsAudioProcessor::applyFFCompression(float sample)
+float Ap_dynamicsAudioProcessor::applyFFCompression(float sample, ValType type)
 {
     auto alphaA = exp(-log(9) / (getSampleRate() * attack_));
     auto alphaR = exp(-log(9) / (getSampleRate() * release_));
@@ -247,7 +249,8 @@ float Ap_dynamicsAudioProcessor::applyFFCompression(float sample)
     else
         gain_sc = x_dB;
 
-    fillPlotBuffer(x_dB, gain_sc);
+    curr_xdB_ = x_dB;
+    curr_gainsc_ = gain_sc;
 
     float gainChange_dB = gain_sc - x_dB;
 
@@ -267,10 +270,17 @@ float Ap_dynamicsAudioProcessor::applyFFCompression(float sample)
     prevGainSmooth_ = gainSmooth;
 
     // Apply Compression
-    return x_out;
+    switch (type) {
+        case sampleVal:
+            return x_out;
+        case gainsc:
+            return gain_sc;
+        default:
+            return 0;
+    }
 }
 
-float Ap_dynamicsAudioProcessor::applyFBCompression(float sample)
+float Ap_dynamicsAudioProcessor::applyFBCompression(float sample, ValType type)
 {
     auto alphaA = exp(-log(9) / (getSampleRate() * attack_));
     auto alphaR = exp(-log(9) / (getSampleRate() * release_));
@@ -290,7 +300,8 @@ float Ap_dynamicsAudioProcessor::applyFBCompression(float sample)
     else
         gain_sc = y_dB;
 
-    fillPlotBuffer(y_dB, gain_sc);
+    curr_xdB_ = y_dB;
+    curr_gainsc_ = gain_sc;
 
     float gainChange_dB = gain_sc - y_dB;
 
@@ -311,10 +322,17 @@ float Ap_dynamicsAudioProcessor::applyFBCompression(float sample)
     prevGainSmooth_ = gainSmooth;
 
     // Apply Compression
-    return y_out;
+    switch (type) {
+        case sampleVal:
+            return y_out;
+        case gainsc:
+            return gain_sc;
+        default:
+            return 0;
+    }
 }
 
-float Ap_dynamicsAudioProcessor::applyRMSCompression(float sample)
+float Ap_dynamicsAudioProcessor::applyRMSCompression(float sample, ValType type)
 {
     auto alphaA = exp(-log(9) / (getSampleRate() * attack_));
     auto alphaR = exp(-log(9) / (getSampleRate() * release_));
@@ -334,7 +352,8 @@ float Ap_dynamicsAudioProcessor::applyRMSCompression(float sample)
     else
         gain_sc = x_dB;
 
-    fillPlotBuffer(x_dB, gain_sc);
+    curr_xdB_ = x_dB;
+    curr_gainsc_ = gain_sc;
 
     float gainChange_dB = gain_sc - x_dB;
 
@@ -356,7 +375,14 @@ float Ap_dynamicsAudioProcessor::applyRMSCompression(float sample)
     prevGainSmooth_ = gainSmooth;
 
     // Apply Compression
-    return x_out;
+    switch (type) {
+        case sampleVal:
+            return x_out;
+        case gainsc:
+            return gain_sc;
+        default:
+            return 0;
+    }
 }
 
 float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) {
@@ -379,14 +405,40 @@ float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) {
 
 void Ap_dynamicsAudioProcessor::fillPlotBuffer(float x_dB, float gain_sc)
 {
-    if (counter_ < pBufferSize_)
+//    if (counter_ < pBufferSize_)
+//    {
+//        inputAmps_.set(counter_, x_dB);
+//        outputAmps_.set(counter_, gain_sc);
+//    } else {
+//        counter_ = 0;
+//        inputAmps_.set(counter_, x_dB);
+//        outputAmps_.set(counter_, gain_sc);
+//    }
+}
+
+void Ap_dynamicsAudioProcessor::fillCCurve()
+{
+    for (auto i = 0; i < pBufferSize_; i++)
     {
-        inputAmps_.set(counter_, x_dB);
-        outputAmps_.set(counter_, gain_sc);
-    } else {
-        counter_ = 0;
-        inputAmps_.set(counter_, x_dB);
-        outputAmps_.set(counter_, gain_sc);
+        float x_value = juce::jmap ((float) i, 0.0f, (float) pBufferSize_, 0.0f, 1.0f);
+        float y_value;
+        switch (compTypeID_) {
+            case 0:
+                y_value = applyFFCompression (x_value, gainsc);
+                break;
+            case 1:
+                y_value = applyFBCompression (x_value, gainsc);
+                break;
+            case 2:
+                y_value = applyRMSCompression (x_value, gainsc);
+                break;
+            default:
+                y_value = x_value;
+                break;
+        }
+        x_value = juce::Decibels::gainToDecibels(x_value, (float) mindB_);
+        inputAmps_.set(i, x_value);
+        outputAmps_.set(i, y_value);
     }
 }
 
@@ -412,6 +464,8 @@ void Ap_dynamicsAudioProcessor::update()
                 apvts.getRawParameterValue("MU")->load()
                 ));
     }
+
+    fillCCurve();
 }
 
 void Ap_dynamicsAudioProcessor::reset()
@@ -490,20 +544,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
             juce::AudioProcessorParameter::genericParameter,
             valueToTextFunction,
             textToValueFunction
-    ));
-    // **Dynamic Range Processor Type**
-    parameters.emplace_back(std::make_unique<juce::AudioParameterChoice>(
-            "DRT",
-            "Dynamic Range Type",
-            juce::StringArray { "Compressor", "Expander" },
-            0
-            ));
-    // **Compression Type**
-    parameters.emplace_back(std::make_unique<juce::AudioParameterChoice>(
-            "CT",
-            "Compression Type",
-            juce::StringArray { "Feedforward", "Feedback", "RMS" },
-            0
     ));
     // **Makeup Gain Parameter** - in dB
     parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(

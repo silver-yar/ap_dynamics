@@ -16,6 +16,15 @@
             file="Resources/liq_dyn_text.png"/>
     </GROUP>
     <GROUP id="{EDFDECA6-21B2-2E2E-F4BB-E88C8EE0426B}" name="Source">
+      <FILE id="ygWysT" name="WaveformWindow.cpp" compile="1" resource="0"
+            file="Source/WaveformWindow.cpp"/>
+      <FILE id="CK3snw" name="WaveformWindow.h" compile="0" resource="0"
+            file="Source/WaveformWindow.h"/>
+      <FILE id="dr4yCg" name="APSliderLook.h" compile="0" resource="0" file="Source/APSliderLook.h"/>
+      <FILE id="YmzxyM" name="APToggleButton.cpp" compile="1" resource="0"
+            file="Source/APToggleButton.cpp"/>
+      <FILE id="UIt76Q" name="APToggleButton.h" compile="0" resource="0"
+            file="Source/APToggleButton.h"/>
       <FILE id="FLb9Dw" name="ButtonMenu.cpp" compile="1" resource="0" file="Source/ButtonMenu.cpp"/>
       <FILE id="ZAzPgF" name="ButtonMenu.h" compile="0" resource="0" file="Source/ButtonMenu.h"/>
       <FILE id="Bq3dp1" name="APStyle.cpp" compile="1" resource="0" file="Source/APStyle.cpp"/>

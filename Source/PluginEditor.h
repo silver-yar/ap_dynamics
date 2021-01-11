@@ -12,6 +12,8 @@
 #include "PluginProcessor.h"
 #include "APPlot.h"
 #include "ButtonMenu.h"
+#include "APSliderLook.h"
+#include "WaveformWindow.h"
 
 //==============================================================================
 /**
@@ -39,8 +41,10 @@ private:
                                                          BinaryData::liq_dyn_text_pngSize)};
     juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::Antipasto_Med_ttf,
                                                                 BinaryData::Antipasto_Med_ttfSize)};
+    APSliderLook apSliderLook_;
 
     std::unique_ptr<ButtonMenu> buttonMenu_;
+    std::unique_ptr<WaveformWindow> waveformWindow_;
     std::unique_ptr<APPlot> plot_;
 
     std::unique_ptr<juce::Slider> thresholdSlider_, ratioSlider_, kneeSlider_, attackSlider_,

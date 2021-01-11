@@ -55,21 +55,35 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
+    enum ValType {
+        sampleVal,
+        gainsc
+    };
+
     // ValueTree
     juce::AudioProcessorValueTreeState apvts;
     std::atomic<float> meterLocalMaxVal, meterGlobalMaxVal; // std::atomic to make value thread safe
 
     // Getters
-    juce::Array<float> getInputBuffer() { return inputAmps_; };
-    juce::Array<float> getOutputBuffer() { return outputAmps_; };
+    juce::Array<float> getInputBuffer() { return inputAmps_; }
+    juce::Array<float> getOutputBuffer() { return outputAmps_; }
     int getMinDB() const { return mindB_; }
+    float getCurrXdB() { return curr_xdB_; }
+    float getCurrGainSC() { return curr_gainsc_; }
+    bool getOverdrive() { return isOverdrived_; }
+    juce::AudioBuffer<float>& getWaveForm() { return waveform_; };
+
+    // Setters
+    void setOverdrive (bool isOverdrived) { isOverdrived_ = isOverdrived; }
+    void setCompTypeID (int id) { compTypeID_ = id; }
 
     // TODO: Lots of repeated code, refactor!
-    float applyFFCompression (float sample);
-    float applyFBCompression (float sample);
-    float applyRMSCompression (float sample);
+    float applyFFCompression (float sample, ValType type = ValType::sampleVal);
+    float applyFBCompression (float sample, ValType type = ValType::sampleVal);
+    float applyRMSCompression (float sample, ValType type = ValType::sampleVal);
     float applyPiecewiseOverdrive (float sample);
     void fillPlotBuffer (float x_dB, float gain_sc);
+    void fillCCurve();
     // Passes the sample rate and buffer size to DSP
     void prepare (double sampleRate, int samplesPerBlock);
     // Updates DSP when user changes parameters
@@ -82,18 +96,20 @@ public:
 private:
     bool mustUpdateProcessing_ { false }, isActive_ { false };
 
+    juce::AudioBuffer<float> waveform_;
     juce::Array<float> inputAmps_, outputAmps_;
-    int pBufferSize_ = 512;
-    int counter_ = 0;
+    int pBufferSize_ = 2048;
+    float curr_xdB_, curr_gainsc_;
 
     const juce::StringArray dynRangeChoices_ = { "Compressor", "Expander" };
     const juce::StringArray compTypeChoices_ = { "Feedforward", "Feedback", "RMS" };
-
 
     float threshold_, ratio_, kneeWidth_, attack_, release_ = 0;
 //    juce::LinearSmoothedValue<float> inputGain_ [2] { 0.0f };
     juce::LinearSmoothedValue<float> makeup_ [2];
     juce::IIRFilter tone_ [2];
+    bool isOverdrived_ { false };
+    int compTypeID_ { 0 };
     int mindB_ = -144;
     float prevGainSmooth_ = 0;
     float y_prev_ = 0;
