@@ -143,8 +143,8 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     auto numChannels = juce::jmin (totalNumInputChannels, totalNumOutputChannels);
     auto numSamples = buffer.getNumSamples();
 
-    auto sumMaxVal = 0.0f;
-    auto currentMaxVal = meterGlobalMaxVal.load();
+//    auto sumMaxVal = 0.0f;
+//    auto currentMaxVal = meterGlobalMaxVal.load();
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
         buffer.clear(i, 0, buffer.getNumSamples());
@@ -158,47 +158,31 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         auto* channelData = buffer.getWritePointer (channel);
 //        auto* input = inputAmps_.getWritePointer(channel);
 //        auto* output = outputAmps_.getWritePointer(channel);
-        auto channelMaxVal = 0.0f;
+//        auto channelMaxVal = 0.0f;
 
         for (int sample = 0; sample < numSamples; ++sample) {
-//            input[sample] = channelData[sample];
-            switch (compTypeID_) {
-                case 0:
-                    channelData[sample] = applyFFCompression(channelData[sample]);
-                    break;
-                case 1:
-                    channelData[sample] = applyFBCompression(channelData[sample]);
-                    break;
-                case 2:
-                    channelData[sample] = applyRMSCompression(channelData[sample]);
-                    break;
-                default:
-                    break;
-            }
+            channelData[sample] = applyRMSCompression(channelData[sample]);
+            channelData[sample] = applyPiecewiseOverdrive(channelData[sample]);
         }
-
-        tone_[channel].processSamples (channelData, numSamples);
-        makeup_[channel].applyGain (channelData, numSamples);
 
         // Find max value in buffer channel
-        for (int sample = 0; sample < numSamples; ++sample)
-        {
-            if (isOverdrived_)
-                channelData[sample] = applyPiecewiseOverdrive(channelData[sample]);
-
-            auto rectifiedVal = std::abs (channelData[sample]);
-            if (channelMaxVal < rectifiedVal) channelMaxVal = rectifiedVal;
-            if (currentMaxVal < rectifiedVal) currentMaxVal = rectifiedVal;
-        }
+//        for (int sample = 0; sample < numSamples; ++sample)
+//        {
+//            channelData[sample] = applyPiecewiseOverdrive(channelData[sample]);
+//
+//            auto rectifiedVal = std::abs (channelData[sample]);
+//            if (channelMaxVal < rectifiedVal) channelMaxVal = rectifiedVal;
+//            if (currentMaxVal < rectifiedVal) currentMaxVal = rectifiedVal;
+//        }
 
 //        makeup_[channel].applyGain (channelData, numSamples);
 
-        sumMaxVal += channelMaxVal; // Sum of channel 0 and channel 1 max values
+//        sumMaxVal += channelMaxVal; // Sum of channel 0 and channel 1 max values
 
-        meterGlobalMaxVal.store (currentMaxVal);
+//        meterGlobalMaxVal.store (currentMaxVal);
     }
 
-    meterLocalMaxVal.store (sumMaxVal / (float) numChannels);
+//    meterLocalMaxVal.store (sumMaxVal / (float) numChannels);
     waveform_ = buffer;
 }
 
@@ -389,15 +373,20 @@ float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) {
     float x_uni = abs(sample);
     float out = 0;
 
-    if (x_uni <= 1/3)
+//    if (x_uni <= 1/3)
+//    {
+//        out = 2 * sample;
+//    }
+    if (apvts.getRawParameterValue("STY")->load() == styleChoices_.indexOf("Clean"))
     {
-        out = 2 * sample;
+        out = sample;
     }
-    if (x_uni >= 2/3)
+    if (apvts.getRawParameterValue("STY")->load() == styleChoices_.indexOf("Dirtier"))
     {
         out = sin(sample);
     }
-    else {
+    if (apvts.getRawParameterValue("STY")->load() == styleChoices_.indexOf("Dirty"))
+    {
         out = sin(sample) * (3 - powf(2 - 3 * x_uni, 2)) / 3;
     }
     return out;
@@ -567,6 +556,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
             valueToTextFunction,
             textToValueFunction
     ));
+    // **Style Parameter**
+    parameters.emplace_back(std::make_unique<juce::AudioParameterChoice>(
+            "STY",
+            "Style",
+            juce::StringArray { "Clean", "Dirty", "Dirtier" },
+            0
+            ));
 
     return { parameters.begin(), parameters.end() };
 }

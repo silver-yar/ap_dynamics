@@ -47,13 +47,15 @@ private:
     std::unique_ptr<WaveformWindow> waveformWindow_;
     std::unique_ptr<APPlot> plot_;
 
+    std::unique_ptr<juce::ComboBox> styleSlider_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> styleAttachment_;
     std::unique_ptr<juce::Slider> thresholdSlider_, ratioSlider_, kneeSlider_, attackSlider_,
         releaseSlider_, makeupSlider_, toneSlider_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, 
         ratioAttachment_, kneeAttachment_, attackAttachment_, releaseAttachment_,
         makeupAttachment_, toneAttachment_;
     std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, kneeLabel_, attackLabel_,
-        releaseLabel_, makeupLabel_, toneLabel_;
+        releaseLabel_, makeupLabel_, toneLabel_, styleLabel_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Ap_dynamicsAudioProcessorEditor)
 };

@@ -101,7 +101,7 @@ private:
     int pBufferSize_ = 2048;
     float curr_xdB_, curr_gainsc_;
 
-    const juce::StringArray dynRangeChoices_ = { "Compressor", "Expander" };
+    const juce::StringArray styleChoices_ = { "Clean", "Dirty", "Dirtier" };
     const juce::StringArray compTypeChoices_ = { "Feedforward", "Feedback", "RMS" };
 
     float threshold_, ratio_, kneeWidth_, attack_, release_ = 0;
