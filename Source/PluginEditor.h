@@ -14,6 +14,8 @@
 #include "ButtonMenu.h"
 #include "APSliderLook.h"
 #include "WaveformWindow.h"
+#include "CustomSlider.h"
+#include "MixerButton.h"
 
 //==============================================================================
 /**
@@ -30,26 +32,23 @@ public:
     void resized() override;
 
 
-    void setupSlider (std::unique_ptr<juce::Slider>& slider, std::unique_ptr<juce::Label>& label,
-                      const juce::String& name, const juce::String& suffix = "s");
+    void setupSlider (std::unique_ptr<CustomSlider>& slider, std::unique_ptr<juce::Label>& label,
+                      const juce::String& name, bool showMeter, const juce::String& suffix = "s");
     void timerCallback() override;
 
 private:
     Ap_dynamicsAudioProcessor& audioProcessor;
 
-    juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::liq_dyn_text_png,
-                                                         BinaryData::liq_dyn_text_pngSize)};
-    juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::Antipasto_Med_ttf,
-                                                                BinaryData::Antipasto_Med_ttfSize)};
-    APSliderLook apSliderLook_;
+    juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::logotwo_png,
+                                                         BinaryData::logotwo_pngSize)};
+    juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
+                                                                BinaryData::VarelaRound_ttfSize)};
+    MyLookAndFeel apSliderLook_;
 
-    std::unique_ptr<ButtonMenu> buttonMenu_;
-    std::unique_ptr<WaveformWindow> waveformWindow_;
-    std::unique_ptr<APPlot> plot_;
-
+    MixerButton stylePicker_;
     std::unique_ptr<juce::ComboBox> styleSlider_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> styleAttachment_;
-    std::unique_ptr<juce::Slider> thresholdSlider_, ratioSlider_, kneeSlider_, attackSlider_,
+    std::unique_ptr<CustomSlider> thresholdSlider_, ratioSlider_, kneeSlider_, attackSlider_,
         releaseSlider_, makeupSlider_, toneSlider_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, 
         ratioAttachment_, kneeAttachment_, attackAttachment_, releaseAttachment_,

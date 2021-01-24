@@ -143,22 +143,18 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     auto numChannels = juce::jmin (totalNumInputChannels, totalNumOutputChannels);
     auto numSamples = buffer.getNumSamples();
 
-//    auto sumMaxVal = 0.0f;
-//    auto currentMaxVal = meterGlobalMaxVal.load();
+    auto sumMaxVal = 0.0f;
+    auto currentMaxVal = meterGlobalMaxVal.load();
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
         buffer.clear(i, 0, buffer.getNumSamples());
-//        inputAmps_.clear(i, 0, inputAmps_.getNumSamples());
-//        outputAmps_.clear(i, 0, outputAmps_.getNumSamples());
     }
 
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
-//        auto* input = inputAmps_.getWritePointer(channel);
-//        auto* output = outputAmps_.getWritePointer(channel);
-//        auto channelMaxVal = 0.0f;
+        auto channelMaxVal = 0.0f;
 
         for (int sample = 0; sample < numSamples; ++sample) {
             channelData[sample] = applyRMSCompression(channelData[sample]);
@@ -166,23 +162,23 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         }
 
         // Find max value in buffer channel
-//        for (int sample = 0; sample < numSamples; ++sample)
-//        {
-//            channelData[sample] = applyPiecewiseOverdrive(channelData[sample]);
-//
-//            auto rectifiedVal = std::abs (channelData[sample]);
-//            if (channelMaxVal < rectifiedVal) channelMaxVal = rectifiedVal;
-//            if (currentMaxVal < rectifiedVal) currentMaxVal = rectifiedVal;
-//        }
+        for (int sample = 0; sample < numSamples; ++sample)
+        {
+            channelData[sample] = applyPiecewiseOverdrive(channelData[sample]);
 
-//        makeup_[channel].applyGain (channelData, numSamples);
+            auto rectifiedVal = std::abs (channelData[sample]);
+            if (channelMaxVal < rectifiedVal) channelMaxVal = rectifiedVal;
+            if (currentMaxVal < rectifiedVal) currentMaxVal = rectifiedVal;
+        }
 
-//        sumMaxVal += channelMaxVal; // Sum of channel 0 and channel 1 max values
+        makeup_[channel].applyGain (channelData, numSamples);
 
-//        meterGlobalMaxVal.store (currentMaxVal);
+        sumMaxVal += channelMaxVal; // Sum of channel 0 and channel 1 max values
+
+        meterGlobalMaxVal.store (currentMaxVal);
     }
 
-//    meterLocalMaxVal.store (sumMaxVal / (float) numChannels);
+    meterLocalMaxVal.store (sumMaxVal / (float) numChannels);
     waveform_ = buffer;
 }
 
@@ -377,16 +373,27 @@ float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) {
 //    {
 //        out = 2 * sample;
 //    }
-    if (apvts.getRawParameterValue("STY")->load() == styleChoices_.indexOf("Clean"))
+    if (mixValue_ >= 0.0f && mixValue_ <= 30.0f)
+    {
+        // Clean
+        out = sample;
+    }
+    if (mixValue_ > 30.0f && mixValue_ < 34.0f)
     {
         out = sample;
     }
-    if (apvts.getRawParameterValue("STY")->load() == styleChoices_.indexOf("Dirtier"))
+    if (mixValue_ >= 34.0f && mixValue_ <= 60.0f)
+    {
+        // Dirtier
+        out = sin(sample);
+    }
+    if (mixValue_ > 60.0f && mixValue_ < 64.0f)
     {
         out = sin(sample);
     }
-    if (apvts.getRawParameterValue("STY")->load() == styleChoices_.indexOf("Dirty"))
+    if (mixValue_ >= 64.0f && mixValue_ <= 100.0f)
     {
+        // Dirty
         out = sin(sample) * (3 - powf(2 - 3 * x_uni, 2)) / 3;
     }
     return out;

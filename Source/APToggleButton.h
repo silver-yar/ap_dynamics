@@ -18,6 +18,15 @@
 //==============================================================================
 /*
 */
+class ButtonChoice : public juce::Component
+{
+    ButtonChoice();
+    ~ButtonChoice() override;
+
+    void paint (juce::Graphics&) override;
+    void resized() override;
+    void mouseDown (const juce::MouseEvent& e) override;
+};
 class APToggleButton  : public juce::Component
 {
 public:

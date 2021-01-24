@@ -26,30 +26,19 @@ void APToggleButton::paint (juce::Graphics& g)
     //auto buttonBounds = glowBounds.reduced(5);
     g.setFont (myFont_.withHeight(10.0f));
 
-    switch (buttonType_) {
-        case Boolean:
-            if (boolToggle) {
-                g.fillAll(juce::Colours::goldenrod.withAlpha(0.7f));
-            } else {
-                g.fillAll(juce::Colours::darkgrey.withAlpha(0.7f));
-            }
 
-            g.setColour(juce::Colours::snow);
-            g.drawFittedText(boolText_, getLocalBounds(), juce::Justification::centred, 1);
-            break;
-        case Multi:
-            g.fillAll(juce::Colours::darkgrey.withAlpha(0.7f));
-            g.setColour(juce::Colours::snow);
-            g.drawFittedText(multiText_[intToggle], getLocalBounds(), juce::Justification::centred, 1);
-            break;
-        default:
-            break;
-    }
 }
 
 void APToggleButton::resized()
 {
-
+//    juce::Grid grid;
+//    using Track = juce::Grid::TrackInfo;
+//    using Fr = juce::Grid::Fr;
+//
+//    for (auto choice : multiText_)
+//    {
+//        grid.items.add()
+//    }
 }
 
 void APToggleButton::mouseDown(const juce::MouseEvent &e) {

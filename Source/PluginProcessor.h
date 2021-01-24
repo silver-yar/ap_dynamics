@@ -76,6 +76,7 @@ public:
     // Setters
     void setOverdrive (bool isOverdrived) { isOverdrived_ = isOverdrived; }
     void setCompTypeID (int id) { compTypeID_ = id; }
+    void setMixValue (float value) { mixValue_ = value; }
 
     // TODO: Lots of repeated code, refactor!
     float applyFFCompression (float sample, ValType type = ValType::sampleVal);
@@ -108,6 +109,7 @@ private:
 //    juce::LinearSmoothedValue<float> inputGain_ [2] { 0.0f };
     juce::LinearSmoothedValue<float> makeup_ [2];
     juce::IIRFilter tone_ [2];
+    float mixValue_ = 0.0f;
     bool isOverdrived_ { false };
     int compTypeID_ { 0 };
     int mindB_ = -144;

@@ -9,13 +9,17 @@
             file="Resources/Antipasto_Med.ttf"/>
       <FILE id="YqqlR6" name="ap_logo_groovees.png" compile="0" resource="1"
             file="Resources/ap_logo_groovees.png"/>
-      <FILE id="JMmB0E" name="Berlin Bold.ttf" compile="0" resource="1" file="Resources/Berlin Bold.ttf"/>
-      <FILE id="V54AF7" name="Jazz_Ball_Regular.ttf" compile="0" resource="1"
-            file="Resources/Jazz_Ball_Regular.ttf"/>
       <FILE id="RMh9GK" name="liq_dyn_text.png" compile="0" resource="1"
             file="Resources/liq_dyn_text.png"/>
+      <FILE id="fOwXKq" name="logotwo.png" compile="0" resource="1" file="../../../Desktop/logotwo.png"/>
+      <FILE id="eHycAp" name="VarelaRound.ttf" compile="0" resource="1" file="Resources/VarelaRound.ttf"/>
     </GROUP>
     <GROUP id="{EDFDECA6-21B2-2E2E-F4BB-E88C8EE0426B}" name="Source">
+      <FILE id="ZV9M6A" name="MixerButton.cpp" compile="1" resource="0" file="Source/MixerButton.cpp"/>
+      <FILE id="vcLvKA" name="MixerButton.h" compile="0" resource="0" file="Source/MixerButton.h"/>
+      <FILE id="qMDsut" name="CustomSlider.cpp" compile="1" resource="0"
+            file="Source/CustomSlider.cpp"/>
+      <FILE id="Hgiy46" name="CustomSlider.h" compile="0" resource="0" file="Source/CustomSlider.h"/>
       <FILE id="ygWysT" name="WaveformWindow.cpp" compile="1" resource="0"
             file="Source/WaveformWindow.cpp"/>
       <FILE id="CK3snw" name="WaveformWindow.h" compile="0" resource="0"
@@ -95,6 +99,6 @@
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
   <LIVE_SETTINGS>
-    <OSX/>
+    <OSX buildEnabled="0"/>
   </LIVE_SETTINGS>
 </JUCERPROJECT>
