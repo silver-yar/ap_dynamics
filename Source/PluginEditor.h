@@ -39,8 +39,8 @@ public:
 private:
     Ap_dynamicsAudioProcessor& audioProcessor;
 
-    juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::logotwo_png,
-                                                         BinaryData::logotwo_pngSize)};
+    juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::liq_dyn_text_png,
+                                                         BinaryData::liq_dyn_text_pngSize)};
     juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                 BinaryData::VarelaRound_ttfSize)};
     MyLookAndFeel apSliderLook_;

@@ -23,23 +23,24 @@ MixerButton::~MixerButton()
 void MixerButton::paint (juce::Graphics& g)
 {
 
+    auto bounds = juce::Rectangle<int> (60, 0, getWidth() - 70, getHeight());
     // Background
     g.setGradientFill (
             juce::ColourGradient (juce::Colours::grey, getWidth() / 2, getHeight() / 2,juce::Colours::darkgrey,0,0,true)
     );
-    g.fillRoundedRectangle (0, 0, getWidth(), getHeight(), 10);
-    auto bounds = getLocalBounds();
-    bounds.removeFromTop(10).removeFromBottom(10);
+    g.fillRoundedRectangle (bounds.toFloat(), 10);
+    //bounds.removeFromTop(10).removeFromBottom(10);
+    //bounds.removeFromRight(60);
 
     // Labels
     g.setColour(juce::Colours::snow);
     g.setFont(labelFont_.withHeight (24.0f));
-    g.drawFittedText("clean", bounds.removeFromTop(getHeight() / 3 - 10),
+    g.drawFittedText("clean", bounds.removeFromTop(getHeight() / 3),
                      juce::Justification::centred, 1);
-    g.drawLine(10, getHeight() / 3, getWidth() - 10, getHeight() / 3, 1);
+    g.drawLine(70, getHeight() / 3, getWidth() - 20, getHeight() / 3, 1);
     g.drawFittedText("dirty", bounds.removeFromTop(getHeight() / 3),
                      juce::Justification::centred, 1);
-    g.drawLine(10, getHeight() / 3 * 2, getWidth() - 10, getHeight() / 3 * 2, 1);
+    g.drawLine(70, getHeight() / 3 * 2, getWidth() - 20, getHeight() / 3 * 2, 1);
     g.drawFittedText("dirtier", bounds,
                      juce::Justification::centred, 1);
 

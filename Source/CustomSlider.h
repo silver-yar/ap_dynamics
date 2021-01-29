@@ -38,6 +38,7 @@ private:
     juce::Font labelFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                 BinaryData::VarelaRound_ttfSize)};
 
+
     float bubblePosY1_ = bubStart_;
     float bubblePosX1_ = 20;
     float bubblePosY2_ = bubStart_;
@@ -45,7 +46,7 @@ private:
     float bubblePosY3_ = bubStart_;
     float bubblePosX3_ = 120;
     int bubStart_;
-    int labelMargin_ = 60;
+    int labelMargin_ = 70;
     float lastSliderPos_ = 0;
     float sliderWidth_ = 0;
 };

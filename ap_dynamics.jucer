@@ -5,6 +5,12 @@
               companyName="audio pirate">
   <MAINGROUP id="Sy3GVJ" name="ap_dynamics">
     <GROUP id="{51C09136-CC53-80CE-892F-F27B65CEA6E4}" name="Resources">
+      <GROUP id="{C4E88B89-866B-86EE-B50F-2FD6B79C42C8}" name="chrome">
+        <FILE id="YvupEt" name="chr_0000_2.png" compile="0" resource="1" file="../../../Desktop/chrome/chr_0000_2.png"/>
+        <FILE id="Bbwcwa" name="chr_0001_3.png" compile="0" resource="1" file="../../../Desktop/chrome/chr_0001_3.png"/>
+        <FILE id="XmiJwd" name="chr_0002_Layer-1.png" compile="0" resource="1"
+              file="../../../Desktop/chrome/chr_0002_Layer-1.png"/>
+      </GROUP>
       <FILE id="Ywt07O" name="Antipasto_Med.ttf" compile="0" resource="1"
             file="Resources/Antipasto_Med.ttf"/>
       <FILE id="YqqlR6" name="ap_logo_groovees.png" compile="0" resource="1"
@@ -15,6 +21,10 @@
       <FILE id="eHycAp" name="VarelaRound.ttf" compile="0" resource="1" file="Resources/VarelaRound.ttf"/>
     </GROUP>
     <GROUP id="{EDFDECA6-21B2-2E2E-F4BB-E88C8EE0426B}" name="Source">
+      <GROUP id="{C26112AF-5A97-8FAC-DC64-A186E03357A0}" name="OpenGL">
+        <FILE id="yLIuZ7" name="SliderBarGL.cpp" compile="1" resource="0" file="Source/OpenGL/SliderBarGL.cpp"/>
+        <FILE id="mG771F" name="SliderBarGL.h" compile="0" resource="0" file="Source/OpenGL/SliderBarGL.h"/>
+      </GROUP>
       <FILE id="ZV9M6A" name="MixerButton.cpp" compile="1" resource="0" file="Source/MixerButton.cpp"/>
       <FILE id="vcLvKA" name="MixerButton.h" compile="0" resource="0" file="Source/MixerButton.h"/>
       <FILE id="qMDsut" name="CustomSlider.cpp" compile="1" resource="0"
@@ -60,6 +70,7 @@
         <MODULEPATH id="juce_graphics" path="../../sdk/JUCE_old/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../sdk/JUCE_old/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../sdk/JUCE_old/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../sdk/JUCE_old/modules"/>
       </MODULEPATHS>
     </CLION>
     <XCODE_MAC targetFolder="Builds/MacOSX">
@@ -80,6 +91,7 @@
         <MODULEPATH id="juce_graphics" path="../../sdk/JUCE_old/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../sdk/JUCE_old/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../sdk/JUCE_old/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../sdk/JUCE_old/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>
@@ -97,6 +109,7 @@
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
   <LIVE_SETTINGS>
     <OSX buildEnabled="0"/>

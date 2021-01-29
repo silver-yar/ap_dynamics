@@ -62,6 +62,10 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
     // Bar
     if (slider.isBar())
     {
+//        g.drawImage(bar1_, Rectangle<float> ((float) x, sliderPos > 20 ? sliderPos - 10 : 10,
+//                                      (float) width - labelMargin_,
+//                                      sliderPos > 20 ? (float) y + ((float) height - sliderPos) : height - 20),
+//                                      juce::RectanglePlacement::fillDestination);
         Path p;
         if (slider.isTextBoxEditable()) {
             g.setGradientFill(
