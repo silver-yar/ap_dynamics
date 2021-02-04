@@ -32,7 +32,7 @@ public:
     void resized() override;
 
 
-    void setupSlider (std::unique_ptr<CustomSlider>& slider, std::unique_ptr<juce::Label>& label,
+    void setupSlider (std::unique_ptr<CustomSlider_>& slider, std::unique_ptr<juce::Label>& label,
                       const juce::String& name, bool showMeter, const juce::String& suffix = "s");
     void timerCallback() override;
 
@@ -48,7 +48,7 @@ private:
     MixerButton stylePicker_;
     std::unique_ptr<juce::ComboBox> styleSlider_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> styleAttachment_;
-    std::unique_ptr<CustomSlider> thresholdSlider_, ratioSlider_, kneeSlider_, attackSlider_,
+    std::unique_ptr<CustomSlider_> thresholdSlider_, ratioSlider_, kneeSlider_, attackSlider_,
         releaseSlider_, makeupSlider_, toneSlider_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, 
         ratioAttachment_, kneeAttachment_, attackAttachment_, releaseAttachment_,

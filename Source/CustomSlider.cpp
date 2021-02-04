@@ -21,6 +21,41 @@ CustomSlider::~CustomSlider()
 
 }
 
+
+CustomSlider_::CustomSlider_()
+{
+    sliderVid_.loadAsync(juce::URL(juce::File("~/Desktop/water_low.mov")),
+                         [this](const juce::URL& url, juce::Result result) {
+                             if (result.wasOk())
+                             {
+                                 sliderVid_.play();
+                                 DBG("Succesful");
+                             }
+                             else
+                             {
+                                 DBG("Unsuccesful");
+                             }
+                         });
+    sliderVid_.onPlaybackStopped = [this]() {
+        sliderVid_.setPlayPosition(0.0);
+        sliderVid_.play();
+    };
+    addAndMakeVisible (sliderVid_, -1);
+    //sliderVid_.toBack();
+    addAndMakeVisible (slider, 1);
+}
+
+CustomSlider_::~CustomSlider_()
+{
+
+}
+
+void CustomSlider_::resized()
+{
+    sliderVid_.setBounds(getLocalBounds());
+    slider.setBounds(getLocalBounds());
+}
+
 MyLookAndFeel::MyLookAndFeel(Ap_dynamicsAudioProcessor& p) : audioProcessor (p)
 {
 }

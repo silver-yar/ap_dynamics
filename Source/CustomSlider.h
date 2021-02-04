@@ -21,6 +21,19 @@ public:
 private:
 };
 
+class CustomSlider_ : public juce::Component
+{
+public:
+    CustomSlider_();
+    ~CustomSlider_();
+
+    void resized() override;
+
+    CustomSlider slider;
+private:
+    juce::VideoComponent sliderVid_ { false };
+};
+
 class MyLookAndFeel : public juce::LookAndFeel_V4
 {
 public:
@@ -37,7 +50,6 @@ private:
     Ap_dynamicsAudioProcessor& audioProcessor;
     juce::Font labelFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                 BinaryData::VarelaRound_ttfSize)};
-
 
     float bubblePosY1_ = bubStart_;
     float bubblePosX1_ = 20;

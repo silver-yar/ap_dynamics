@@ -15,11 +15,11 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
 {
     setupSlider(thresholdSlider_, thresholdLabel_, "Threshold", true, "dB");
     thresholdAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-            (audioProcessor.apvts, "THR", *thresholdSlider_);
+            (audioProcessor.apvts, "THR", thresholdSlider_->slider);
 
     setupSlider(ratioSlider_, ratioLabel_, "Ratio", false, ": 1");
     ratioAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-            (audioProcessor.apvts, "RAT", *ratioSlider_);
+            (audioProcessor.apvts, "RAT", ratioSlider_->slider);
 
     styleLabel_ = std::make_unique<juce::Label> ("", "style");
     styleLabel_ -> setJustificationType (juce::Justification::centred);
@@ -97,29 +97,29 @@ void Ap_dynamicsAudioProcessorEditor::resized()
 //    grid.performLayout (sBounds.reduced(60, 30));
 }
 
-void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider> &slider,
+void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_> &slider,
                                                   std::unique_ptr<juce::Label> &label,
                                                   const juce::String &name,
                                                   bool showMeter,
                                                   const juce::String &suffix) {
-    slider = std::make_unique<CustomSlider>();
+    slider = std::make_unique<CustomSlider_>();
     if (showMeter) {
-        slider -> setTextBoxIsEditable(showMeter);
+        slider -> slider.setTextBoxIsEditable(showMeter);
     } else {
-        slider -> setTextBoxIsEditable(showMeter);
+        slider -> slider.setTextBoxIsEditable(showMeter);
     }
-    slider -> setSliderStyle(juce::Slider::LinearBarVertical);
-    slider -> setLookAndFeel(&apSliderLook_);
-    slider -> setTextValueSuffix(" " + suffix);
-    slider -> setColour (juce::Slider::trackColourId, juce::Colour(0xFFFFD479));
-    slider -> setColour (juce::Slider::textBoxTextColourId, juce::Colours::snow);
+    slider -> slider.setSliderStyle(juce::Slider::LinearBarVertical);
+    slider -> slider.setLookAndFeel(&apSliderLook_);
+    slider -> slider.setTextValueSuffix(" " + suffix);
+    slider -> slider.setColour (juce::Slider::trackColourId, juce::Colour(0xFFFFD479));
+    slider -> slider.setColour (juce::Slider::textBoxTextColourId, juce::Colours::snow);
     label = std::make_unique<juce::Label> ("", name);
     label -> setJustificationType(juce::Justification::centred);
     label -> setText (name.toLowerCase(), juce::dontSendNotification);
     label -> setBorderSize(juce::BorderSize<int> (10, 0, 10, 70));
     label -> setColour (juce::Label::textColourId, juce::Colours::snow);
     label -> setFont (myFont_.withHeight (24.0f));
-    label -> attachToComponent(slider.get(), false);
+    label -> attachToComponent(&slider->slider, false);
 
     addAndMakeVisible(slider.get());
     addAndMakeVisible(label.get());

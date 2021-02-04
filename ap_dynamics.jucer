@@ -5,16 +5,16 @@
               companyName="audio pirate">
   <MAINGROUP id="Sy3GVJ" name="ap_dynamics">
     <GROUP id="{51C09136-CC53-80CE-892F-F27B65CEA6E4}" name="Resources">
-      <GROUP id="{C4E88B89-866B-86EE-B50F-2FD6B79C42C8}" name="chrome">
-        <FILE id="YvupEt" name="chr_0000_2.png" compile="0" resource="1" file="../../../Desktop/chrome/chr_0000_2.png"/>
-        <FILE id="Bbwcwa" name="chr_0001_3.png" compile="0" resource="1" file="../../../Desktop/chrome/chr_0001_3.png"/>
-        <FILE id="XmiJwd" name="chr_0002_Layer-1.png" compile="0" resource="1"
-              file="../../../Desktop/chrome/chr_0002_Layer-1.png"/>
+      <GROUP id="{FD1F3740-8FFB-E79C-B170-642F3388EBAA}" name="shaders">
+        <FILE id="S56rGH" name="basic.shader" compile="0" resource="1" file="Resources/shaders/basic.shader"/>
+        <FILE id="EmbW5l" name="liquidmetal.shader" compile="0" resource="1"
+              file="Resources/shaders/liquidmetal.shader"/>
       </GROUP>
       <FILE id="Ywt07O" name="Antipasto_Med.ttf" compile="0" resource="1"
             file="Resources/Antipasto_Med.ttf"/>
       <FILE id="YqqlR6" name="ap_logo_groovees.png" compile="0" resource="1"
             file="Resources/ap_logo_groovees.png"/>
+      <FILE id="EVTkfD" name="cantaloupe.png" compile="0" resource="1" file="Resources/cantaloupe.png"/>
       <FILE id="RMh9GK" name="liq_dyn_text.png" compile="0" resource="1"
             file="Resources/liq_dyn_text.png"/>
       <FILE id="fOwXKq" name="logotwo.png" compile="0" resource="1" file="../../../Desktop/logotwo.png"/>
@@ -56,7 +56,7 @@
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>
-    <CLION targetFolder="Builds/CLion">
+    <CLION targetFolder="Builds/CLion" clionXcodeEnabled="1">
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../sdk/JUCE_old/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../../sdk/JUCE_old/modules"/>
@@ -71,6 +71,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../sdk/JUCE_old/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../sdk/JUCE_old/modules"/>
         <MODULEPATH id="juce_opengl" path="../../../sdk/JUCE_old/modules"/>
+        <MODULEPATH id="juce_video" path="../../../sdk/JUCE_old/modules"/>
       </MODULEPATHS>
     </CLION>
     <XCODE_MAC targetFolder="Builds/MacOSX">
@@ -92,6 +93,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../sdk/JUCE_old/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../sdk/JUCE_old/modules"/>
         <MODULEPATH id="juce_opengl" path="../../../sdk/JUCE_old/modules"/>
+        <MODULEPATH id="juce_video" path="../../../sdk/JUCE_old/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>
@@ -110,6 +112,7 @@
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_video" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
   <LIVE_SETTINGS>
     <OSX buildEnabled="0"/>

@@ -15,36 +15,66 @@
 //==============================================================================
 /*
 */
-class SliderBarGL  : public juce::Component, public juce::OpenGLRenderer, public juce::Timer
+class SliderBarGL  : public juce::Component, public juce::OpenGLRenderer
 {
 public:
-    SliderBarGL(juce::OpenGLContext* context);
+    SliderBarGL();
     ~SliderBarGL() override;
 
-    void setData(std::vector<std::vector<double>> _data);
+    // Context Control Functions
+    void start() { openGLContext_.setContinuousRepainting (true); }
+    void stop() { openGLContext_.setContinuousRepainting (false); }
+
+    // OpenGL Callbacks
     void newOpenGLContextCreated() override;
     void openGLContextClosing() override;
     void renderOpenGL() override;
-    void paint (juce::Graphics&) override;
+
+    // JUCE Callbacks
+    void paint(juce::Graphics&) override;
     void resized() override;
 
 private:
-    juce::OpenGLContext *openGLContext;
-//    float rotation;
-    juce::ScopedPointer<juce::OpenGLShaderProgram> shader;
-//    ScopedPointer<Shape> shape;
-//    ScopedPointer<Attributes> attributes;
-//    ScopedPointer<Uniforms> uniforms;
 
-    std::vector<std::vector<double>> data;
-    std::vector<std::vector<double>> currentGrainsData;
+    void createShaders();
+    // Struct to manage uniforms for the fragment shader
+    struct Uniforms
+    {
+        Uniforms (juce::OpenGLContext& openGLContext, juce::OpenGLShaderProgram& shaderProgram)
+        {
+            //projectionMatrix = createUniform (openGLContext, shaderProgram, "projectionMatrix");
+            //viewMatrix       = createUniform (openGLContext, shaderProgram, "viewMatrix");
 
-    juce::String newVertexShader, newFragmentShader;
+            resolution.reset (createUniform (openGLContext, shaderProgram, "resolution"));
+            audioSampleData.reset (createUniform (openGLContext, shaderProgram, "audioSampleData"));
+        }
 
-//    Draggable3DOrientation draggableOrientation;
-    float scale;
-//    float rotationSpeed;
-    bool force;
+        //ScopedPointer<OpenGLShaderProgram::Uniform> projectionMatrix, viewMatrix;
+        std::unique_ptr<juce::OpenGLShaderProgram::Uniform> resolution, audioSampleData;
+
+    private:
+        static juce::OpenGLShaderProgram::Uniform* createUniform (juce::OpenGLContext& openGLContext,
+                                                            juce::OpenGLShaderProgram& shaderProgram,
+                                                            const char* uniformName)
+        {
+            if (openGLContext.extensions.glGetUniformLocation (shaderProgram.getProgramID(), uniformName) < 0)
+                return nullptr;
+
+            return new juce::OpenGLShaderProgram::Uniform (shaderProgram, uniformName);
+        }
+    };
+
+    // OpenGL Member Variables
+    juce::OpenGLContext openGLContext_;
+    GLuint VBO_, VAO_, EBO_;
+
+    std::unique_ptr<juce::OpenGLShaderProgram> shader_;
+    std::unique_ptr<Uniforms> uniforms_;
+
+    juce::String statusText_;
+
+    const char* vertexShader_;
+    const char* fragmentShader_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SliderBarGL)
 };
