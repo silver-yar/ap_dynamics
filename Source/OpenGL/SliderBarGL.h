@@ -18,7 +18,7 @@
 class SliderBarGL  : public juce::Component, public juce::OpenGLRenderer
 {
 public:
-    SliderBarGL();
+    SliderBarGL(const std::string&);
     ~SliderBarGL() override;
 
     // Context Control Functions
@@ -34,6 +34,20 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
 
+    void setSliderValue(float value) {
+        if (uniforms_->sliderVal != nullptr)
+        {
+            value_ = value;
+        }
+    };
+
+    void setMeterValue(float value) {
+        if (uniforms_->sliderVal != nullptr)
+        {
+            vmValue_ = value;
+        }
+    };
+
 private:
 
     void createShaders();
@@ -46,11 +60,16 @@ private:
             //viewMatrix       = createUniform (openGLContext, shaderProgram, "viewMatrix");
 
             resolution.reset (createUniform (openGLContext, shaderProgram, "resolution"));
-            audioSampleData.reset (createUniform (openGLContext, shaderProgram, "audioSampleData"));
+            sliderVal.reset (createUniform (openGLContext, shaderProgram, "sliderValue"));
+            vmVal.reset (createUniform (openGLContext, shaderProgram, "vmValue"));
+            diffTexture.reset (createUniform (openGLContext, shaderProgram, "diffTexture"));
+            specTexture.reset (createUniform (openGLContext, shaderProgram, "specTexture"));
+            runTime.reset (createUniform (openGLContext, shaderProgram, "runTime"));
         }
 
         //ScopedPointer<OpenGLShaderProgram::Uniform> projectionMatrix, viewMatrix;
-        std::unique_ptr<juce::OpenGLShaderProgram::Uniform> resolution, audioSampleData;
+        std::unique_ptr<juce::OpenGLShaderProgram::Uniform> resolution, sliderVal, vmVal,
+                                                                diffTexture, runTime, specTexture;
 
     private:
         static juce::OpenGLShaderProgram::Uniform* createUniform (juce::OpenGLContext& openGLContext,
@@ -68,9 +87,17 @@ private:
     juce::OpenGLContext openGLContext_;
     GLuint VBO_, VAO_, EBO_;
 
+    juce::Time time_;
+    juce::OpenGLTexture diffTexture_, specTexture_;
+    juce::Image cantaloupeImg_ {juce::ImageCache::getFromMemory(BinaryData::cantaloupe_png,
+                                                                BinaryData::cantaloupe_pngSize)};
     std::unique_ptr<juce::OpenGLShaderProgram> shader_;
     std::unique_ptr<Uniforms> uniforms_;
 
+    std::string filename_;
+    float value_ = 0;
+    float vmValue_ = 0.5f;
+    float index_ = 0;
     juce::String statusText_;
 
     const char* vertexShader_;

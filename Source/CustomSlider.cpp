@@ -22,38 +22,66 @@ CustomSlider::~CustomSlider()
 }
 
 
-CustomSlider_::CustomSlider_()
+CustomSlider_::CustomSlider_(Ap_dynamicsAudioProcessor& p, SliderType sliderType) : audioProcessor (p), sliderType_ (sliderType)
 {
-    sliderVid_.loadAsync(juce::URL(juce::File("~/Desktop/water_low.mov")),
-                         [this](const juce::URL& url, juce::Result result) {
-                             if (result.wasOk())
-                             {
-                                 sliderVid_.play();
-                                 DBG("Succesful");
-                             }
-                             else
-                             {
-                                 DBG("Unsuccesful");
-                             }
-                         });
-    sliderVid_.onPlaybackStopped = [this]() {
-        sliderVid_.setPlayPosition(0.0);
-        sliderVid_.play();
-    };
-    addAndMakeVisible (sliderVid_, -1);
-    //sliderVid_.toBack();
-    addAndMakeVisible (slider, 1);
+    sliderBarBk_.start();
+    addAndMakeVisible (sliderBarBk_);
+    sliderBarFr_.start();
+    addAndMakeVisible (sliderBarFr_);
+    addAndMakeVisible (slider);
+
+    startTimerHz(30);
 }
 
 CustomSlider_::~CustomSlider_()
 {
-
+    stopTimer();
 }
 
 void CustomSlider_::resized()
 {
-    sliderVid_.setBounds(getLocalBounds());
-    slider.setBounds(getLocalBounds());
+    switch (sliderType_) {
+        case Normal:
+            boundsBk_ = Rectangle<int> (0, sliderVal_,
+                                        getWidth() - 70.0f, getHeight() - sliderVal_ - 10);
+            sliderBarBk_.setBounds(boundsBk_);
+            slider.setBounds(getLocalBounds());
+            break;
+        case Invert:
+            boundsBk_ = Rectangle<int> (0, 10,
+                                        getWidth() - 70.0f, getHeight() - 20);
+            boundsFr_ = Rectangle<int> (0, sliderVal_,
+                                        getWidth() - 70.0f, getHeight() - sliderVal_ - 10);
+            sliderBarBk_.setBounds(boundsBk_);
+            sliderBarFr_.setBounds(boundsFr_);
+            slider.setBounds(getLocalBounds());
+            break;
+        default:
+            break;
+    }
+}
+
+void CustomSlider_::timerCallback()
+{
+    switch (sliderType_) {
+        case SliderType::Normal:
+            sliderVal_ = juce::jmap(slider.getValue(), 1.0,
+                                    100.0, getHeight() - 10.0,
+                                    10.0);
+            break;
+        case SliderType::Invert:
+            sliderBarFr_.setSliderValue(juce::jmap((float) slider.getValue(), (float) slider.getMinimum(),
+                                                   (float) slider.getMaximum(), 0.0f,
+                                                   1.0f));
+            //sliderBarBk_.setMeterValue(0.75);
+            //                sliderVal_ = juce::jmap(slider.getValue(), slider.getMinimum(),
+            //                                        slider.getMaximum(), getHeight() - 10.0,
+            //                                        10.0);
+        break;
+            default:
+        break;
+    }
+    resized();
 }
 
 MyLookAndFeel::MyLookAndFeel(Ap_dynamicsAudioProcessor& p) : audioProcessor (p)
@@ -138,7 +166,7 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
             auto bubbleBounds = Rectangle<float> (bubblePosX1_, bubblePosY1_, 20, 20);
             auto bb2 = Rectangle<float> (bubblePosX2_, bubblePosY2_, 40, 40);
             auto bb3 = Rectangle<float> (bubblePosX3_, bubblePosY3_, 10, 10);
-            auto bb4 = Rectangle<float> (50, bubblePosY1_, 20, 20);
+//            auto bb4 = Rectangle<float> (50, bubblePosY1_, 20, 20);
 
             g.setGradientFill(
                     juce::ColourGradient(juce::Colour(0xFF00FA92).withAlpha(0.3f),

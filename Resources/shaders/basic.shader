@@ -15,6 +15,8 @@ out vec4 fragColor;
 uniform vec2 resolution;
 uniform sampler3D diffTexture;
 uniform float runTime;
+uniform float sliderValue;
+
 float signcos(in float v)
 {
     return cos(v) * .5 + .5;

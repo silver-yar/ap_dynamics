@@ -33,7 +33,8 @@ public:
 
 
     void setupSlider (std::unique_ptr<CustomSlider_>& slider, std::unique_ptr<juce::Label>& label,
-                      const juce::String& name, bool showMeter, const juce::String& suffix = "s");
+                      const juce::String& name, bool showMeter, CustomSlider_::SliderType sliderType,
+                      const juce::String& suffix = "s");
     void timerCallback() override;
 
 private:
