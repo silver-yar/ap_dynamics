@@ -48,6 +48,7 @@ public:
         }
     };
 
+    int64_t startTime = 0;
 private:
 
     void createShaders();
@@ -95,9 +96,9 @@ private:
     std::unique_ptr<Uniforms> uniforms_;
 
     std::string filename_;
-    float value_ = 0;
+    float value_ = 0.0f;
     float vmValue_ = 0.5f;
-    float index_ = 0;
+    float index_ = 0.0f;
     juce::String statusText_;
 
     const char* vertexShader_;

@@ -57,7 +57,10 @@ static ShaderProgramSource ParseShader(const std::string& filepath)
 //==============================================================================
 SliderBarGL::SliderBarGL(const std::string& filenameNoPath) : filename_ (filenameNoPath)
 {
-    time_ = juce::Time::getCurrentTime();
+    auto now = std::chrono::high_resolution_clock::now();
+    startTime = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            now.time_since_epoch()).count();
+//    time_ = juce::Time::getCurrentTime();
     // Sets OpenGL version to 3.2
     openGLContext_.setOpenGLVersionRequired (
             juce::OpenGLContext::OpenGLVersion::openGL3_2);
@@ -145,11 +148,12 @@ void SliderBarGL::renderOpenGL()
     }
 
     if (uniforms_->runTime != nullptr) {
-        uniforms_->runTime->set((GLfloat) index_);
-        if (index_ <= 255)
-            index_ += 0.01f;
-        else
-            index_ = 0;
+        auto now = std::chrono::high_resolution_clock::now();
+        auto sysTime = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                now.time_since_epoch()).count();
+        auto elapsed = sysTime - startTime;
+        float seconds = elapsed / 1000000000.0;
+        uniforms_->runTime->set((GLfloat) seconds );
     }
     
     // Define Vertices for a Square (the view plane)
