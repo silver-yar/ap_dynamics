@@ -35,14 +35,14 @@ public:
     void resized() override;
 
     void setSliderValue(float value) {
-        if (uniforms_->sliderVal != nullptr)
+        if (uniforms_ != nullptr && uniforms_->sliderVal != nullptr)
         {
             value_ = value;
         }
     };
 
     void setMeterValue(float value) {
-        if (uniforms_->sliderVal != nullptr)
+        if (uniforms_ != nullptr && uniforms_->sliderVal != nullptr)
         {
             vmValue_ = value;
         }
@@ -60,12 +60,12 @@ private:
             //projectionMatrix = createUniform (openGLContext, shaderProgram, "projectionMatrix");
             //viewMatrix       = createUniform (openGLContext, shaderProgram, "viewMatrix");
 
-            resolution.reset (createUniform (openGLContext, shaderProgram, "resolution"));
-            sliderVal.reset (createUniform (openGLContext, shaderProgram, "sliderValue"));
-            vmVal.reset (createUniform (openGLContext, shaderProgram, "vmValue"));
-            diffTexture.reset (createUniform (openGLContext, shaderProgram, "diffTexture"));
-            specTexture.reset (createUniform (openGLContext, shaderProgram, "specTexture"));
-            runTime.reset (createUniform (openGLContext, shaderProgram, "runTime"));
+            resolution = (createUniform (openGLContext, shaderProgram, "resolution"));
+            sliderVal = (createUniform (openGLContext, shaderProgram, "sliderValue"));
+            vmVal = (createUniform (openGLContext, shaderProgram, "vmValue"));
+            diffTexture = (createUniform (openGLContext, shaderProgram, "diffTexture"));
+            specTexture = (createUniform (openGLContext, shaderProgram, "specTexture"));
+            runTime = (createUniform (openGLContext, shaderProgram, "runTime"));
         }
 
         //ScopedPointer<OpenGLShaderProgram::Uniform> projectionMatrix, viewMatrix;
@@ -73,14 +73,14 @@ private:
                                                                 diffTexture, runTime, specTexture;
 
     private:
-        static juce::OpenGLShaderProgram::Uniform* createUniform (juce::OpenGLContext& openGLContext,
+        static std::unique_ptr<juce::OpenGLShaderProgram::Uniform> createUniform (juce::OpenGLContext& openGLContext,
                                                             juce::OpenGLShaderProgram& shaderProgram,
                                                             const char* uniformName)
         {
             if (openGLContext.extensions.glGetUniformLocation (shaderProgram.getProgramID(), uniformName) < 0)
                 return nullptr;
 
-            return new juce::OpenGLShaderProgram::Uniform (shaderProgram, uniformName);
+            return std::make_unique<juce::OpenGLShaderProgram::Uniform> (shaderProgram, uniformName);
         }
     };
 

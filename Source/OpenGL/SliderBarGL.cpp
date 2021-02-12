@@ -218,9 +218,8 @@ void SliderBarGL::createShaders()
         && shaderProgramAttempt->addShader (source.FragmentSource, GL_FRAGMENT_SHADER)
         && shaderProgramAttempt->link())
     {
-        uniforms_.release();
         shader_ = std::move (shaderProgramAttempt);
-        uniforms_.reset (new Uniforms (openGLContext_, *shader_));
+        uniforms_ = std::make_unique<Uniforms> (openGLContext_, *shader_);
 
         statusText_ = "GLSL: v" + juce::String (juce::OpenGLShaderProgram::getLanguageVersion(), 2);
     }
