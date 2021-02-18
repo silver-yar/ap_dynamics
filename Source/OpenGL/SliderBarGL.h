@@ -57,20 +57,17 @@ private:
     {
         Uniforms (juce::OpenGLContext& openGLContext, juce::OpenGLShaderProgram& shaderProgram)
         {
-            //projectionMatrix = createUniform (openGLContext, shaderProgram, "projectionMatrix");
-            //viewMatrix       = createUniform (openGLContext, shaderProgram, "viewMatrix");
-
             resolution = (createUniform (openGLContext, shaderProgram, "resolution"));
             sliderVal = (createUniform (openGLContext, shaderProgram, "sliderValue"));
             vmVal = (createUniform (openGLContext, shaderProgram, "vmValue"));
             diffTexture = (createUniform (openGLContext, shaderProgram, "diffTexture"));
-            specTexture = (createUniform (openGLContext, shaderProgram, "specTexture"));
+//            specTexture = (createUniform (openGLContext, shaderProgram, "specTexture"));
             runTime = (createUniform (openGLContext, shaderProgram, "runTime"));
         }
 
         //ScopedPointer<OpenGLShaderProgram::Uniform> projectionMatrix, viewMatrix;
         std::unique_ptr<juce::OpenGLShaderProgram::Uniform> resolution, sliderVal, vmVal,
-                                                                diffTexture, runTime, specTexture;
+                                                                diffTexture, runTime; // specTexture
 
     private:
         static std::unique_ptr<juce::OpenGLShaderProgram::Uniform> createUniform (juce::OpenGLContext& openGLContext,
@@ -78,7 +75,11 @@ private:
                                                             const char* uniformName)
         {
             if (openGLContext.extensions.glGetUniformLocation (shaderProgram.getProgramID(), uniformName) < 0)
+            {
+                jassertfalse;
+                DBG(uniformName);
                 return nullptr;
+            }
 
             return std::make_unique<juce::OpenGLShaderProgram::Uniform> (shaderProgram, uniformName);
         }

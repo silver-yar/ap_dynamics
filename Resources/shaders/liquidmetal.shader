@@ -1,20 +1,20 @@
 #shader vertex
 #version 330 core
 
-layout (location = 0) in vec4 position;
-in vec3 textureCoordIn;
-out vec3 textureCoordOut;
+layout (location = 0) in vec2 position;
+layout (location = 1) in vec2 textureCoordIn;
+out vec2 textureCoordOut;
 
 void main()
 {
     textureCoordOut = textureCoordIn;
-    gl_Position = vec4(position.xy, 0., 1.);
+    gl_Position = vec4(position, 0., 1.);
 }
 
 #shader fragment
 #version 330 core
 
-in vec3 textureCoordOut;
+in vec2 textureCoordOut;
 out vec4 fragColor;
 uniform vec2 resolution;
 uniform float sliderValue;
@@ -62,12 +62,11 @@ void main()
     vec3 lightDir = normalize(vec3(sin(runTime),1.,cos(runTime)));
 
     vec3 norm3d = normalize(vec3(normal(uv),1.).xzy);
-    //    vec3 dif = diffuse(uv);
-    //    dif *= .25+max(0.,dot(norm3d,lightDir));
+    vec3 diff = diffuse(uv);
+    diff *= .25 + max(0., dot(norm3d, lightDir));
     //    vec3 view = normalize(vec3(uv,-1.).xzy);
     //    vec3 spec = vec3(1., 0., 0.);
-    vec3 diff = vec3(.4,.4, .4);
-    diff *= .25 + max(0., dot(norm3d, lightDir));
+    //    vec3 diff = vec3(.4,.4, .4);
     vec3 spec = vec3(.774597, .774597, .774597);
 
     if (uv.y < sliderValue)

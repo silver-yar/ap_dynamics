@@ -83,7 +83,8 @@ void SliderBarGL::newOpenGLContextCreated()
 
     // Load image for texture
     diffTexture_.loadImage (cantaloupeImg_);
-    specTexture_.loadImage (cantaloupeImg_);
+//    specTexture_.loadImage (cantaloupeImg_);
+    openGLContext_.setTextureMagnificationFilter(juce::OpenGLContext::TextureMagnificationFilter::linear);
 
     // Setup Buffer Objects
     openGLContext_.extensions.glGenBuffers (1, &VBO_); // Vertex Buffer Object
@@ -94,7 +95,7 @@ void SliderBarGL::openGLContextClosing()
 {
     uniforms_.release();
     diffTexture_.release();
-    specTexture_.release();
+//    specTexture_.release();
     shader_.release();
 }
 
@@ -112,15 +113,24 @@ void SliderBarGL::renderOpenGL()
     // Enable Alpha Blending
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    openGLContext_.extensions.glActiveTexture (GL_TEXTURE0);
+    glEnable (GL_TEXTURE_2D);
+
+    if (uniforms_ == nullptr || shader_ == nullptr) {
+        return;
+    }
 
     if (uniforms_->diffTexture != nullptr)
     {
         diffTexture_.bind();
     }
-    if (uniforms_->diffTexture != nullptr)
-    {
-        specTexture_.bind();
-    }
+//    if (uniforms_->specTexture != nullptr)
+//    {
+//        specTexture_.bind();
+//    }
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     
     // Use Shader Program that's been defined
     shader_->use();
@@ -147,6 +157,11 @@ void SliderBarGL::renderOpenGL()
             vmValue_ = 0.5f;
     }
 
+    if (uniforms_->diffTexture != nullptr)
+    {
+        uniforms_->diffTexture->set((GLint) 0);
+    }
+
     if (uniforms_->runTime != nullptr) {
         auto now = std::chrono::high_resolution_clock::now();
         auto sysTime = std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -158,10 +173,10 @@ void SliderBarGL::renderOpenGL()
     
     // Define Vertices for a Square (the view plane)
     GLfloat vertices[] = {
-            1.0f,   1.0f,  0.0f,  // Top Right
-            1.0f,  -1.0f,  0.0f,  // Bottom Right
-            -1.0f, -1.0f,  0.0f,  // Bottom Left
-            -1.0f,  1.0f,  0.0f   // Top Left
+            1.0f,   1.0f, 0.0f, 0.0f,  // Top Right + Tex Coord.
+            1.0f,  -1.0f, 1.0f, 0.0f, // Bottom Right + Tex Coord.
+            -1.0f, -1.0f, 1.0f, 1.0f, // Bottom Left + Tex Coord.
+            -1.0f,  1.0f, 0.0f, 1.0f,  // Top Left + Tex Coord.
     };
     // Define Which Vertex Indexes Make the Square
     GLuint indices[] = {  // Note that we start from 0!
@@ -182,8 +197,13 @@ void SliderBarGL::renderOpenGL()
     openGLContext_.extensions.glBufferData (GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
     
     // Setup Vertex Attributes
-    openGLContext_.extensions.glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    openGLContext_.extensions.glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
     openGLContext_.extensions.glEnableVertexAttribArray (0);
+
+    // Setup Texture Coordinate Attributes
+    openGLContext_.extensions.glVertexAttribPointer (1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
+                                                     (GLvoid*) (2 * sizeof(GLfloat)));
+    openGLContext_.extensions.glEnableVertexAttribArray (1);
     
     // Draw Vertices
     //glDrawArrays (GL_TRIANGLES, 0, 6); // For just VBO's (Vertex Buffer Objects)
@@ -207,25 +227,27 @@ void SliderBarGL::resized()
 
 void SliderBarGL::createShaders()
 {
-    std::unique_ptr<juce::OpenGLShaderProgram> shaderProgramAttempt = std::make_unique<juce::OpenGLShaderProgram> (openGLContext_);
+//    std::unique_ptr<juce::OpenGLShaderProgram> shaderProgramAttempt = std::make_unique<juce::OpenGLShaderProgram> (openGLContext_);
+    shader_ = std::make_unique<juce::OpenGLShaderProgram> (openGLContext_);
 
     // Retrieve shader from file
     ShaderProgramSource source = ParseShader("../../../../../../Resources/shaders/" + filename_);
     DBG("Shader Selected: " + filename_);
 
     // Sets up pipeline of shaders and compiles the program
-    if (shaderProgramAttempt->addShader (source.VertexSource, GL_VERTEX_SHADER)
-        && shaderProgramAttempt->addShader (source.FragmentSource, GL_FRAGMENT_SHADER)
-        && shaderProgramAttempt->link())
+    if (shader_->addShader (source.VertexSource, GL_VERTEX_SHADER)
+        && shader_->addShader (source.FragmentSource, GL_FRAGMENT_SHADER)
+        && shader_->link())
     {
-        shader_ = std::move (shaderProgramAttempt);
+//        shader_ = std::move (shader_);
         uniforms_ = std::make_unique<Uniforms> (openGLContext_, *shader_);
 
         statusText_ = "GLSL: v" + juce::String (juce::OpenGLShaderProgram::getLanguageVersion(), 2);
     }
     else
     {
-        statusText_ = shaderProgramAttempt->getLastError();
+        statusText_ = shader_->getLastError();
+        shader_ = nullptr;
     }
 
     //triggerAsyncUpdate();
