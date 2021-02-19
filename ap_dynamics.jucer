@@ -5,6 +5,14 @@
               companyName="audio pirate">
   <MAINGROUP id="Sy3GVJ" name="ap_dynamics">
     <GROUP id="{51C09136-CC53-80CE-892F-F27B65CEA6E4}" name="Resources">
+      <GROUP id="{C88675DC-2475-43F0-41FB-33DE2BF63323}" name="cube">
+        <FILE id="ajg7FI" name="back.png" compile="0" resource="1" file="Resources/cube/back.png"/>
+        <FILE id="bSS32i" name="bottom.png" compile="0" resource="1" file="Resources/cube/bottom.png"/>
+        <FILE id="IFhz82" name="front.png" compile="0" resource="1" file="Resources/cube/front.png"/>
+        <FILE id="aghwvw" name="left.png" compile="0" resource="1" file="Resources/cube/left.png"/>
+        <FILE id="cYguCP" name="right.png" compile="0" resource="1" file="Resources/cube/right.png"/>
+        <FILE id="PMuqgC" name="top.png" compile="0" resource="1" file="Resources/cube/top.png"/>
+      </GROUP>
       <GROUP id="{FD1F3740-8FFB-E79C-B170-642F3388EBAA}" name="shaders">
         <FILE id="S56rGH" name="basic.shader" compile="0" resource="1" file="Resources/shaders/basic.shader"/>
         <FILE id="EmbW5l" name="liquidmetal.shader" compile="0" resource="1"
@@ -18,6 +26,8 @@
       <FILE id="RMh9GK" name="liq_dyn_text.png" compile="0" resource="1"
             file="Resources/liq_dyn_text.png"/>
       <FILE id="fOwXKq" name="logotwo.png" compile="0" resource="1" file="../../../Desktop/logotwo.png"/>
+      <FILE id="m530MY" name="organic.png" compile="0" resource="1" file="Resources/organic.png"/>
+      <FILE id="n742va" name="refl.png" compile="0" resource="1" file="Resources/refl.png"/>
       <FILE id="eHycAp" name="VarelaRound.ttf" compile="0" resource="1" file="Resources/VarelaRound.ttf"/>
     </GROUP>
     <GROUP id="{EDFDECA6-21B2-2E2E-F4BB-E88C8EE0426B}" name="Source">

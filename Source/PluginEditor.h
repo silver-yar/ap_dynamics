@@ -33,7 +33,7 @@ public:
 
 
     void setupSlider (std::unique_ptr<CustomSlider_>& slider, std::unique_ptr<juce::Label>& label,
-                      const juce::String& name, bool showMeter, CustomSlider_::SliderType sliderType,
+                      const juce::String& name, bool showMeter, SliderType sliderType,
                       const juce::String& suffix = "s");
     void timerCallback() override;
 
@@ -44,7 +44,7 @@ private:
                                                          BinaryData::liq_dyn_text_pngSize)};
     juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                 BinaryData::VarelaRound_ttfSize)};
-    MyLookAndFeel apSliderLook_;
+    MyLookAndFeel thresholdLook_, ratioLook_;
 
     MixerButton stylePicker_;
     std::unique_ptr<juce::ComboBox> styleSlider_;

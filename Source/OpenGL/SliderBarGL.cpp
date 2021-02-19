@@ -55,7 +55,9 @@ static ShaderProgramSource ParseShader(const std::string& filepath)
 }
 
 //==============================================================================
-SliderBarGL::SliderBarGL(const std::string& filenameNoPath) : filename_ (filenameNoPath)
+SliderBarGL::SliderBarGL(const std::string& filenameNoPath) : filename_ (filenameNoPath),
+                                                              value_ (0.0f),
+                                                              vmValue_ (0.5f)
 {
     auto now = std::chrono::high_resolution_clock::now();
     startTime = std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -82,8 +84,17 @@ void SliderBarGL::newOpenGLContextCreated()
     createShaders();
 
     // Load image for texture
-    diffTexture_.loadImage (cantaloupeImg_);
-//    specTexture_.loadImage (cantaloupeImg_);
+    diffTexture_.loadImage (diffImage_);
+
+    // Load images for cubemap texture
+//    rightTex_.loadImage(textureFaces_[0]);
+//    leftTex_.loadImage(textureFaces_[1]);
+//    topTex_.loadImage(textureFaces_[2]);
+//    bottomTex_.loadImage(textureFaces_[3]);
+//    backTex_.loadImage(textureFaces_[4]);
+//    frontTex_.loadImage(textureFaces_[5]);
+
+//    specTexture_.loadImage (diffImage_);
     openGLContext_.setTextureMagnificationFilter(juce::OpenGLContext::TextureMagnificationFilter::linear);
 
     // Setup Buffer Objects
@@ -95,6 +106,16 @@ void SliderBarGL::openGLContextClosing()
 {
     uniforms_.release();
     diffTexture_.release();
+//    rightTex_.release();
+//    leftTex_.release();
+//    topTex_.release();
+//    bottomTex_.release();
+//    backTex_.release();
+//    frontTex_.release();
+//    for (auto &texture : cubeMapTextures_)
+//    {
+//        texture.release();
+//    }
 //    specTexture_.release();
     shader_.release();
 }
@@ -108,7 +129,7 @@ void SliderBarGL::renderOpenGL()
     glViewport (0, 0, juce::roundToInt (renderingScale * getWidth()), juce::roundToInt (renderingScale * getHeight()));
     
     // Set background Color
-    juce::OpenGLHelpers::clear (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    juce::OpenGLHelpers::clear (juce::Colours::grey);
     
     // Enable Alpha Blending
     glEnable (GL_BLEND);
@@ -124,6 +145,8 @@ void SliderBarGL::renderOpenGL()
     {
         diffTexture_.bind();
     }
+
+
 //    if (uniforms_->specTexture != nullptr)
 //    {
 //        specTexture_.bind();
@@ -160,6 +183,11 @@ void SliderBarGL::renderOpenGL()
     if (uniforms_->diffTexture != nullptr)
     {
         uniforms_->diffTexture->set((GLint) 0);
+    }
+
+    if (uniforms_->specTexture != nullptr)
+    {
+        uniforms_->specTexture->set((GLint) loadCubeMap());
     }
 
     if (uniforms_->runTime != nullptr) {
@@ -225,6 +253,33 @@ void SliderBarGL::resized()
 {
 }
 
+unsigned int SliderBarGL::loadCubeMap()
+{
+    unsigned int textureId;
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+
+    for (auto i = 0; i < textureFaces_.size(); i++)
+    {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
+                     textureFaces_[i].getWidth(),
+                     textureFaces_[i].getHeight(),
+                     0,
+                     GL_RGB,
+                     GL_UNSIGNED_BYTE,
+                     textureFaces_[i].getPixelData()
+        );
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureId;
+}
+
 void SliderBarGL::createShaders()
 {
 //    std::unique_ptr<juce::OpenGLShaderProgram> shaderProgramAttempt = std::make_unique<juce::OpenGLShaderProgram> (openGLContext_);
@@ -232,7 +287,7 @@ void SliderBarGL::createShaders()
 
     // Retrieve shader from file
     ShaderProgramSource source = ParseShader("../../../../../../Resources/shaders/" + filename_);
-    DBG("Shader Selected: " + filename_);
+    DBG("Shader Selected: " + filename_ + '\n');
 
     // Sets up pipeline of shaders and compiles the program
     if (shader_->addShader (source.VertexSource, GL_VERTEX_SHADER)

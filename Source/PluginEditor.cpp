@@ -11,15 +11,20 @@
 
 //==============================================================================
 Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), apSliderLook_ (p), stylePicker_ (p)
+    : AudioProcessorEditor (&p), audioProcessor (p),
+                                 thresholdLook_ (p, Invert),
+                                 ratioLook_ (p, Normal),
+                                 stylePicker_ (p)
 {
     setupSlider(thresholdSlider_, thresholdLabel_, "Threshold", true,
-                CustomSlider_::SliderType::Invert, "dB");
+                SliderType::Invert, "dB");
+    thresholdSlider_->slider.setLookAndFeel (&thresholdLook_);
     thresholdAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
             (audioProcessor.apvts, "THR", thresholdSlider_->slider);
 
     setupSlider(ratioSlider_, ratioLabel_, "Ratio", false,
-                CustomSlider_::SliderType::Normal, ": 1");
+                SliderType::Normal, ": 1");
+    ratioSlider_->slider.setLookAndFeel (&ratioLook_);
     ratioAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
             (audioProcessor.apvts, "RAT", ratioSlider_->slider);
 
@@ -80,17 +85,13 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_>
                                                   std::unique_ptr<juce::Label> &label,
                                                   const juce::String &name,
                                                   bool showMeter,
-                                                  CustomSlider_::SliderType sliderType,
+                                                  SliderType sliderType,
                                                   const juce::String &suffix) {
-    slider = std::make_unique<CustomSlider_>(audioProcessor, sliderType);
-    if (showMeter) {
-        slider -> slider.setTextBoxIsEditable(showMeter);
-    } else {
-        slider -> slider.setTextBoxIsEditable(showMeter);
-    }
+    slider = std::make_unique<CustomSlider_> (audioProcessor, sliderType);
+    slider -> slider.setTextBoxIsEditable (false);
     slider -> slider.setSliderStyle(juce::Slider::LinearBarVertical);
-    slider -> slider.setLookAndFeel(&apSliderLook_);
-    slider -> slider.setTextValueSuffix(" " + suffix);
+    // slider -> slider.setLookAndFeel(&apSliderLook_);
+    slider -> slider.setTextValueSuffix (" " + suffix);
     slider -> slider.setColour (juce::Slider::trackColourId, juce::Colour(0xFFFFD479));
     slider -> slider.setColour (juce::Slider::textBoxTextColourId, juce::Colours::snow);
     label = std::make_unique<juce::Label> ("", name);

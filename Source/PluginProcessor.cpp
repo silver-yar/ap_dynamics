@@ -502,7 +502,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
             "RAT",
             "Ratio",
             juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.25f),
-            0.0f,
+            1.0f,
             "",
             juce::AudioProcessorParameter::genericParameter,
             valueToTextFunction,

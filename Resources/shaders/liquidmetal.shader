@@ -20,7 +20,7 @@ uniform vec2 resolution;
 uniform float sliderValue;
 uniform float vmValue;
 uniform sampler2D diffTexture;
-uniform sampler3D specTexture;
+uniform samplerCube specTexture;
 uniform float runTime;
 
 float signcos(in float v) {
@@ -64,10 +64,10 @@ void main()
     vec3 norm3d = normalize(vec3(normal(uv),1.).xzy);
     vec3 diff = diffuse(uv);
     diff *= .25 + max(0., dot(norm3d, lightDir));
-    //    vec3 view = normalize(vec3(uv,-1.).xzy);
-    //    vec3 spec = vec3(1., 0., 0.);
-    //    vec3 diff = vec3(.4,.4, .4);
-    vec3 spec = vec3(.774597, .774597, .774597);
+    vec3 view = normalize(vec3(uv,-1.).xzy);
+    vec3 spec = vec3(.774597, .774597, .774597) *
+                                            max(0.,dot(-norm3d,view));
+    // vec3 spec = vec3(.774597, .774597, .774597);
 
     if (uv.y < sliderValue)
     {
