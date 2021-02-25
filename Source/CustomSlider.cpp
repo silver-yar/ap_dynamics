@@ -81,10 +81,9 @@ void CustomSlider_::timerCallback()
             sliderBarFr_.setSliderValue(juce::jmap((float) slider.getValue(), (float) slider.getMinimum(),
                                                    (float) slider.getMaximum(), 0.0f,
                                                    1.0f));
-            //sliderBarBk_.setMeterValue(0.75);
-            //                sliderVal_ = juce::jmap(slider.getValue(), slider.getMinimum(),
-            //                                        slider.getMaximum(), getHeight() - 10.0,
-            //                                        10.0);
+            sliderBarBk_.setMeterValue(juce::jmap(audioProcessor.meterLocalMaxVal.load(),
+                                                  -1.0f, 1.0f,
+                                                  0.0f, 1.0f));
             break;
             default:
                 break;
@@ -102,7 +101,7 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
     lastSliderPos_ = sliderPos;
     sliderWidth_ = width - labelMargin_ + 1.0f;
     // Background
-    g.setColour (juce::Colours::grey);
+    g.setColour (juce::Colours::darkgrey);
     g.fillRoundedRectangle (x, y, width - labelMargin_, height, 10);
 }
 

@@ -47,10 +47,10 @@ void MixerButton::paint (juce::Graphics& g)
     auto bubbleBounds = juce::Rectangle<float> (pointerPos_.getX() - 10, pointerPos_.getY() - 10, 20, 20);
 
     // Pointer
-    g.setGradientFill(juce::ColourGradient(juce::Colour(0xFF00FA92).withAlpha(0.3f),
+    g.setGradientFill(juce::ColourGradient(juce::Colours::grey.withAlpha(0.3f),
                          bubbleBounds.getCentreX(),
                          bubbleBounds.getCentreY(),
-                         juce::Colour(0xFFD783FF),
+                         juce::Colours::white,
                          bubbleBounds.getX(), bubbleBounds.getY(), true)
                          );
     g.fillEllipse(bubbleBounds);

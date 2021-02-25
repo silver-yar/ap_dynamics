@@ -18,7 +18,7 @@
 class SliderBarGL  : public juce::Component, public juce::OpenGLRenderer
 {
 public:
-    SliderBarGL(const std::string&);
+    explicit SliderBarGL(const std::string&);
     ~SliderBarGL() override;
 
     // Context Control Functions
@@ -77,14 +77,14 @@ private:
         {
             if (openGLContext.extensions.glGetUniformLocation (shaderProgram.getProgramID(), uniformName) < 0)
             {
-                jassertfalse;
-                DBG("Uniform: " << uniformName << ", Location: "
-                                << openGLContext.extensions.glGetUniformLocation (shaderProgram.getProgramID(), uniformName));
+//                jassertfalse;
+//                DBG("Uniform: " << uniformName << ", Location: "
+//                                << openGLContext.extensions.glGetUniformLocation (shaderProgram.getProgramID(), uniformName));
                 return nullptr;
             }
 
-            DBG("Uniform: " << uniformName << ", Location: "
-                            << openGLContext.extensions.glGetUniformLocation (shaderProgram.getProgramID(), uniformName));
+//            DBG("Uniform: " << uniformName << ", Location: "
+//                            << openGLContext.extensions.glGetUniformLocation (shaderProgram.getProgramID(), uniformName));
 
             return std::make_unique<juce::OpenGLShaderProgram::Uniform> (shaderProgram, uniformName);
         }

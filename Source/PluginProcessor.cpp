@@ -460,8 +460,6 @@ void Ap_dynamicsAudioProcessor::update()
                 apvts.getRawParameterValue("MU")->load()
                 ));
     }
-
-    fillCCurve();
 }
 
 void Ap_dynamicsAudioProcessor::reset()
@@ -485,6 +483,29 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
 
     auto valueToTextFunction = [](float val, int len) { return juce::String(val, len); };
     auto textToValueFunction = [](const juce::String& text) { return text.getFloatValue(); };
+    const float ratioSkew = 0.25f;
+    auto ratioRange = juce::NormalisableRange<float> (1.0f,
+                                                      100.0f,
+                                                      [ratioSkew](auto start, auto end, auto norm) {
+                                                          if (ratioSkew != 1.0f && norm > 0.0f) {
+                                                              norm = std::exp(std::log(norm) / ratioSkew);
+                                                          }
+
+//                                                          return start + (end - start) * norm;
+                                                          return juce::jmap(norm, end, start);
+                                                        },
+                                                      [ratioSkew](auto start, auto end, auto value) {
+                                                          auto proportion = juce::jmap(value, start, end, 0.0f, 1.0f);
+
+                                                          if (ratioSkew == 1.0f) {
+                                                              return proportion;
+                                                          }
+
+
+                                                          return std::pow (proportion, ratioSkew);
+                                                        },
+                                                      [](auto start, auto end, auto value) { return value; }
+                                                      );
 
     // **Threshold**
     parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
@@ -501,7 +522,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
     parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
             "RAT",
             "Ratio",
-            juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.25f),
+            juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.2f),
             1.0f,
             "",
             juce::AudioProcessorParameter::genericParameter,

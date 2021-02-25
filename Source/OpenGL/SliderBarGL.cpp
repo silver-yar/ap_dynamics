@@ -57,7 +57,7 @@ static ShaderProgramSource ParseShader(const std::string& filepath)
 //==============================================================================
 SliderBarGL::SliderBarGL(const std::string& filenameNoPath) : filename_ (filenameNoPath),
                                                               value_ (0.0f),
-                                                              vmValue_ (0.5f)
+                                                              vmValue_ (0.0f)
 {
     auto now = std::chrono::high_resolution_clock::now();
     startTime = std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -129,7 +129,7 @@ void SliderBarGL::renderOpenGL()
     glViewport (0, 0, juce::roundToInt (renderingScale * getWidth()), juce::roundToInt (renderingScale * getHeight()));
     
     // Set background Color
-    juce::OpenGLHelpers::clear (juce::Colours::grey);
+    juce::OpenGLHelpers::clear (juce::Colours::darkgrey);
     
     // Enable Alpha Blending
     glEnable (GL_BLEND);
@@ -174,10 +174,6 @@ void SliderBarGL::renderOpenGL()
     if (uniforms_->vmVal != nullptr) // vmVal
     {
         uniforms_->vmVal->set((GLfloat) vmValue_);
-        if (vmValue_ < 1)
-            vmValue_ += 0.01f;
-        else
-            vmValue_ = 0.5f;
     }
 
     if (uniforms_->diffTexture != nullptr)
@@ -282,16 +278,175 @@ unsigned int SliderBarGL::loadCubeMap()
 
 void SliderBarGL::createShaders()
 {
+    if (filename_ == "liquidmetal.shader")
+    {
+        vertexShader_ =
+                "#version 330 core\n"
+                "layout (location = 0) in vec2 position;\n"
+                "layout (location = 1) in vec2 textureCoordIn;\n"
+                "out vec2 textureCoordOut;\n"
+                "\n"
+                "void main()\n"
+                "{\n"
+                "    textureCoordOut = textureCoordIn;\n"
+                "    gl_Position = vec4(position, 0., 1.);\n"
+                "}\n"
+                "\n";
+        fragmentShader_ =
+                "#version 330 core\n"
+                "in vec2 textureCoordOut;\n"
+                "out vec4 fragColor;\n"
+                "uniform vec2 resolution;\n"
+                "uniform float sliderValue;\n"
+                "uniform float vmValue;\n"
+                "uniform sampler2D diffTexture;\n"
+                "uniform samplerCube specTexture;\n"
+                "uniform float runTime;\n"
+                "\n"
+                "float signcos(in float v) {\n"
+                "    return cos(v)*.5+.5;\n"
+                "}\n"
+                "float height(in vec2 p) {\n"
+                "    vec2 uv = p;\n"
+                "    float res = 1.;\n"
+                "    for (int i = 0; i < 3; i++) {\n"
+                "        res += cos(uv.y*12.345 - runTime *4. + cos(res*12.234)*.2 + cos(uv.x*32.2345 + cos(uv.y*17.234)) ) + cos(uv.x*12.345);\n"
+                "        uv = uv.yx;\n"
+                "        uv.x += res*.1;\n"
+                "    }\n"
+                "    return res;\n"
+                "}\n"
+                "vec2 normal(in vec2 p) {\n"
+                "    const vec2 NE = vec2(.1,0.);\n"
+                "    return normalize(vec2( height(p+NE)-height(p-NE),\n"
+                "    height(p+NE.yx)-height(p-NE.yx) ));\n"
+                "}\n"
+                "vec3 diffuse(in vec2 p) {\n"
+                "\n"
+                "    vec2 uv = p;\n"
+                "    float res = 1.;\n"
+                "    for (int i = 0; i < 3; i++) {\n"
+                "        res += cos(uv.y*12.345 - runTime *4. + cos(res*12.234)*.2 + cos(uv.x*32.2345 + cos(uv.y*17.234)) ) + cos(uv.x*12.345);\n"
+                "        uv = uv.yx;\n"
+                "        uv.x += res*.1;\n"
+                "    }\n"
+                "\n"
+                "    return texture(diffTexture, uv).xyz;\n"
+                "}\n"
+                "\n"
+                "\n"
+                "void main()\n"
+                "{\n"
+                "    vec2 uv = gl_FragCoord.xy / resolution.xy;\n"
+                "\n"
+                "    vec3 lightDir = normalize(vec3(sin(runTime),1.,cos(runTime)));\n"
+                "\n"
+                "    vec3 norm3d = normalize(vec3(normal(uv),1.).xzy);\n"
+                "    vec3 diff = diffuse(uv);\n"
+                "    diff *= .25 + max(0., dot(norm3d, lightDir));\n"
+                "    vec3 view = normalize(vec3(uv,-1.).xzy);\n"
+                "    vec3 spec = vec3(.774597, .774597, .774597) *\n"
+                "                                            max(0.,dot(-norm3d,view));\n"
+                "\n"
+                "    if (uv.y < sliderValue)\n"
+                "    {\n"
+                "        fragColor = vec4(255. / 255., 220. / 255., 140. / 255., 1.);\n"
+                "    }\n"
+                "    else if (uv.y < vmValue && uv.y > sliderValue)\n"
+                "    {\n"
+                "        fragColor = vec4(mix(diff,spec,.5), 1.);\n"
+                "    }\n"
+                "    else\n"
+                "    {\n"
+                "        fragColor = vec4(1., 1., 1., .0);\n"
+                "    }\n"
+                "}\n";
+    }
+    else if (filename_ == "basic.shader")
+    {
+        vertexShader_ =
+                "#version 330 core\n"
+                "layout (location = 0) in vec4 position;\n"
+                "\n"
+                "void main()\n"
+                "{\n"
+                "    gl_Position = vec4(position.xy, 0., 1.);\n"
+                "}\n";
+        fragmentShader_ =
+                "#version 330 core\n"
+                "out vec4 fragColor;\n"
+                "uniform vec2 resolution;\n"
+                "uniform float sliderValue;\n"
+                "uniform float vmValue;\n"
+                "uniform sampler2D diffTexture;\n"
+                "uniform float runTime;\n"
+                "\n"
+                "float signcos(in float v) {\n"
+                "    return cos(v)*.5+.5;\n"
+                "}\n"
+                "float height(in vec2 p) {\n"
+                "    vec2 uv = p;\n"
+                "    float res = 1.;\n"
+                "    for (int i = 0; i < 3; i++) {\n"
+                "        res += cos(uv.y*12.345 - runTime *4. + cos(res*12.234)*.2 + cos(uv.x*32.2345 + cos(uv.y*17.234)) ) + cos(uv.x*12.345);\n"
+                "        uv = uv.yx;\n"
+                "        uv.x += res*.1;\n"
+                "    }\n"
+                "    return res;\n"
+                "}\n"
+                "vec2 normal(in vec2 p) {\n"
+                "    const vec2 NE = vec2(.1,0.);\n"
+                "    return normalize(vec2( height(p+NE)-height(p-NE),\n"
+                "    height(p+NE.yx)-height(p-NE.yx) ));\n"
+                "}\n"
+                "vec3 diffuse(in vec2 p) {\n"
+                "\n"
+                "    vec2 uv = p;\n"
+                "    float res = 1.;\n"
+                "    for (int i = 0; i < 3; i++) {\n"
+                "        res += cos(uv.y*12.345 - runTime *4. + cos(res*12.234)*.2 + cos(uv.x*32.2345 + cos(uv.y*17.234)) ) + cos(uv.x*12.345);\n"
+                "        uv = uv.yx;\n"
+                "        uv.x += res*.1;\n"
+                "    }\n"
+                "\n"
+                "    return texture(diffTexture, uv).xyz;\n"
+                "}\n"
+                "\n"
+                "void main()\n"
+                "{\n"
+                "    vec2 uv = gl_FragCoord.xy / resolution.xy;\n"
+                "\n"
+                "    vec3 lightDir = normalize(vec3(sin(runTime),1.,cos(runTime)));\n"
+                "\n"
+                "    vec3 norm3d = normalize(vec3(normal(uv),1.).xzy);\n"
+                "    vec3 diff = diffuse(uv);\n"
+                "    diff *= .25 + max(0., dot(norm3d, lightDir));\n"
+                "    vec3 view = normalize(vec3(uv,-1.).xzy);\n"
+                "    vec3 spec = vec3(.774597, .774597, .774597) *\n"
+                "                                max(0.,dot(-norm3d,view));\n"
+                "\n"
+                "    if (uv.y < sliderValue)\n"
+                "    {\n"
+                "        fragColor = vec4(mix(diff,spec,.5), 1.);\n"
+                "    }\n"
+                "    else\n"
+                "    {\n"
+                "        fragColor = vec4(255. / 255., 220. / 255., 140. / 255., 1.);\n"
+                "    }\n"
+                "}\n";
+    }
 //    std::unique_ptr<juce::OpenGLShaderProgram> shaderProgramAttempt = std::make_unique<juce::OpenGLShaderProgram> (openGLContext_);
     shader_ = std::make_unique<juce::OpenGLShaderProgram> (openGLContext_);
 
     // Retrieve shader from file
-    ShaderProgramSource source = ParseShader("../../../../../../Resources/shaders/" + filename_);
-    DBG("Shader Selected: " + filename_ + '\n');
+//    ShaderProgramSource source = ParseShader("../../../../../../Resources/shaders/" + filename_);
+//    DBG("Shader Selected: " + filename_ + '\n');
+//    DBG("Vertex Source: \n" << source.VertexSource << '\n');
+//    DBG("Fragment Source: \n" << source.FragmentSource << '\n');
 
     // Sets up pipeline of shaders and compiles the program
-    if (shader_->addShader (source.VertexSource, GL_VERTEX_SHADER)
-        && shader_->addShader (source.FragmentSource, GL_FRAGMENT_SHADER)
+    if (shader_->addShader (vertexShader_, GL_VERTEX_SHADER)
+        && shader_->addShader (fragmentShader_, GL_FRAGMENT_SHADER)
         && shader_->link())
     {
 //        shader_ = std::move (shader_);

@@ -40,8 +40,8 @@ public:
 private:
     Ap_dynamicsAudioProcessor& audioProcessor;
 
-    juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::liq_dyn_text_png,
-                                                         BinaryData::liq_dyn_text_pngSize)};
+    juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::logo2_png,
+                                                         BinaryData::logo2_pngSize)};
     juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                 BinaryData::VarelaRound_ttfSize)};
     MyLookAndFeel thresholdLook_, ratioLook_;
