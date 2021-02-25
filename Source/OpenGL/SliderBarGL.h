@@ -42,7 +42,7 @@ public:
     };
 
     void setMeterValue(float value) {
-        if (uniforms_ != nullptr && uniforms_->sliderVal != nullptr)
+        if (uniforms_ != nullptr && uniforms_->vmVal != nullptr)
         {
             vmValue_ = value;
         }
@@ -60,7 +60,7 @@ private:
         {
             resolution = (createUniform (openGLContext, shaderProgram, "resolution"));
             sliderVal = (createUniform (openGLContext, shaderProgram, "sliderValue"));
-            vmVal = (createUniform (openGLContext, shaderProgram, "vmValue"));
+            vmVal = (createUniform (openGLContext, shaderProgram, "vomValue"));
             diffTexture = (createUniform (openGLContext, shaderProgram, "diffTexture"));
             specTexture = (createUniform (openGLContext, shaderProgram, "specTexture"));
             runTime = (createUniform (openGLContext, shaderProgram, "runTime"));

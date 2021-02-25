@@ -471,7 +471,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
     parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
             "RAT",
             "Ratio",
-            juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.2f),
+            juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.3f),
             1.0f,
             "",
             juce::AudioProcessorParameter::genericParameter,

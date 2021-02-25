@@ -45,10 +45,10 @@ public:
 private:
     Ap_dynamicsAudioProcessor& audioProcessor;
     SliderType sliderType_;
-    SliderBarGL sliderBarFr_ {"liquidmetal.shader"};
-    SliderBarGL sliderBarBk_ {"basic.shader"};
+    SliderBarGL threshSliderBar_ {"liquidmetal.shader"};
+    SliderBarGL ratioSliderBar_ {"basic.shader"};
 
-    juce::Rectangle<int> boundsFr_, boundsBk_;
+    juce::Rectangle<int> threshBounds_, ratioBounds_;
 };
 
 class MyLookAndFeel : public juce::LookAndFeel_V4

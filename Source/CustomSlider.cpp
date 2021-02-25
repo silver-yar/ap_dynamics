@@ -24,10 +24,10 @@ CustomSlider::~CustomSlider()
 
 CustomSlider_::CustomSlider_(Ap_dynamicsAudioProcessor& p, SliderType sliderType) : audioProcessor (p), sliderType_ (sliderType)
 {
-    sliderBarBk_.start();
-    addAndMakeVisible (sliderBarBk_);
-    sliderBarFr_.start();
-    addAndMakeVisible (sliderBarFr_);
+    ratioSliderBar_.start();
+    addAndMakeVisible (ratioSliderBar_);
+    threshSliderBar_.start();
+    addAndMakeVisible (threshSliderBar_);
     addAndMakeVisible (slider);
 
     startTimerHz(30);
@@ -35,8 +35,8 @@ CustomSlider_::CustomSlider_(Ap_dynamicsAudioProcessor& p, SliderType sliderType
 
 CustomSlider_::~CustomSlider_()
 {
-    sliderBarBk_.stop();
-    sliderBarFr_.stop();
+    ratioSliderBar_.stop();
+    threshSliderBar_.stop();
     stopTimer();
 }
 
@@ -45,18 +45,18 @@ void CustomSlider_::resized()
     auto offset = 72.0f;
     switch (sliderType_) {
         case Normal:
-            boundsBk_ = Rectangle<int> (1, 10,
+            ratioBounds_ = Rectangle<int> (1, 10,
                                         getWidth() - offset, getHeight() - 20);
-            sliderBarBk_.setBounds(boundsBk_);
+            ratioSliderBar_.setBounds(ratioBounds_);
             slider.setBounds(getLocalBounds());
             break;
         case Invert:
-            boundsBk_ = Rectangle<int> (1, 10,
+//            ratioBounds_ = Rectangle<int> (1, 10,
+//                                        getWidth() - offset, getHeight() - 20);
+            threshBounds_ = Rectangle<int> (1, 10,
                                         getWidth() - offset, getHeight() - 20);
-            boundsFr_ = Rectangle<int> (1, 10,
-                                        getWidth() - offset, getHeight() - 20);
-            sliderBarBk_.setBounds(boundsBk_);
-            sliderBarFr_.setBounds(boundsFr_);
+//            ratioSliderBar_.setBounds(ratioBounds_);
+            threshSliderBar_.setBounds(threshBounds_);
             slider.setBounds(getLocalBounds());
             break;
         default:
@@ -66,6 +66,8 @@ void CustomSlider_::resized()
 
 void CustomSlider_::timerCallback()
 {
+    auto gaindB = juce::Decibels::gainToDecibels(audioProcessor.meterLocalMaxVal.load(), -96.0f);
+
     switch (sliderType_) {
         case SliderType::Normal: {
             const float sliderPos = slider.getPositionOfValue(slider.getValue());
@@ -74,19 +76,17 @@ void CustomSlider_::timerCallback()
                                                  0.0f,
                                                  0.0f,
                                                  1.0f);
-            sliderBarBk_.setSliderValue(sliderValue);
+            ratioSliderBar_.setSliderValue(sliderValue);
         }
             break;
         case SliderType::Invert:
-            sliderBarFr_.setSliderValue(juce::jmap((float) slider.getValue(), (float) slider.getMinimum(),
-                                                   (float) slider.getMaximum(), 0.0f,
-                                                   1.0f));
-            sliderBarBk_.setMeterValue(juce::jmap(audioProcessor.meterLocalMaxVal.load(),
-                                                  -1.0f, 1.0f,
-                                                  0.0f, 1.0f));
+            threshSliderBar_.setSliderValue(juce::jmap((float) slider.getValue(), (float) slider.getMinimum(),
+                                                       (float) slider.getMaximum(), 0.0f,
+                                                       1.0f));
+            threshSliderBar_.setMeterValue(juce::jmap(gaindB, -96.0f, 0.0f, 0.0f, 1.0f));
             break;
-            default:
-                break;
+        default:
+            break;
     }
     resized();
 }
