@@ -40,21 +40,7 @@
       <FILE id="qMDsut" name="CustomSlider.cpp" compile="1" resource="0"
             file="Source/CustomSlider.cpp"/>
       <FILE id="Hgiy46" name="CustomSlider.h" compile="0" resource="0" file="Source/CustomSlider.h"/>
-      <FILE id="ygWysT" name="WaveformWindow.cpp" compile="1" resource="0"
-            file="Source/WaveformWindow.cpp"/>
-      <FILE id="CK3snw" name="WaveformWindow.h" compile="0" resource="0"
-            file="Source/WaveformWindow.h"/>
       <FILE id="dr4yCg" name="APSliderLook.h" compile="0" resource="0" file="Source/APSliderLook.h"/>
-      <FILE id="YmzxyM" name="APToggleButton.cpp" compile="1" resource="0"
-            file="Source/APToggleButton.cpp"/>
-      <FILE id="UIt76Q" name="APToggleButton.h" compile="0" resource="0"
-            file="Source/APToggleButton.h"/>
-      <FILE id="FLb9Dw" name="ButtonMenu.cpp" compile="1" resource="0" file="Source/ButtonMenu.cpp"/>
-      <FILE id="ZAzPgF" name="ButtonMenu.h" compile="0" resource="0" file="Source/ButtonMenu.h"/>
-      <FILE id="Bq3dp1" name="APStyle.cpp" compile="1" resource="0" file="Source/APStyle.cpp"/>
-      <FILE id="RPACTX" name="APStyle.h" compile="0" resource="0" file="Source/APStyle.h"/>
-      <FILE id="TvLFUf" name="APPlot.cpp" compile="1" resource="0" file="Source/APPlot.cpp"/>
-      <FILE id="eV7N0E" name="APPlot.h" compile="0" resource="0" file="Source/APPlot.h"/>
       <FILE id="ql0IYV" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="pLhd4J" name="PluginProcessor.h" compile="0" resource="0"

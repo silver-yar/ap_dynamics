@@ -36,16 +36,10 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
     styleLabel_ -> setColour (juce::Label::textColourId, juce::Colours::snow);
     styleLabel_ -> attachToComponent (&stylePicker_, false);
     addAndMakeVisible (stylePicker_);
-//    styleSlider_ = std::make_unique<juce::ComboBox> ("Style");
-//    styleSlider_->addItemList(juce::StringArray { "Clean", "Dirty", "Dirtier" }, 1);
-//    addAndMakeVisible (styleSlider_.get());
-//    styleAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>
-//            (audioProcessor.apvts, "STY", *styleSlider_);
-
 
     auto min_width = 700;
     auto min_height = 500;
-//    setResizeLimits(min_width, min_height, min_width * 2, min_height * 2);
+
     setSize (min_width, min_height);
     startTimerHz(60);
 }
@@ -58,11 +52,11 @@ Ap_dynamicsAudioProcessorEditor::~Ap_dynamicsAudioProcessorEditor()
 //==============================================================================
 void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
 {
-//    g.setGradientFill (
-//            juce::ColourGradient (juce::Colour(0xFFFFD479), getWidth() / 2, getHeight() / 4,
-//                                  juce::Colour(0xFFFFD479),50,50,true)
-//    );
-    g.fillAll (juce::Colour(0xFFFFD479));
+    g.setGradientFill (
+            juce::ColourGradient (juce::Colour(0xFFFFD479), getWidth() / 2, getHeight() / 2,
+                                  juce::Colour(0xFFFFD479).darker(0.3f),0,0,true)
+    );
+    g.fillAll ();
 
     g.drawImage (bgText_, getLocalBounds().removeFromTop(getHeight() * 0.4)
         .reduced(80, 40)
@@ -90,7 +84,6 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_>
     slider = std::make_unique<CustomSlider_> (audioProcessor, sliderType);
     slider -> slider.setTextBoxIsEditable (false);
     slider -> slider.setSliderStyle(juce::Slider::LinearBarVertical);
-    // slider -> slider.setLookAndFeel(&apSliderLook_);
     slider -> slider.setTextValueSuffix (" " + suffix);
     slider -> slider.setColour (juce::Slider::trackColourId, juce::Colour(0xFFFFD479));
     slider -> slider.setColour (juce::Slider::textBoxTextColourId, juce::Colours::snow);

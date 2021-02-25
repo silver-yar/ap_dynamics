@@ -1,5 +1,5 @@
 # ap_dynamics
-A vst3 plugin with various dynamic range control (compressor, expander, etc.)
+A vst3 compressor plugin utilizing rms compression, piecewise overdrive, and openGL graphics.
 
-![Plugin Image](Screenshots/v1.png "interface")
+![Plugin Image](Screenshots/simpler.png "interface")
 ~70% Complete

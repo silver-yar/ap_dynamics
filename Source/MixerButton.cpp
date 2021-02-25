@@ -29,8 +29,6 @@ void MixerButton::paint (juce::Graphics& g)
             juce::ColourGradient (juce::Colours::grey, getWidth() / 2, getHeight() / 2,juce::Colours::darkgrey,0,0,true)
     );
     g.fillRoundedRectangle (bounds.toFloat(), 10);
-    //bounds.removeFromTop(10).removeFromBottom(10);
-    //bounds.removeFromRight(60);
 
     // Labels
     g.setColour(juce::Colours::snow);

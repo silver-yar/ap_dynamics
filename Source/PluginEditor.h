@@ -10,10 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-#include "APPlot.h"
-#include "ButtonMenu.h"
 #include "APSliderLook.h"
-#include "WaveformWindow.h"
 #include "CustomSlider.h"
 #include "MixerButton.h"
 
@@ -47,15 +44,9 @@ private:
     MyLookAndFeel thresholdLook_, ratioLook_;
 
     MixerButton stylePicker_;
-    std::unique_ptr<juce::ComboBox> styleSlider_;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> styleAttachment_;
-    std::unique_ptr<CustomSlider_> thresholdSlider_, ratioSlider_, kneeSlider_, attackSlider_,
-        releaseSlider_, makeupSlider_, toneSlider_;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, 
-        ratioAttachment_, kneeAttachment_, attackAttachment_, releaseAttachment_,
-        makeupAttachment_, toneAttachment_;
-    std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, kneeLabel_, attackLabel_,
-        releaseLabel_, makeupLabel_, toneLabel_, styleLabel_;
+    std::unique_ptr<CustomSlider_> thresholdSlider_, ratioSlider_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, ratioAttachment_;
+    std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, styleLabel_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Ap_dynamicsAudioProcessorEditor)
 };

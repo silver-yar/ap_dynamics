@@ -75,14 +75,13 @@ public:
 
     // Setters
     void setOverdrive (bool isOverdrived) { isOverdrived_ = isOverdrived; }
-    void setCompTypeID (int id) { compTypeID_ = id; }
     void setMixValue (float value) { mixValue_ = value; }
 
     // TODO: Lots of repeated code, refactor!
     float applyFFCompression (float sample, ValType type = ValType::sampleVal);
     float applyFBCompression (float sample, ValType type = ValType::sampleVal);
     float applyRMSCompression (float sample, ValType type = ValType::sampleVal);
-    float applyPiecewiseOverdrive (float sample);
+    float applyPiecewiseOverdrive (float sample) const;
     void fillPlotBuffer (float x_dB, float gain_sc);
     void fillCCurve();
     // Passes the sample rate and buffer size to DSP
@@ -102,16 +101,10 @@ private:
     int pBufferSize_ = 2048;
     float curr_xdB_, curr_gainsc_;
 
-    const juce::StringArray styleChoices_ = { "Clean", "Dirty", "Dirtier" };
-    const juce::StringArray compTypeChoices_ = { "Feedforward", "Feedback", "RMS" };
-
     float threshold_, ratio_, kneeWidth_, attack_, release_ = 0;
-//    juce::LinearSmoothedValue<float> inputGain_ [2] { 0.0f };
     juce::LinearSmoothedValue<float> makeup_ [2];
-    juce::IIRFilter tone_ [2];
     float mixValue_ = 0.0f;
     bool isOverdrived_ { false };
-    int compTypeID_ { 0 };
     int mindB_ = -144;
     float prevGainSmooth_ = 0;
     float y_prev_ = 0;

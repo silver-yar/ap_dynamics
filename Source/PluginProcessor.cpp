@@ -179,7 +179,6 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     }
 
     meterLocalMaxVal.store (sumMaxVal / (float) numChannels);
-    waveform_ = buffer;
 }
 
 //==============================================================================
@@ -314,8 +313,12 @@ float Ap_dynamicsAudioProcessor::applyFBCompression(float sample, ValType type)
 
 float Ap_dynamicsAudioProcessor::applyRMSCompression(float sample, ValType type)
 {
-    auto alphaA = exp(-log(9) / (getSampleRate() * attack_));
-    auto alphaR = exp(-log(9) / (getSampleRate() * release_));
+    auto attack = 0.05f;
+    auto release = 0.25f;
+    auto kneeWidth = 6.0f;
+
+    auto alphaA = exp(-log(9) / (getSampleRate() * attack));
+    auto alphaR = exp(-log(9) / (getSampleRate() * release));
 
     float gainSmooth = 0;
     float gain_sc = 0;
@@ -325,10 +328,10 @@ float Ap_dynamicsAudioProcessor::applyRMSCompression(float sample, ValType type)
     if (x_dB < mindB_)
         x_dB = mindB_;
     // Static Characteristics
-    if (x_dB > (threshold_ + kneeWidth_ / 2))
+    if (x_dB > (threshold_ + kneeWidth / 2))
         gain_sc = threshold_ + (x_dB - threshold_) / ratio_; // Perform downwards compression
-    else if (x_dB > (threshold_ - kneeWidth_ / 2))
-        gain_sc = x_dB + ((1 / ratio_ - 1) * powf((x_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
+    else if (x_dB > (threshold_ - kneeWidth / 2))
+        gain_sc = x_dB + ((1 / ratio_ - 1) * powf((x_dB - threshold_ + kneeWidth / 2), 2)) / (2 * kneeWidth);
     else
         gain_sc = x_dB;
 
@@ -365,14 +368,10 @@ float Ap_dynamicsAudioProcessor::applyRMSCompression(float sample, ValType type)
     }
 }
 
-float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) {
+float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) const {
     float x_uni = abs(sample);
     float out = 0;
 
-//    if (x_uni <= 1/3)
-//    {
-//        out = 2 * sample;
-//    }
     if (mixValue_ >= 0.0f && mixValue_ <= 30.0f)
     {
         // Clean
@@ -399,63 +398,14 @@ float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) {
     return out;
 }
 
-void Ap_dynamicsAudioProcessor::fillPlotBuffer(float x_dB, float gain_sc)
-{
-//    if (counter_ < pBufferSize_)
-//    {
-//        inputAmps_.set(counter_, x_dB);
-//        outputAmps_.set(counter_, gain_sc);
-//    } else {
-//        counter_ = 0;
-//        inputAmps_.set(counter_, x_dB);
-//        outputAmps_.set(counter_, gain_sc);
-//    }
-}
-
-void Ap_dynamicsAudioProcessor::fillCCurve()
-{
-    for (auto i = 0; i < pBufferSize_; i++)
-    {
-        float x_value = juce::jmap ((float) i, 0.0f, (float) pBufferSize_, 0.0f, 1.0f);
-        float y_value;
-        switch (compTypeID_) {
-            case 0:
-                y_value = applyFFCompression (x_value, gainsc);
-                break;
-            case 1:
-                y_value = applyFBCompression (x_value, gainsc);
-                break;
-            case 2:
-                y_value = applyRMSCompression (x_value, gainsc);
-                break;
-            default:
-                y_value = x_value;
-                break;
-        }
-        x_value = juce::Decibels::gainToDecibels(x_value, (float) mindB_);
-        inputAmps_.set(i, x_value);
-        outputAmps_.set(i, y_value);
-    }
-}
-
-void Ap_dynamicsAudioProcessor::prepare(double sampleRate, int samplesPerBlock)
-{
-}
-
 void Ap_dynamicsAudioProcessor::update()
 {
     mustUpdateProcessing_ = false;
     
     threshold_ = apvts.getRawParameterValue("THR")->load();
     ratio_ = apvts.getRawParameterValue("RAT")->load();
-    kneeWidth_ = apvts.getRawParameterValue("KW")->load();
-    attack_ = apvts.getRawParameterValue("ATT")->load();
-    release_ = apvts.getRawParameterValue("REL")->load();
 
     for (int channel = 0; channel < 2; ++channel) {
-        tone_[channel].setCoefficients (juce::IIRCoefficients::makeLowPass (
-                getSampleRate(), apvts.getRawParameterValue("TN")->load())
-                );
         makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain(
                 apvts.getRawParameterValue("MU")->load()
                 ));
@@ -468,7 +418,6 @@ void Ap_dynamicsAudioProcessor::reset()
     y_prev_ = 0;
 
     for (int channel = 0; channel < 2; ++channel) {
-        tone_[channel].reset();
         makeup_[channel].reset(getSampleRate(), 0.050);
     }
 
@@ -529,68 +478,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
             valueToTextFunction,
             textToValueFunction
     ));
-    // **Knee Width**
-    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
-            "KW",
-            "Knee Width",
-            juce::NormalisableRange<float>(0.0f, 10.0f, 0.1f),
-            6.0f,
-            "dB",
-            juce::AudioProcessorParameter::genericParameter,
-            valueToTextFunction,
-            textToValueFunction
-    ));
-    // **Attack**
-    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
-            "ATT",
-            "Attack",
-            juce::NormalisableRange<float>(0.0f, 2.0f, 0.01f),
-            0.05f,
-            "s",
-            juce::AudioProcessorParameter::genericParameter,
-            valueToTextFunction,
-            textToValueFunction
-    ));
-    // **Release**
-    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
-            "REL",
-            "Release",
-            juce::NormalisableRange<float>(0.0f, 2.0f, 0.01f),
-            0.25f,
-            "s",
-            juce::AudioProcessorParameter::genericParameter,
-            valueToTextFunction,
-            textToValueFunction
-    ));
     // **Makeup Gain Parameter** - in dB
     parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
             "MU",
             "Makeup",
             juce::NormalisableRange<float>(-40.0f, 40.0f,0.01f),
-            0.0f,
+            3.0f,
             "dB",
             juce::AudioProcessorParameter::genericParameter,
             valueToTextFunction,
             textToValueFunction
     ));
-    // **Low Pass Filter Parameter** - in Hz
-    parameters.emplace_back (std::make_unique<juce::AudioParameterFloat>(
-            "TN",
-            "Tone",
-            juce::NormalisableRange<float>(20.0f, 22000.0f, 10.0f, 0.2f),
-            22000.0f,
-            "Hz",
-            juce::AudioProcessorParameter::genericParameter,
-            valueToTextFunction,
-            textToValueFunction
-    ));
-    // **Style Parameter**
-    parameters.emplace_back(std::make_unique<juce::AudioParameterChoice>(
-            "STY",
-            "Style",
-            juce::StringArray { "Clean", "Dirty", "Dirtier" },
-            0
-            ));
 
     return { parameters.begin(), parameters.end() };
 }
