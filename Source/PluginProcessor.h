@@ -76,6 +76,12 @@ public:
     // Setters
     void setOverdrive (bool isOverdrived) { isOverdrived_ = isOverdrived; }
     void setMixValue (float value) { mixValue_ = value; }
+    void setOutputGain (float value)
+    {
+        for (int channel = 0; channel < 2; ++channel) {
+            makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain (value));
+        }
+    }
 
     // TODO: Lots of repeated code, refactor!
     float applyFFCompression (float sample, ValType type = ValType::sampleVal);

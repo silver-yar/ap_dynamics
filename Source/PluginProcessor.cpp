@@ -405,11 +405,11 @@ void Ap_dynamicsAudioProcessor::update()
     threshold_ = apvts.getRawParameterValue("THR")->load();
     ratio_ = apvts.getRawParameterValue("RAT")->load();
 
-    for (int channel = 0; channel < 2; ++channel) {
-        makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain(
-                apvts.getRawParameterValue("MU")->load()
-                ));
-    }
+//    for (int channel = 0; channel < 2; ++channel) {
+//        makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain(
+//                apvts.getRawParameterValue("MU")->load()
+//                ));
+//    }
 }
 
 void Ap_dynamicsAudioProcessor::reset()

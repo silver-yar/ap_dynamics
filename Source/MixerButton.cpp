@@ -35,6 +35,17 @@ void MixerButton::paint (juce::Graphics& g)
     g.setFont(labelFont_.withHeight (24.0f));
     g.drawFittedText("clean", bounds.removeFromTop(getHeight() / 3),
                      juce::Justification::centred, 1);
+
+    // dB
+    g.setFont (8.0f);
+    g.drawFittedText("-20 dB", juce::Rectangle<int> (70, bounds.getY() + (getHeight() / 6) - 4,
+                                                     20, 10),
+                     juce::Justification::centred, 1);
+    g.drawFittedText("+20 dB", juce::Rectangle<int> (bounds.getRight() - 30, bounds.getY() + (getHeight() / 6) - 4,
+                                                     20, 10),
+                     juce::Justification::centred, 1);
+
+    g.setFont (24.0f);
     g.drawLine(70, getHeight() / 3, getWidth() - 20, getHeight() / 3, 1);
     g.drawFittedText("dirty", bounds.removeFromTop(getHeight() / 3),
                      juce::Justification::centred, 1);
@@ -62,13 +73,7 @@ void MixerButton::mouseDown(const juce::MouseEvent& event) {
     auto bounds = getLocalBounds();
 
     if (bounds.contains (event.getMouseDownPosition())) {
-        auto x = juce::jlimit(70, getWidth() - 20, event.getMouseDownX());
-        auto y = juce::jlimit(10, getHeight() - 10, event.getMouseDownY());
-
-        pointerPos_ = juce::Point<int> (x, y);
-        mixValue_ = juce::jmap(pointerPos_.getY(), 0, getHeight(),
-                               0, 100);
-        audioProcessor.setMixValue (mixValue_);
+        mapMouseToValue(event.getMouseDownPosition());
     }
 }
 
@@ -76,12 +81,26 @@ void MixerButton::mouseDrag(const juce::MouseEvent& event) {
     auto bounds = getLocalBounds();
 
     if (bounds.contains (event.getMouseDownPosition())) {
-        auto x = juce::jlimit(70, getWidth() - 20, event.getPosition().getX());
-        auto y = juce::jlimit(10, getHeight() - 10, event.getPosition().getY());
-
-        pointerPos_ = juce::Point<int> (x, y);
-        mixValue_ = juce::jmap(pointerPos_.getY(), 0, getHeight(),
-                               0, 100);
-        audioProcessor.setMixValue (mixValue_);
+        mapMouseToValue(event.getPosition());
     }
+}
+
+void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
+{
+    auto x_min = 70.0f;
+    auto x_max = getWidth() - 20.0f;
+    auto y_min = 10.0f;
+    auto y_max = getWidth() - 10.0f;
+
+    auto x = juce::jlimit(x_min, x_max, (float) mPoint.getX());
+    auto y = juce::jlimit(y_min, y_max, (float) mPoint.getY());
+
+    pointerPos_ = juce::Point<int> (x, y);
+//    mixValue_ = juce::jmap((float) pointerPos_.getY(), y_min, y_max,
+//                           0.0f, 100.0f);
+//    gainOutdB_ = juce::jmap((float) pointerPos_.getX(), x_min, x_max, -40.0f, 40.0f);
+    audioProcessor.setMixValue (juce::jmap((float) pointerPos_.getY(), y_min, y_max,
+                                           0.0f, 100.0f));
+    audioProcessor.setOutputGain (juce::jmap((float) pointerPos_.getX(), x_min, x_max,
+                                             -20.0f, 20.0f));
 }
