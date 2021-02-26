@@ -57,7 +57,8 @@ static ShaderProgramSource ParseShader(const std::string& filepath)
 //==============================================================================
 SliderBarGL::SliderBarGL(const std::string& filenameNoPath) : filename_ (filenameNoPath),
                                                               value_ (0.0f),
-                                                              vmValue_ (0.0f)
+                                                              vmValue_ (0.0f),
+                                                              shader_(openGLContext_)
 {
     auto now = std::chrono::high_resolution_clock::now();
     startTime = std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -104,7 +105,7 @@ void SliderBarGL::newOpenGLContextCreated()
 
 void SliderBarGL::openGLContextClosing()
 {
-    uniforms_.release();
+    // uniforms_.release();
     diffTexture_.release();
 //    rightTex_.release();
 //    leftTex_.release();
@@ -117,7 +118,7 @@ void SliderBarGL::openGLContextClosing()
 //        texture.release();
 //    }
 //    specTexture_.release();
-    shader_.release();
+    shader_.release(); // OpenGLProgram release! not unique_ptr release
 }
 
 void SliderBarGL::renderOpenGL()
@@ -137,7 +138,7 @@ void SliderBarGL::renderOpenGL()
     openGLContext_.extensions.glActiveTexture (GL_TEXTURE0);
     glEnable (GL_TEXTURE_2D);
 
-    if (uniforms_ == nullptr || shader_ == nullptr) {
+    if (uniforms_ == nullptr) {
         return;
     }
 
@@ -156,7 +157,7 @@ void SliderBarGL::renderOpenGL()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     
     // Use Shader Program that's been defined
-    shader_->use();
+    shader_.use();
     
     // Setup the Uniforms for use in the Shader
 
@@ -436,7 +437,6 @@ void SliderBarGL::createShaders()
                 "}\n";
     }
 //    std::unique_ptr<juce::OpenGLShaderProgram> shaderProgramAttempt = std::make_unique<juce::OpenGLShaderProgram> (openGLContext_);
-    shader_ = std::make_unique<juce::OpenGLShaderProgram> (openGLContext_);
 
     // Retrieve shader from file
 //    ShaderProgramSource source = ParseShader("../../../../../../Resources/shaders/" + filename_);
@@ -445,19 +445,18 @@ void SliderBarGL::createShaders()
 //    DBG("Fragment Source: \n" << source.FragmentSource << '\n');
 
     // Sets up pipeline of shaders and compiles the program
-    if (shader_->addShader (vertexShader_, GL_VERTEX_SHADER)
-        && shader_->addShader (fragmentShader_, GL_FRAGMENT_SHADER)
-        && shader_->link())
+    if (shader_.addShader (vertexShader_, GL_VERTEX_SHADER)
+        && shader_.addShader (fragmentShader_, GL_FRAGMENT_SHADER)
+        && shader_.link())
     {
 //        shader_ = std::move (shader_);
-        uniforms_ = std::make_unique<Uniforms> (openGLContext_, *shader_);
+        uniforms_ = std::make_unique<Uniforms> (openGLContext_, shader_);
 
         statusText_ = "GLSL: v" + juce::String (juce::OpenGLShaderProgram::getLanguageVersion(), 2);
     }
     else
     {
-        statusText_ = shader_->getLastError();
-        shader_ = nullptr;
+        statusText_ = shader_.getLastError();
     }
 
     //triggerAsyncUpdate();

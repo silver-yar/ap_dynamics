@@ -138,7 +138,7 @@ private:
             },
     };
 
-    std::unique_ptr<juce::OpenGLShaderProgram> shader_;
+    juce::OpenGLShaderProgram shader_;
     std::unique_ptr<Uniforms> uniforms_;
 
     std::string filename_;
