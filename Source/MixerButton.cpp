@@ -62,7 +62,10 @@ void MixerButton::mouseDown(const juce::MouseEvent& event) {
     auto bounds = getLocalBounds();
 
     if (bounds.contains (event.getMouseDownPosition())) {
-        pointerPos_ = event.getMouseDownPosition();
+        auto x = juce::jlimit(70, getWidth() - 20, event.getMouseDownX());
+        auto y = juce::jlimit(10, getHeight() - 10, event.getMouseDownY());
+
+        pointerPos_ = juce::Point<int> (x, y);
         mixValue_ = juce::jmap(pointerPos_.getY(), 0, getHeight(),
                                0, 100);
         audioProcessor.setMixValue (mixValue_);
@@ -73,7 +76,10 @@ void MixerButton::mouseDrag(const juce::MouseEvent& event) {
     auto bounds = getLocalBounds();
 
     if (bounds.contains (event.getMouseDownPosition())) {
-        pointerPos_ = event.getPosition();
+        auto x = juce::jlimit(70, getWidth() - 20, event.getPosition().getX());
+        auto y = juce::jlimit(10, getHeight() - 10, event.getPosition().getY());
+
+        pointerPos_ = juce::Point<int> (x, y);
         mixValue_ = juce::jmap(pointerPos_.getY(), 0, getHeight(),
                                0, 100);
         audioProcessor.setMixValue (mixValue_);
