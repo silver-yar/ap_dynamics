@@ -54,7 +54,7 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.setGradientFill (
             juce::ColourGradient (juce::Colour(0xFFFFD479), getWidth() / 2, getHeight() / 2,
-                                  juce::Colour(0xFFFFD479).darker(0.3f),0,0,true)
+                                  juce::Colour(0xFFFFC446),0,0,true)
     );
     g.fillAll ();
 
