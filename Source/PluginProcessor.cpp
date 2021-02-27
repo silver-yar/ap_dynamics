@@ -15,7 +15,10 @@ Ap_dynamicsAudioProcessor::Ap_dynamicsAudioProcessor()
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
-                       .withInput  ("Input", juce::AudioChannelSet::stereo(), true)
+                       .withInput  ("Input",
+                                    getTotalNumInputChannels() > 1 ? juce::AudioChannelSet::stereo()
+                                                                                : juce::AudioChannelSet::mono(),
+                                    true)
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
@@ -24,8 +27,8 @@ Ap_dynamicsAudioProcessor::Ap_dynamicsAudioProcessor()
 , apvts (*this, nullptr, "Parameters", createParameters())
 {
     apvts.state.addListener (this);
-    inputAmps_.resize(pBufferSize_);
-    outputAmps_.resize(pBufferSize_);
+    setOutputGain (0.0f);
+    init();
 }
 
 Ap_dynamicsAudioProcessor::~Ap_dynamicsAudioProcessor()
@@ -97,6 +100,10 @@ void Ap_dynamicsAudioProcessor::changeProgramName (int index, const juce::String
 //==============================================================================
 void Ap_dynamicsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    for (auto channel = 0; channel < 2; ++channel)
+    {
+        compressor_[channel]->setSampleRate (sampleRate);
+    }
     update();
     reset();
     isActive_ = true;
@@ -156,10 +163,7 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         auto* channelData = buffer.getWritePointer (channel);
         auto channelMaxVal = 0.0f;
 
-        for (int sample = 0; sample < numSamples; ++sample) {
-            channelData[sample] = applyRMSCompression(channelData[sample]);
-            channelData[sample] = applyPiecewiseOverdrive(channelData[sample]);
-        }
+        compressor_[channel]->process(channelData, channelData, buffer.getNumSamples());
 
         // Find max value in buffer channel
         for (int sample = 0; sample < numSamples; ++sample)
@@ -208,166 +212,6 @@ void Ap_dynamicsAudioProcessor::setStateInformation (const void* data, int sizeI
     apvts.replaceState (copyState);
 }
 
-float Ap_dynamicsAudioProcessor::applyFFCompression(float sample, ValType type)
-{
-    auto alphaA = exp(-log(9) / (getSampleRate() * attack_));
-    auto alphaR = exp(-log(9) / (getSampleRate() * release_));
-
-    float gainSmooth = 0;
-    float gain_sc = 0;
-
-    auto x_uni = abs(sample);
-    auto x_dB = 20 * log10(x_uni);
-    if (x_dB < mindB_)
-        x_dB = mindB_;
-    // Static Characteristics
-    if (x_dB > (threshold_ + kneeWidth_ / 2))
-        gain_sc = threshold_ + (x_dB - threshold_) / ratio_; // Perform downwards compression
-    else if (x_dB > (threshold_ - kneeWidth_ / 2))
-        gain_sc = x_dB + ((1 / ratio_ - 1) * powf((x_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
-    else
-        gain_sc = x_dB;
-
-    curr_xdB_ = x_dB;
-    curr_gainsc_ = gain_sc;
-
-    float gainChange_dB = gain_sc - x_dB;
-
-    // Smooth gain change
-    if (gainChange_dB < prevGainSmooth_) {
-        // attack mode
-        gainSmooth = ((1 - alphaA) * gainChange_dB) + (alphaA * prevGainSmooth_);
-    } else {
-        // release mode
-        gainSmooth = ((1 - alphaR) * gainChange_dB) + (alphaR * prevGainSmooth_);
-    }
-
-    // Convert back to linear amplitude scalar
-    auto lin_a = powf(10, gainSmooth / 20);
-    float x_out = lin_a * sample;
-
-    prevGainSmooth_ = gainSmooth;
-
-    // Apply Compression
-    switch (type) {
-        case sampleVal:
-            return x_out;
-        case gainsc:
-            return gain_sc;
-        default:
-            return 0;
-    }
-}
-
-float Ap_dynamicsAudioProcessor::applyFBCompression(float sample, ValType type)
-{
-    auto alphaA = exp(-log(9) / (getSampleRate() * attack_));
-    auto alphaR = exp(-log(9) / (getSampleRate() * release_));
-
-    float gainSmooth = 0;
-    float gain_sc = 0;
-
-    auto y_uni = abs(y_prev_);
-    auto y_dB = 20 * log10(y_uni);
-    if (y_dB < mindB_)
-        y_dB = mindB_;
-    // Static Characteristics
-    if (y_dB > (threshold_ + kneeWidth_ / 2))
-        gain_sc = threshold_ + (y_dB - threshold_) / ratio_; // Perform downwards compression
-    else if (y_dB > (threshold_ - kneeWidth_ / 2))
-        gain_sc = y_dB + ((1 / ratio_ - 1) * powf((y_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_); // Compression with ramp
-    else
-        gain_sc = y_dB;
-
-    curr_xdB_ = y_dB;
-    curr_gainsc_ = gain_sc;
-
-    float gainChange_dB = gain_sc - y_dB;
-
-    // Smooth gain change
-    if (gainChange_dB < prevGainSmooth_) {
-        // attack mode
-        gainSmooth = ((1 - alphaA) * gainChange_dB) + (alphaA * prevGainSmooth_);
-    } else {
-        // release mode
-        gainSmooth = ((1 - alphaR) * gainChange_dB) + (alphaR * prevGainSmooth_);
-    }
-
-    // Convert back to linear amplitude scalar
-    auto lin_a = powf(10, gainSmooth / 20);
-    float y_out = lin_a * sample;
-
-    y_prev_ = y_out;
-    prevGainSmooth_ = gainSmooth;
-
-    // Apply Compression
-    switch (type) {
-        case sampleVal:
-            return y_out;
-        case gainsc:
-            return gain_sc;
-        default:
-            return 0;
-    }
-}
-
-float Ap_dynamicsAudioProcessor::applyRMSCompression(float sample, ValType type)
-{
-    auto attack = 0.05f;
-    auto release = 0.25f;
-    auto kneeWidth = 6.0f;
-
-    auto alphaA = exp(-log(9) / (getSampleRate() * attack));
-    auto alphaR = exp(-log(9) / (getSampleRate() * release));
-
-    float gainSmooth = 0;
-    float gain_sc = 0;
-
-    auto x_uni = abs(sample);
-    auto x_dB = 20 * log10(x_uni);
-    if (x_dB < mindB_)
-        x_dB = mindB_;
-    // Static Characteristics
-    if (x_dB > (threshold_ + kneeWidth / 2))
-        gain_sc = threshold_ + (x_dB - threshold_) / ratio_; // Perform downwards compression
-    else if (x_dB > (threshold_ - kneeWidth / 2))
-        gain_sc = x_dB + ((1 / ratio_ - 1) * powf((x_dB - threshold_ + kneeWidth / 2), 2)) / (2 * kneeWidth);
-    else
-        gain_sc = x_dB;
-
-    curr_xdB_ = x_dB;
-    curr_gainsc_ = gain_sc;
-
-    float gainChange_dB = gain_sc - x_dB;
-
-    // Smooth gain change (RMS Approximation)
-    if (gainChange_dB < prevGainSmooth_) {
-        // attack mode
-        gainSmooth = -sqrt(((1 - alphaA) * powf(gainChange_dB,2))
-                + (alphaA * powf(prevGainSmooth_, 2)));
-    } else {
-        // release mode
-        gainSmooth = -sqrt(((1 - alphaR) * powf(gainChange_dB,2))
-                           + (alphaR * powf(prevGainSmooth_, 2)));
-    }
-
-    // Convert back to linear amplitude scalar
-    auto lin_a = powf(10, gainSmooth / 20);
-    float x_out = lin_a * sample;
-
-    prevGainSmooth_ = gainSmooth;
-
-    // Apply Compression
-    switch (type) {
-        case sampleVal:
-            return x_out;
-        case gainsc:
-            return gain_sc;
-        default:
-            return 0;
-    }
-}
-
 float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) const {
     float x_uni = abs(sample);
     float out = 0;
@@ -398,12 +242,25 @@ float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) const {
     return out;
 }
 
+void Ap_dynamicsAudioProcessor::init()
+{
+    for (auto i = 0; i < 2; ++i)
+    {
+        compressor_[i] = std::make_unique<APCompressor>();
+    }
+}
+
 void Ap_dynamicsAudioProcessor::update()
 {
     mustUpdateProcessing_ = false;
-    
-    threshold_ = apvts.getRawParameterValue("THR")->load();
-    ratio_ = apvts.getRawParameterValue("RAT")->load();
+
+    for (auto channel = 0; channel < 2; ++channel)
+    {
+        compressor_[channel]->updateParameters(apvts.getRawParameterValue("THR")->load(),
+                                         apvts.getRawParameterValue("RAT")->load());
+    }
+//    threshold_ = apvts.getRawParameterValue("THR")->load();
+//    ratio_ = apvts.getRawParameterValue("RAT")->load();
 
 //    for (int channel = 0; channel < 2; ++channel) {
 //        makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain(
@@ -414,10 +271,9 @@ void Ap_dynamicsAudioProcessor::update()
 
 void Ap_dynamicsAudioProcessor::reset()
 {
-    prevGainSmooth_ = 0;
-    y_prev_ = 0;
 
     for (int channel = 0; channel < 2; ++channel) {
+        compressor_[channel]->reset();
         makeup_[channel].reset(getSampleRate(), 0.050);
     }
 

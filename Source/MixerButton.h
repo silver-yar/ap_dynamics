@@ -24,8 +24,9 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
-    void mouseDown(const juce::MouseEvent&) override;
-    void mouseDrag(const juce::MouseEvent&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
 
 private:
     void mapMouseToValue(const juce::Point<int>&);
@@ -36,5 +37,6 @@ private:
     juce::Point<int> pointerPos_ {100, 50};
     float gainOutdB_ = 0.0f;
     float mixValue_ = 0.0f;
+    bool showdB = false;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MixerButton)
 };

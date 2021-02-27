@@ -4,6 +4,13 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               companyName="audio pirate">
   <MAINGROUP id="Sy3GVJ" name="ap_dynamics">
+    <GROUP id="{D723A9F3-2362-74A1-35A4-B69B061B46B5}" name="DSP">
+      <FILE id="waHywF" name="APCompressor.cpp" compile="1" resource="0"
+            file="DSP/APCompressor.cpp"/>
+      <FILE id="wGiSmY" name="APCompressor.h" compile="0" resource="0" file="DSP/APCompressor.h"/>
+      <FILE id="i2smqK" name="APOverdrive.cpp" compile="1" resource="0" file="DSP/APOverdrive.cpp"/>
+      <FILE id="GywcA1" name="APOverdrive.h" compile="0" resource="0" file="DSP/APOverdrive.h"/>
+    </GROUP>
     <GROUP id="{51C09136-CC53-80CE-892F-F27B65CEA6E4}" name="Resources">
       <GROUP id="{C88675DC-2475-43F0-41FB-33DE2BF63323}" name="cube">
         <FILE id="ajg7FI" name="back.png" compile="0" resource="1" file="Resources/cube/back.png"/>

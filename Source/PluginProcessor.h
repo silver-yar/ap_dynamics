@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "../DSP/APCompressor.h"
 
 //==============================================================================
 /**
@@ -64,17 +65,7 @@ public:
     juce::AudioProcessorValueTreeState apvts;
     std::atomic<float> meterLocalMaxVal, meterGlobalMaxVal; // std::atomic to make value thread safe
 
-    // Getters
-    juce::Array<float> getInputBuffer() { return inputAmps_; }
-    juce::Array<float> getOutputBuffer() { return outputAmps_; }
-    int getMinDB() const { return mindB_; }
-    float getCurrXdB() { return curr_xdB_; }
-    float getCurrGainSC() { return curr_gainsc_; }
-    bool getOverdrive() { return isOverdrived_; }
-    juce::AudioBuffer<float>& getWaveForm() { return waveform_; };
-
     // Setters
-    void setOverdrive (bool isOverdrived) { isOverdrived_ = isOverdrived; }
     void setMixValue (float value) { mixValue_ = value; }
     void setOutputGain (float value)
     {
@@ -83,15 +74,9 @@ public:
         }
     }
 
-    // TODO: Lots of repeated code, refactor!
-    float applyFFCompression (float sample, ValType type = ValType::sampleVal);
-    float applyFBCompression (float sample, ValType type = ValType::sampleVal);
-    float applyRMSCompression (float sample, ValType type = ValType::sampleVal);
     float applyPiecewiseOverdrive (float sample) const;
-    void fillPlotBuffer (float x_dB, float gain_sc);
-    void fillCCurve();
-    // Passes the sample rate and buffer size to DSP
-    void prepare (double sampleRate, int samplesPerBlock);
+
+    void init();
     // Updates DSP when user changes parameters
     void update();
     // Overrides AudioProcessor reset, reset DSP parameters
@@ -102,18 +87,10 @@ public:
 private:
     bool mustUpdateProcessing_ { false }, isActive_ { false };
 
-    juce::AudioBuffer<float> waveform_;
-    juce::Array<float> inputAmps_, outputAmps_;
-    int pBufferSize_ = 2048;
-    float curr_xdB_, curr_gainsc_;
+    std::unique_ptr<APCompressor> compressor_ [2];
 
-    float threshold_, ratio_, kneeWidth_, attack_, release_ = 0;
     juce::LinearSmoothedValue<float> makeup_ [2];
     float mixValue_ = 0.0f;
-    bool isOverdrived_ { false };
-    int mindB_ = -144;
-    float prevGainSmooth_ = 0;
-    float y_prev_ = 0;
 
     // Callback for DSP parameter changes
     void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyChanged, const juce::Identifier& property) override

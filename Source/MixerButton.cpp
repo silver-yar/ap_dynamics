@@ -37,13 +37,15 @@ void MixerButton::paint (juce::Graphics& g)
                      juce::Justification::centred, 1);
 
     // dB
-    g.setFont (8.0f);
-    g.drawFittedText("-20 dB", juce::Rectangle<int> (70, bounds.getY() + (getHeight() / 6) - 4,
-                                                     20, 10),
-                     juce::Justification::centred, 1);
-    g.drawFittedText("+20 dB", juce::Rectangle<int> (bounds.getRight() - 30, bounds.getY() + (getHeight() / 6) - 4,
-                                                     20, 10),
-                     juce::Justification::centred, 1);
+    if (showdB) {
+        g.setFont(8.0f);
+        g.drawFittedText("-20 dB", juce::Rectangle<int>(70, bounds.getY() + (getHeight() / 6) - 4,
+                                                        20, 10),
+                         juce::Justification::centred, 1);
+        g.drawFittedText("+20 dB", juce::Rectangle<int>(bounds.getRight() - 30, bounds.getY() + (getHeight() / 6) - 4,
+                                                        20, 10),
+                         juce::Justification::centred, 1);
+    }
 
     g.setFont (24.0f);
     g.drawLine(70, getHeight() / 3, getWidth() - 20, getHeight() / 3, 1);
@@ -73,6 +75,7 @@ void MixerButton::mouseDown(const juce::MouseEvent& event) {
     auto bounds = getLocalBounds();
 
     if (bounds.contains (event.getMouseDownPosition())) {
+        showdB = true;
         mapMouseToValue(event.getMouseDownPosition());
     }
 }
@@ -81,8 +84,18 @@ void MixerButton::mouseDrag(const juce::MouseEvent& event) {
     auto bounds = getLocalBounds();
 
     if (bounds.contains (event.getMouseDownPosition())) {
+        showdB = true;
         mapMouseToValue(event.getPosition());
     }
+}
+
+void MixerButton::mouseUp(const juce::MouseEvent& event) {
+    auto bounds = getLocalBounds();
+
+    if (bounds.contains (event.getMouseDownPosition())) {
+        showdB = false;
+    }
+
 }
 
 void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
@@ -90,7 +103,7 @@ void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
     auto x_min = 70.0f;
     auto x_max = getWidth() - 20.0f;
     auto y_min = 10.0f;
-    auto y_max = getWidth() - 10.0f;
+    auto y_max = getWidth() - 25.0f;
 
     auto x = juce::jlimit(x_min, x_max, (float) mPoint.getX());
     auto y = juce::jlimit(y_min, y_max, (float) mPoint.getY());
