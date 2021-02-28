@@ -8,21 +8,11 @@
   ==============================================================================
 */
 
-#include "CustomSlider.h"
+#include "APSlider.h"
 
 using namespace juce;
 
-CustomSlider::CustomSlider()
-{
-}
-
-CustomSlider::~CustomSlider()
-{
-
-}
-
-
-CustomSlider_::CustomSlider_(Ap_dynamicsAudioProcessor& p, SliderType sliderType) : audioProcessor (p), sliderType_ (sliderType)
+APSlider::APSlider(Ap_dynamicsAudioProcessor& p, SliderType sliderType) : audioProcessor (p), sliderType_ (sliderType)
 {
     ratioSliderBar_.start();
     addAndMakeVisible (ratioSliderBar_);
@@ -33,20 +23,20 @@ CustomSlider_::CustomSlider_(Ap_dynamicsAudioProcessor& p, SliderType sliderType
     startTimerHz(30);
 }
 
-CustomSlider_::~CustomSlider_()
+APSlider::~APSlider()
 {
     ratioSliderBar_.stop();
     threshSliderBar_.stop();
     stopTimer();
 }
 
-void CustomSlider_::resized()
+void APSlider::resized()
 {
     auto offset = 72.0f;
     switch (sliderType_) {
         case Normal:
             ratioBounds_ = Rectangle<int> (1, 10,
-                                        getWidth() - offset, getHeight() - 20);
+                                        getWidth() - offset, ap_slider_height - 20);
             ratioSliderBar_.setBounds(ratioBounds_);
             slider.setBounds(getLocalBounds());
             break;
@@ -54,7 +44,7 @@ void CustomSlider_::resized()
 //            ratioBounds_ = Rectangle<int> (1, 10,
 //                                        getWidth() - offset, getHeight() - 20);
             threshBounds_ = Rectangle<int> (1, 10,
-                                        getWidth() - offset, getHeight() - 20);
+                                        getWidth() - offset, ap_slider_height - 20);
 //            ratioSliderBar_.setBounds(ratioBounds_);
             threshSliderBar_.setBounds(threshBounds_);
             slider.setBounds(getLocalBounds());
@@ -64,7 +54,7 @@ void CustomSlider_::resized()
     }
 }
 
-void CustomSlider_::timerCallback()
+void APSlider::timerCallback()
 {
     auto gaindB = juce::Decibels::gainToDecibels(audioProcessor.meterLocalMaxVal.load(), -96.0f);
 
@@ -72,7 +62,7 @@ void CustomSlider_::timerCallback()
         case SliderType::Normal: {
             const float sliderPos = slider.getPositionOfValue(slider.getValue());
             const float sliderValue = juce::jmap(sliderPos,
-                                                 (float) slider.getHeight(),
+                                                 (float) ap_slider_height,
                                                  0.0f,
                                                  0.0f,
                                                  1.0f);
@@ -100,9 +90,11 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
                                            juce::Slider &slider) {
     lastSliderPos_ = sliderPos;
     sliderWidth_ = width - labelMargin_ + 1.0f;
+    ap_slider_height = height;
+
     // Background
     g.setColour (juce::Colours::darkgrey);
-    g.fillRoundedRectangle (x, y, width - labelMargin_, height, 10);
+    g.fillRoundedRectangle (x, y, width - labelMargin_, ap_slider_height, 10);
 }
 
 void MyLookAndFeel::drawLinearSliderBackground(Graphics &g, int x, int y, int width, int height, float sliderPos,
@@ -115,17 +107,16 @@ void MyLookAndFeel::drawLinearSliderBackground(Graphics &g, int x, int y, int wi
 juce::Label* MyLookAndFeel::createSliderTextBox(Slider &slider) {
     auto* l = LookAndFeel_V2::createSliderTextBox (slider);
 
-//    l->setColour (Label::textColourId, Colours::snow);
-//    l->setFont(labelFont_);
-//    l->setFont (16);
-//    l->setBounds(slider.getLocalBounds().removeFromTop(100));
+    l->setColour (Label::textColourId, Colours::snow);
+    l->setFont(labelFont_);
+    l->setFont (16);
+    l->setBounds(slider.getLocalBounds().removeFromTop(100));
 
     return l;
 }
 
 void MyLookAndFeel::drawLabel(Graphics &g, Label &label) {
     g.setColour(juce::Colours::snow);
-    g.setFont(labelFont_.withHeight(16.0f));
 
     Rectangle<int> labelBounds;
 

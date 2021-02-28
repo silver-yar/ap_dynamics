@@ -37,8 +37,8 @@ public:
 private:
     Ap_dynamicsAudioProcessor& audioProcessor;
 
-    juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::logo2_png,
-                                                         BinaryData::logo2_pngSize)};
+    juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::logo3_png,
+                                                         BinaryData::logo3_pngSize)};
     juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                 BinaryData::VarelaRound_ttfSize)};
     MyLookAndFeel thresholdLook_, ratioLook_;
@@ -47,6 +47,8 @@ private:
     std::unique_ptr<CustomSlider_> thresholdSlider_, ratioSlider_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, ratioAttachment_;
     std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, styleLabel_;
+
+    juce::Rectangle<int> thresholdBounds_, ratioBounds_, pickerBounds_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Ap_dynamicsAudioProcessorEditor)
 };

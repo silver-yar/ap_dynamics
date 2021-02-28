@@ -37,6 +37,13 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
     styleLabel_ -> attachToComponent (&stylePicker_, false);
     addAndMakeVisible (stylePicker_);
 
+    auto sliderHeight = 170;
+    thresholdBounds_ = juce::Rectangle<int> (40, 275, 200, sliderHeight);
+
+    ratioBounds_ = juce::Rectangle<int> (280, 275, 200, sliderHeight);
+
+    pickerBounds_ = juce::Rectangle<int> (470, 275, 200, sliderHeight);
+
     auto min_width = 700;
     auto min_height = 500;
 
@@ -63,16 +70,24 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
         .toFloat(),
         juce::RectanglePlacement::fillDestination);
 
+    // Shadows
+    g.setColour(juce::Colours::black.withAlpha(0.2f));
+
+    auto shadowBounds = juce::Rectangle<float> (80, 295, 130, 170);
+
+    g.fillRoundedRectangle(shadowBounds,10.0f);
+    g.fillRoundedRectangle(shadowBounds.withX(255.0f),10.0f);
+    g.fillRoundedRectangle(shadowBounds.withX(305.0f),10.0f);
+    g.fillRoundedRectangle(shadowBounds.withX(490),10.0f);
 }
 
 void Ap_dynamicsAudioProcessorEditor::resized()
 {
-    thresholdSlider_->setBounds(juce::Rectangle<int> (40, 275,
-                                                        200, 185));
-    ratioSlider_->setBounds(juce::Rectangle<int> (280, 275,
-                                                        200, 185));
-    stylePicker_.setBounds(juce::Rectangle<int> (460, 275,
-                                                        200, 185));
+    thresholdSlider_->setBounds(thresholdBounds_);
+
+    ratioSlider_->setBounds(ratioBounds_);
+
+    stylePicker_.setBounds(pickerBounds_);
 }
 
 void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_> &slider,
