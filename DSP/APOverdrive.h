@@ -9,3 +9,16 @@
 */
 
 #pragma once
+
+class APOverdrive
+{
+public:
+    APOverdrive();
+    ~APOverdrive();
+
+    void process (float* audioIn,
+                  float mix,
+                  float* audioOut,
+                  int numSamplesToRender);
+private:
+};

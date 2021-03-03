@@ -10,6 +10,8 @@
 
 #include <JuceHeader.h>
 #include "../DSP/APCompressor.h"
+#include "../DSP/APTubeDistortion.h"
+#include "../DSP/APOverdrive.h"
 
 //==============================================================================
 /**
@@ -74,8 +76,6 @@ public:
         }
     }
 
-    float applyPiecewiseOverdrive (float sample) const;
-
     void init();
     // Updates DSP when user changes parameters
     void update();
@@ -88,6 +88,8 @@ private:
     bool mustUpdateProcessing_ { false }, isActive_ { false };
 
     std::unique_ptr<APCompressor> compressor_ [2];
+    std::unique_ptr<APTubeDistortion> tubeDistortion_ [2];
+    std::unique_ptr<APOverdrive> overdrive_ [2];
 
     juce::LinearSmoothedValue<float> makeup_ [2];
     float mixValue_ = 0.0f;

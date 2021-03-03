@@ -30,7 +30,7 @@ public:
 
 
     void setupSlider (std::unique_ptr<CustomSlider_>& slider, std::unique_ptr<juce::Label>& label,
-                      const juce::String& name, bool showMeter, SliderType sliderType,
+                      const juce::String& name, SliderType sliderType,
                       const juce::String& suffix = "s");
     void timerCallback() override;
 
@@ -39,6 +39,7 @@ private:
 
     juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::logo3_png,
                                                          BinaryData::logo3_pngSize)};
+
     juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                 BinaryData::VarelaRound_ttfSize)};
     MyLookAndFeel thresholdLook_, ratioLook_;
@@ -48,6 +49,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, ratioAttachment_;
     std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, styleLabel_;
 
+    const int sliderHeight_ = 185;
     juce::Rectangle<int> thresholdBounds_, ratioBounds_, pickerBounds_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Ap_dynamicsAudioProcessorEditor)

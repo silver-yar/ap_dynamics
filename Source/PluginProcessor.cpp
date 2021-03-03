@@ -164,18 +164,19 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         auto channelMaxVal = 0.0f;
 
         compressor_[channel]->process(channelData, channelData, buffer.getNumSamples());
+        tubeDistortion_[channel]->process(channelData, 1.0f, 0.4f, 0.8f, mixValue_,
+                                          channelData, buffer.getNumSamples());
+        overdrive_[channel]->process(channelData, mixValue_, channelData, buffer.getNumSamples());
+        makeup_[channel].applyGain (channelData, numSamples);
 
         // Find max value in buffer channel
         for (int sample = 0; sample < numSamples; ++sample)
         {
-            channelData[sample] = applyPiecewiseOverdrive(channelData[sample]);
 
             auto rectifiedVal = std::abs (channelData[sample]);
             if (channelMaxVal < rectifiedVal) channelMaxVal = rectifiedVal;
             if (currentMaxVal < rectifiedVal) currentMaxVal = rectifiedVal;
         }
-
-        makeup_[channel].applyGain (channelData, numSamples);
 
         sumMaxVal += channelMaxVal; // Sum of channel 0 and channel 1 max values
 
@@ -210,36 +211,6 @@ void Ap_dynamicsAudioProcessor::setStateInformation (const void* data, int sizeI
     std::unique_ptr<juce::XmlElement> xml = getXmlFromBinary (data, sizeInBytes);
     juce::ValueTree copyState = juce::ValueTree::fromXml (*xml);
     apvts.replaceState (copyState);
-}
-
-float Ap_dynamicsAudioProcessor::applyPiecewiseOverdrive(float sample) const {
-    float x_uni = abs(sample);
-    float out = 0;
-
-    if (mixValue_ >= 0.0f && mixValue_ <= 30.0f)
-    {
-        // Clean
-        out = sample;
-    }
-    if (mixValue_ > 30.0f && mixValue_ < 34.0f)
-    {
-        out = sample;
-    }
-    if (mixValue_ >= 34.0f && mixValue_ <= 60.0f)
-    {
-        // Dirtier
-        out = sin(sample);
-    }
-    if (mixValue_ > 60.0f && mixValue_ < 64.0f)
-    {
-        out = sin(sample);
-    }
-    if (mixValue_ >= 64.0f && mixValue_ <= 100.0f)
-    {
-        // Dirty
-        out = sin(sample) * (3 - powf(2 - 3 * x_uni, 2)) / 3;
-    }
-    return out;
 }
 
 void Ap_dynamicsAudioProcessor::init()

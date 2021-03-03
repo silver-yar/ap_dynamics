@@ -117,7 +117,7 @@ void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
 //                           0.0f, 100.0f);
 //    gainOutdB_ = juce::jmap((float) pointerPos_.getX(), x_min, x_max, -40.0f, 40.0f);
     audioProcessor.setMixValue (juce::jmap((float) pointerPos_.getY(), y_min, y_max,
-                                           0.0f, 100.0f));
+                                           0.0f, 1.0f));
     audioProcessor.setOutputGain (juce::jmap((float) pointerPos_.getX(), x_min, x_max,
                                              -20.0f, 20.0f));
 }

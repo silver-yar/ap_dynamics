@@ -10,6 +10,10 @@
       <FILE id="wGiSmY" name="APCompressor.h" compile="0" resource="0" file="DSP/APCompressor.h"/>
       <FILE id="i2smqK" name="APOverdrive.cpp" compile="1" resource="0" file="DSP/APOverdrive.cpp"/>
       <FILE id="GywcA1" name="APOverdrive.h" compile="0" resource="0" file="DSP/APOverdrive.h"/>
+      <FILE id="mWqKxY" name="APTubeDistortion.cpp" compile="1" resource="0"
+            file="DSP/APTubeDistortion.cpp"/>
+      <FILE id="CgtFkC" name="APTubeDistortion.h" compile="0" resource="0"
+            file="DSP/APTubeDistortion.h"/>
     </GROUP>
     <GROUP id="{51C09136-CC53-80CE-892F-F27B65CEA6E4}" name="Resources">
       <GROUP id="{C88675DC-2475-43F0-41FB-33DE2BF63323}" name="cube">
@@ -36,6 +40,7 @@
       <FILE id="fOwXKq" name="logotwo.png" compile="0" resource="1" file="../../../Desktop/logotwo.png"/>
       <FILE id="m530MY" name="organic.png" compile="0" resource="1" file="Resources/organic.png"/>
       <FILE id="n742va" name="refl.png" compile="0" resource="1" file="Resources/refl.png"/>
+      <FILE id="sKxg0j" name="settings.svg" compile="0" resource="1" file="Resources/settings.svg"/>
       <FILE id="eHycAp" name="VarelaRound.ttf" compile="0" resource="1" file="Resources/VarelaRound.ttf"/>
     </GROUP>
     <GROUP id="{EDFDECA6-21B2-2E2E-F4BB-E88C8EE0426B}" name="Source">
