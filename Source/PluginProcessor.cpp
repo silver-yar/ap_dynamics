@@ -26,9 +26,13 @@ Ap_dynamicsAudioProcessor::Ap_dynamicsAudioProcessor()
 #endif
 , apvts (*this, nullptr, "Parameters", createParameters())
 {
+    compressor_ = std::make_unique<APCompressor>();
+    tubeDistortion_ = std::make_unique<APTubeDistortion>();
+    overdrive_ = std::make_unique<APOverdrive>();
+
+
     apvts.state.addListener (this);
     setOutputGain (0.0f);
-    init();
 }
 
 Ap_dynamicsAudioProcessor::~Ap_dynamicsAudioProcessor()
@@ -100,10 +104,8 @@ void Ap_dynamicsAudioProcessor::changeProgramName (int index, const juce::String
 //==============================================================================
 void Ap_dynamicsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    for (auto channel = 0; channel < 2; ++channel)
-    {
-        compressor_[channel]->setSampleRate (sampleRate);
-    }
+
+    compressor_->setSampleRate (sampleRate);
     update();
     reset();
     isActive_ = true;
@@ -163,11 +165,11 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         auto* channelData = buffer.getWritePointer (channel);
         auto channelMaxVal = 0.0f;
 
-        compressor_[channel]->process(channelData, channelData, buffer.getNumSamples());
-        tubeDistortion_[channel]->process(channelData, 1.0f, 0.4f, 0.8f, mixValue_,
+        compressor_->process(channelData, channelData, buffer.getNumSamples());
+        tubeDistortion_->process(channelData, 1.0f, 0.4f, 0.8f, mixValue_,
                                           channelData, buffer.getNumSamples());
-        overdrive_[channel]->process(channelData, mixValue_, channelData, buffer.getNumSamples());
-        makeup_[channel].applyGain (channelData, numSamples);
+        overdrive_->process(channelData, mixValue_, channelData, buffer.getNumSamples());
+        makeup_.applyGain (channelData, numSamples);
 
         // Find max value in buffer channel
         for (int sample = 0; sample < numSamples; ++sample)
@@ -213,23 +215,13 @@ void Ap_dynamicsAudioProcessor::setStateInformation (const void* data, int sizeI
     apvts.replaceState (copyState);
 }
 
-void Ap_dynamicsAudioProcessor::init()
-{
-    for (auto i = 0; i < 2; ++i)
-    {
-        compressor_[i] = std::make_unique<APCompressor>();
-    }
-}
-
 void Ap_dynamicsAudioProcessor::update()
 {
     mustUpdateProcessing_ = false;
 
-    for (auto channel = 0; channel < 2; ++channel)
-    {
-        compressor_[channel]->updateParameters(apvts.getRawParameterValue("THR")->load(),
-                                         apvts.getRawParameterValue("RAT")->load());
-    }
+    compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(),
+                                  apvts.getRawParameterValue("RAT")->load());
+
 //    threshold_ = apvts.getRawParameterValue("THR")->load();
 //    ratio_ = apvts.getRawParameterValue("RAT")->load();
 
@@ -243,10 +235,8 @@ void Ap_dynamicsAudioProcessor::update()
 void Ap_dynamicsAudioProcessor::reset()
 {
 
-    for (int channel = 0; channel < 2; ++channel) {
-        compressor_[channel]->reset();
-        makeup_[channel].reset(getSampleRate(), 0.050);
-    }
+    compressor_->reset();
+    makeup_.reset(getSampleRate(), 0.050);
 
     meterLocalMaxVal.store (0.0f);
     meterGlobalMaxVal.store (0.0f);

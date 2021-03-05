@@ -72,11 +72,10 @@ public:
     void setOutputGain (float value)
     {
         for (int channel = 0; channel < 2; ++channel) {
-            makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain (value));
+            makeup_.setTargetValue(juce::Decibels::decibelsToGain (value));
         }
     }
 
-    void init();
     // Updates DSP when user changes parameters
     void update();
     // Overrides AudioProcessor reset, reset DSP parameters
@@ -87,11 +86,11 @@ public:
 private:
     bool mustUpdateProcessing_ { false }, isActive_ { false };
 
-    std::unique_ptr<APCompressor> compressor_ [2];
-    std::unique_ptr<APTubeDistortion> tubeDistortion_ [2];
-    std::unique_ptr<APOverdrive> overdrive_ [2];
+    std::unique_ptr<APCompressor> compressor_;
+    std::unique_ptr<APTubeDistortion> tubeDistortion_;
+    std::unique_ptr<APOverdrive> overdrive_;
 
-    juce::LinearSmoothedValue<float> makeup_ [2];
+    juce::LinearSmoothedValue<float> makeup_;
     float mixValue_ = 0.0f;
 
     // Callback for DSP parameter changes
