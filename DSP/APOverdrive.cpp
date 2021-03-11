@@ -36,7 +36,7 @@ void APOverdrive::process (float* audioIn,
             out = sample;
         }
         if (mix > 0.3f && mix < 0.34f) {
-            out = sample;
+            out = mix * sin(sample) + (1 - mix) * sample;
         }
         if (mix >= 0.34f && mix <= 0.6f) {
             // Dirtier
@@ -44,12 +44,15 @@ void APOverdrive::process (float* audioIn,
             out = mix * out + (1 - mix) * sample;
         }
         if (mix > 0.6f && mix < 0.64f) {
-            out = sin(sample);
+            out = mix *
+                    (sin(sample) * (3 - powf(2 - 3 * x_uni, 2)) / 3) +
+                    (1 - mix) *
+                    sin(sample);
         }
         if (mix >= 0.64f && mix <= 1.0f) {
             // Dirty
             out = sin(sample) * (3 - powf(2 - 3 * x_uni, 2)) / 3;
-            out = mix * out + (1 - mix) * sample;
+            out = mix * out + (1 - mix) * sin(sample);
         }
         audioOut[i] = out;
     }

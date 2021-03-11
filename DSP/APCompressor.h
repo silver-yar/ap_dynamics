@@ -35,8 +35,8 @@ private:
     float sampleRate_;
     float threshold_ = 0.0f;
     float ratio_ = 1.0f;
-    float attack_ = 0.05f;
-    float release_ = 0.25f;
+    float attack_ = 0.02f; // 50 ms
+    float release_ = 0.08f; // 80 ms
     float kneeWidth_ = 6.0f;
     float prevGainSmooth_ = 0.0f;
     float y_prev_ = 0.0f;

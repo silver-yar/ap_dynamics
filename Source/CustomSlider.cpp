@@ -102,7 +102,7 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
     sliderWidth_ = width - labelMargin_ + 1.0f;
     // Background
     g.setColour (juce::Colours::darkgrey);
-    g.fillRoundedRectangle (x, y, width - labelMargin_, height, 10);
+    g.fillRoundedRectangle (x, y, width - labelMargin_, height, CustomSlider_::cornerSize);
 }
 
 void MyLookAndFeel::drawLinearSliderBackground(Graphics &g, int x, int y, int width, int height, float sliderPos,

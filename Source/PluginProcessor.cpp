@@ -166,9 +166,9 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         auto channelMaxVal = 0.0f;
 
         compressor_->process(channelData, channelData, buffer.getNumSamples());
-        tubeDistortion_->process(channelData, 1.0f, 0.4f, 0.8f, mixValue_,
-                                          channelData, buffer.getNumSamples());
         overdrive_->process(channelData, mixValue_, channelData, buffer.getNumSamples());
+        tubeDistortion_->process(channelData, 1.0f, -0.2f, 8.0f, mixValue_,
+                                          channelData, buffer.getNumSamples());
         makeup_.applyGain (channelData, numSamples);
 
         // Find max value in buffer channel

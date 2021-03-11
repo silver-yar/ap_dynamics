@@ -32,11 +32,10 @@ private:
 class CustomSlider_ : public juce::Component, public juce::Timer
 {
 public:
+    static constexpr float cornerSize = 10.0f;
 
     CustomSlider_(Ap_dynamicsAudioProcessor&, SliderType);
     ~CustomSlider_();
-
-
 
     void resized() override;
     void timerCallback() override;
