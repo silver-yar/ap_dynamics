@@ -140,7 +140,7 @@ void SliderBarGL::renderOpenGL()
 
     if (uniforms_->diffTexture != nullptr)
     {
-        uniforms_->diffTexture->set((GLint) 1);
+        uniforms_->diffTexture->set((GLint) diffTexture_.getTextureID());
     }
 
     if (uniforms_->specTexture != nullptr)

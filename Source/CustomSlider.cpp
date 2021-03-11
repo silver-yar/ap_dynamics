@@ -147,6 +147,6 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label) {
             break;
     }
     g.drawFittedText(label.getText().substring(0, 9), labelBounds,
-                     label.getJustificationType(), 1);
+                     juce::Justification::centredRight, 1);
 }
 
