@@ -18,6 +18,15 @@
 //==============================================================================
 /**
 */
+const static int M_HEIGHT = 500;
+const static int M_WIDTH = 700;
+const static float FONT_HEIGHT = 24.0f;
+const static float SHADOW_FONT_HEIGHT = 28.0f;
+
+const static juce::Colour SHADOW_COLOR = juce::Colours::black.withAlpha(0.15f);
+const static juce::Colour INNER_GRADIENT_BG = juce::Colour(0xFFFFD479);
+const static juce::Colour OUTER_GRADIENT_BG = juce::Colour(0xFFFFC446);
+
 class Ap_dynamicsAudioProcessorEditor  : public juce::AudioProcessorEditor,
                                          public juce::Timer
 {
@@ -31,6 +40,7 @@ public:
 
 
     void setupSlider (std::unique_ptr<CustomSlider_>& slider, std::unique_ptr<juce::Label>& label,
+                      std::unique_ptr<juce::Label>& labelShadow,
                       const juce::String& name, SliderType sliderType,
                       const juce::String& suffix = "s");
     void timerCallback() override;
@@ -51,7 +61,7 @@ private:
     std::unique_ptr<CustomSlider_> thresholdSlider_, ratioSlider_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, ratioAttachment_;
     std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, styleLabel_;
-//    juce::Label lshdwT_, lshdwR_, lshdwS_;
+    std::unique_ptr<juce::Label> lshdwT_, lshdwR_, lshdwS_;
 
 //    juce::Point<float> offset_ {0, -10};
 //    int shadowDeltaXY_ = 5;

@@ -16,13 +16,13 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
                                  ratioLook_ (p, Normal),
                                  stylePicker_ (p)
 {
-    setupSlider(thresholdSlider_, thresholdLabel_, "Threshold",
+    setupSlider(thresholdSlider_, thresholdLabel_, lshdwT_, "Threshold",
                 SliderType::Invert, "dB");
     thresholdSlider_->slider.setLookAndFeel (&thresholdLook_);
     thresholdAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
             (audioProcessor.apvts, "THR", thresholdSlider_->slider);
 
-    setupSlider(ratioSlider_, ratioLabel_, "Ratio",
+    setupSlider(ratioSlider_, ratioLabel_, lshdwR_, "Ratio",
                 SliderType::Normal, ": 1");
     ratioSlider_->slider.setLookAndFeel (&ratioLook_);
     ratioAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
@@ -31,10 +31,18 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
     styleLabel_ = std::make_unique<juce::Label> ("", "style");
     styleLabel_ -> setJustificationType (juce::Justification::centred);
     styleLabel_ -> setText("style", juce::dontSendNotification);
-    styleLabel_ -> setFont (myFont_.withHeight (24.0f));
+    styleLabel_ -> setFont (myFont_.withHeight (FONT_HEIGHT));
     styleLabel_ -> setBorderSize(juce::BorderSize<int> (10, 50, 30, 0));
     styleLabel_ -> setColour (juce::Label::textColourId, juce::Colours::snow);
     styleLabel_ -> attachToComponent (&stylePicker_, false);
+
+    lshdwS_ = std::make_unique<juce::Label> ("", "style");
+    lshdwS_ -> setJustificationType (juce::Justification::centred);
+    lshdwS_ -> setText("style", juce::dontSendNotification);
+    lshdwS_ -> setFont (myFont_.withHeight (SHADOW_FONT_HEIGHT));
+    lshdwS_ -> setBorderSize(juce::BorderSize<int> (10, 50, 38, 0));
+    lshdwS_ -> setColour (juce::Label::textColourId, SHADOW_COLOR);
+    lshdwS_ -> attachToComponent (&stylePicker_, false);
     addAndMakeVisible (stylePicker_);
 
     thresholdBounds_ = juce::Rectangle<int> (40, 270, 200, sliderHeight_);
@@ -43,10 +51,7 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
 
     pickerBounds_ = juce::Rectangle<int> (470, 270, 200, sliderHeight_);
 
-    auto min_width = 700;
-    auto min_height = 500;
-
-    setSize (min_width, min_height);
+    setSize (M_WIDTH, M_HEIGHT);
     startTimerHz (60);
     
     testBox_.setBounds(0, 0, 100, 150);
@@ -62,8 +67,8 @@ Ap_dynamicsAudioProcessorEditor::~Ap_dynamicsAudioProcessorEditor()
 void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.setGradientFill (
-            juce::ColourGradient (juce::Colour(0xFFFFD479), getWidth() / 2, getHeight() / 2,
-                                  juce::Colour(0xFFFFC446),-80,-80,true)
+            juce::ColourGradient (INNER_GRADIENT_BG, getWidth() / 2, getHeight() / 2,
+                                  OUTER_GRADIENT_BG,-80,-80,true)
     );
     g.fillAll();
 
@@ -86,7 +91,7 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
 
 
     // Slider Shadows
-    g.setColour(juce::Colours::black.withAlpha(0.2f));
+    g.setColour(SHADOW_COLOR);
 
     auto shadowBounds = juce::Rectangle<float> (40, 270, 130, sliderHeight_);
 
@@ -109,6 +114,7 @@ void Ap_dynamicsAudioProcessorEditor::resized()
 
 void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_> &slider,
                                                   std::unique_ptr<juce::Label> &label,
+                                                  std::unique_ptr<juce::Label> &labelShadow,
                                                   const juce::String &name,
                                                   SliderType sliderType,
                                                   const juce::String &suffix) {
@@ -118,16 +124,24 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_>
     slider -> slider.setTextValueSuffix (" " + suffix);
     slider -> slider.setColour (juce::Slider::trackColourId, juce::Colour(0xFFFFD479));
     slider -> slider.setColour (juce::Slider::textBoxTextColourId, juce::Colours::snow);
+    
     label = std::make_unique<juce::Label> ("", name);
     label -> setJustificationType(juce::Justification::centred);
     label -> setText (name.toLowerCase(), juce::dontSendNotification);
     label -> setBorderSize(juce::BorderSize<int> (10, 0, 30, 70));
     label -> setColour (juce::Label::textColourId, juce::Colours::snow);
-    label -> setFont (myFont_.withHeight (24.0f));
+    label -> setFont (myFont_.withHeight (FONT_HEIGHT));
     label -> attachToComponent(slider.get(), false);
 
+    labelShadow = std::make_unique<juce::Label> ("", name);
+    labelShadow -> setJustificationType(juce::Justification::centred);
+    labelShadow -> setText (name.toLowerCase(), juce::dontSendNotification);
+    labelShadow -> setBorderSize(juce::BorderSize<int> (10, 0, 38, 70));
+    labelShadow -> setColour (juce::Label::textColourId, SHADOW_COLOR);
+    labelShadow -> setFont (myFont_.withHeight (SHADOW_FONT_HEIGHT));
+    labelShadow -> attachToComponent(slider.get(), false);
+
     addAndMakeVisible(slider.get());
-    addAndMakeVisible(label.get());
 }
 
 void Ap_dynamicsAudioProcessorEditor::timerCallback()

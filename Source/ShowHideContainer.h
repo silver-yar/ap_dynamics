@@ -72,8 +72,8 @@ public:
     {
     }
 
-    juce::Point<float> offset {0, -10};
-    int shadowDeltaXY = 5;
+    juce::Point<float> offset {0, -16};
+    int shadowDeltaXY = 8;
 
 private:
     juce::TextEditor xOffset_, yOffset_, deltaEditor_;
