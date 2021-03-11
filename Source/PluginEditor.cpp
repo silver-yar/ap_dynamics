@@ -45,17 +45,17 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
     lshdwS_ -> attachToComponent (&stylePicker_, false);
     addAndMakeVisible (stylePicker_);
 
-    thresholdBounds_ = juce::Rectangle<int> (40, 270, 200, sliderHeight_);
+    thresholdBounds_ = juce::Rectangle<int> (40, SLIDER_Y, SLIDER_WIDTH, sliderHeight_);
 
-    ratioBounds_ = juce::Rectangle<int> (280, 270, 200, sliderHeight_);
+    ratioBounds_ = juce::Rectangle<int> (280, SLIDER_Y, SLIDER_WIDTH, sliderHeight_);
 
-    pickerBounds_ = juce::Rectangle<int> (470, 270, 200, sliderHeight_);
+    pickerBounds_ = juce::Rectangle<int> (470, SLIDER_Y, SLIDER_WIDTH, sliderHeight_);
 
     setSize (M_WIDTH, M_HEIGHT);
     startTimerHz (60);
     
-    testBox_.setBounds(0, 0, 100, 150);
-    addAndMakeVisible (testBox_);
+//    testBox_.setBounds(0, 0, 100, 150);
+//    addAndMakeVisible (testBox_);
 }
 
 Ap_dynamicsAudioProcessorEditor::~Ap_dynamicsAudioProcessorEditor()
@@ -75,7 +75,7 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
     // Logo
     constexpr int textDeltaX = 80;
     constexpr int textDeltaY = 40;
-    const int textHeight = getHeight() * 0.4f;
+    const int textHeight = getHeight() * 0.45f;
     const auto textBounds = getLocalBounds().removeFromTop(textHeight)
             .reduced(textDeltaX, textDeltaY)
             .toFloat();
@@ -93,7 +93,7 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
     // Slider Shadows
     g.setColour(SHADOW_COLOR);
 
-    auto shadowBounds = juce::Rectangle<float> (40, 270, 130, sliderHeight_);
+    auto shadowBounds = juce::Rectangle<float> (40, SLIDER_Y, 130, sliderHeight_);
 
     g.fillRoundedRectangle(shadowBounds.expanded(testBox_.shadowDeltaXY) +
                                                         testBox_.offset, 10.0f);

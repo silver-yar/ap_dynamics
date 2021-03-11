@@ -14,10 +14,10 @@
 #include "SliderBarGL.h"
 
 //==============================================================================
-SliderBarGL::SliderBarGL(const std::string& filenameNoPath) : filename_ (filenameNoPath),
+SliderBarGL::SliderBarGL(const std::string& filenameNoPath) : shader_(openGLContext_),
+                                                              filename_ (filenameNoPath),
                                                               value_ (0.0f),
-                                                              vmValue_ (0.0f),
-                                                              shader_(openGLContext_)
+                                                              vmValue_ (0.0f)
 {
     auto now = std::chrono::high_resolution_clock::now();
     startTime = std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -310,7 +310,7 @@ void SliderBarGL::createShaders()
                 "\n"
                 "    if (uv.y < sliderValue)\n"
                 "    {\n"
-                "        fragColor = vec4(255. / 255., 220. / 255., 140. / 255., 1.);\n"
+                "        fragColor = vec4(255. / 255., 212. / 255., 121. / 255., 1.);\n"
                 "    }\n"
                 "    else if (uv.y < vomValue && uv.y > sliderValue)\n"
                 "    {\n"
@@ -391,7 +391,7 @@ void SliderBarGL::createShaders()
                 "    }\n"
                 "    else\n"
                 "    {\n"
-                "        fragColor = vec4(255. / 255., 220. / 255., 140. / 255., 1.);\n"
+                "        fragColor = vec4(255. / 255., 212. / 255., 121. / 255., 1.);\n"
                 "    }\n"
                 "}\n";
     }
