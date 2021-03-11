@@ -30,6 +30,8 @@ public:
     void openGLContextClosing() override;
     void renderOpenGL() override;
 
+    GLint loadCubeMap(std::vector<juce::Image> texture_images);
+
     // JUCE Callbacks
     void paint(juce::Graphics&) override;
     void resized() override;
@@ -52,7 +54,6 @@ public:
 private:
 
     void createShaders();
-    unsigned int loadCubeMap();
     // Struct to manage uniforms for the fragment shader
     struct Uniforms
     {
@@ -97,10 +98,7 @@ private:
     juce::Time time_;
 
     // Texture Objects
-    juce::OpenGLTexture diffTexture_, specTexture_,
-                        rightTex_, leftTex_,
-                        topTex_, bottomTex_,
-                        backTex_, frontTex_;
+    juce::OpenGLTexture diffTexture_, specTexture_;
 //    juce::Array<juce::OpenGLTexture> cubeMapTextures_ {
 //        &rightTex_, &leftTex_,
 //        &topTex_, &bottomTex_,

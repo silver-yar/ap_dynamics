@@ -94,7 +94,9 @@ void SliderBarGL::renderOpenGL()
     // Enable Alpha Blending
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    openGLContext_.extensions.glActiveTexture (GL_TEXTURE0);
+
+    // Enable 2D Diffuse Texture
+    openGLContext_.extensions.glActiveTexture (GL_TEXTURE1);
     glEnable (GL_TEXTURE_2D);
 
     if (uniforms_ == nullptr) {
@@ -138,12 +140,12 @@ void SliderBarGL::renderOpenGL()
 
     if (uniforms_->diffTexture != nullptr)
     {
-        uniforms_->diffTexture->set((GLint) 0);
+        uniforms_->diffTexture->set((GLint) 1);
     }
 
     if (uniforms_->specTexture != nullptr)
     {
-        uniforms_->specTexture->set((GLint) loadCubeMap());
+        uniforms_->specTexture->set((GLint) loadCubeMap(textureFaces_));
     }
 
     if (uniforms_->runTime != nullptr) {
@@ -201,39 +203,43 @@ void SliderBarGL::renderOpenGL()
     //openGLContext_.extensions.glBindVertexArray(0);
 }
 
-void SliderBarGL::paint (juce::Graphics& g)
+GLint SliderBarGL::loadCubeMap(std::vector<juce::Image> texture_images)
 {
-}
-
-void SliderBarGL::resized()
-{
-}
-
-unsigned int SliderBarGL::loadCubeMap()
-{
-    unsigned int textureId;
-    glGenTextures(1, &textureId);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+    auto texID = specTexture_.getTextureID();
+    glActiveTexture (GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
 
     for (auto i = 0; i < textureFaces_.size(); i++)
     {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                     0,
+                     GL_RGBA,
                      textureFaces_[i].getWidth(),
                      textureFaces_[i].getHeight(),
                      0,
-                     GL_RGB,
+                     GL_RGBA,
                      GL_UNSIGNED_BYTE,
-                     textureFaces_[i].getPixelData()
+                     (GLvoid*) textureFaces_[i].getPixelData()
         );
     }
 
+    glEnable (GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    return textureId;
+    return specTexture_.getTextureID();
+}
+
+void SliderBarGL::paint (juce::Graphics& g)
+{
+}
+
+void SliderBarGL::resized()
+{
 }
 
 void SliderBarGL::createShaders()
@@ -305,7 +311,7 @@ void SliderBarGL::createShaders()
                 "    vec3 diff = diffuse(uv);\n"
                 "    diff *= .25 + max(0., dot(norm3d, lightDir));\n"
                 "    vec3 view = normalize(vec3(uv,-1.).xzy);\n"
-                "    vec3 spec = vec3(.774597, .774597, .774597) *\n"
+                "    vec3 spec = texture(specTexture, reflect(view, norm3d)).xyz *\n"
                 "                                            max(0.,dot(-norm3d,view));\n"
                 "\n"
                 "    if (uv.y < sliderValue)\n"
@@ -339,6 +345,7 @@ void SliderBarGL::createShaders()
                 "uniform float sliderValue;\n"
                 "uniform float vomValue;\n"
                 "uniform sampler2D diffTexture;\n"
+                "uniform samplerCube specTexture;\n"
                 "uniform float runTime;\n"
                 "\n"
                 "float signcos(in float v) {\n"
@@ -382,8 +389,8 @@ void SliderBarGL::createShaders()
                 "    vec3 diff = diffuse(uv);\n"
                 "    diff *= .25 + max(0., dot(norm3d, lightDir));\n"
                 "    vec3 view = normalize(vec3(uv,-1.).xzy);\n"
-                "    vec3 spec = vec3(.774597, .774597, .774597) *\n"
-                "                                max(0.,dot(-norm3d,view));\n"
+                "    vec3 spec = texture(specTexture, reflect(view, norm3d)).xyz *\n"
+                "                                            max(0.,dot(-norm3d,view));\n"
                 "\n"
                 "    if (uv.y > sliderValue)\n"
                 "    {\n"
