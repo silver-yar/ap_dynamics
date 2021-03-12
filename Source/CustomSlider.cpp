@@ -101,7 +101,7 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
     lastSliderPos_ = sliderPos;
     sliderWidth_ = width - labelMargin_ + 1.0f;
     // Background
-    g.setColour (juce::Colours::darkgrey);
+    g.setColour (AP::Colors::DarkGrey);
     g.fillRoundedRectangle (x, y, width - labelMargin_, height, CustomSlider_::cornerSize);
 }
 
@@ -124,7 +124,7 @@ juce::Label* MyLookAndFeel::createSliderTextBox(Slider &slider) {
 }
 
 void MyLookAndFeel::drawLabel(Graphics &g, Label &label) {
-    g.setColour(juce::Colours::snow);
+    g.setColour(AP::Colors::DarkGrey);
     g.setFont(labelFont_.withHeight(16.0f));
 
     Rectangle<int> labelBounds;

@@ -46,6 +46,8 @@
       <FILE id="eHycAp" name="VarelaRound.ttf" compile="0" resource="1" file="Resources/VarelaRound.ttf"/>
     </GROUP>
     <GROUP id="{EDFDECA6-21B2-2E2E-F4BB-E88C8EE0426B}" name="Source">
+      <FILE id="PB29t5" name="APDefines.cpp" compile="1" resource="0" file="Source/APDefines.cpp"/>
+      <FILE id="Kebx9p" name="APDefines.h" compile="0" resource="0" file="Source/APDefines.h"/>
       <FILE id="bLNdCg" name="ShowHideContainer.h" compile="0" resource="0"
             file="Source/ShowHideContainer.h"/>
       <GROUP id="{C26112AF-5A97-8FAC-DC64-A186E03357A0}" name="OpenGL">

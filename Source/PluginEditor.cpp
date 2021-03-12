@@ -33,7 +33,7 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
     styleLabel_ -> setText("style", juce::dontSendNotification);
     styleLabel_ -> setFont (myFont_.withHeight (FONT_HEIGHT));
     styleLabel_ -> setBorderSize(juce::BorderSize<int> (10, 50, 30, 0));
-    styleLabel_ -> setColour (juce::Label::textColourId, juce::Colours::snow);
+    styleLabel_ -> setColour (juce::Label::textColourId, AP::Colors::DarkGrey);
     styleLabel_ -> attachToComponent (&stylePicker_, false);
 
     lshdwS_ = std::make_unique<juce::Label> ("", "style");
@@ -129,7 +129,7 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_>
     label -> setJustificationType(juce::Justification::centred);
     label -> setText (name.toLowerCase(), juce::dontSendNotification);
     label -> setBorderSize(juce::BorderSize<int> (10, 0, 30, 70));
-    label -> setColour (juce::Label::textColourId, juce::Colours::snow);
+    label -> setColour (juce::Label::textColourId, AP::Colors::DarkGrey);
     label -> setFont (myFont_.withHeight (FONT_HEIGHT));
     label -> attachToComponent(slider.get(), false);
 

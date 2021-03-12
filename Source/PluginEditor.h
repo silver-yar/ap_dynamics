@@ -14,6 +14,7 @@
 #include "CustomSlider.h"
 #include "MixerButton.h"
 #include "ShowHideContainer.h"
+#include "APDefines.h"
 
 //==============================================================================
 /**
