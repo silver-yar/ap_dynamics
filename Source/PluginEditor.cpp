@@ -79,6 +79,11 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
     );
     g.fillAll();
 
+//    g.setColour(juce::Colours::black);
+//    g.drawText("x: " + juce::String((float) mouseX / getWidth()) + ", y: " +
+//                juce::String((float) mouseY / getHeight()), 10, 10, 200, 50,
+//               juce::Justification::centred, false);
+
     // Logo
     constexpr int textDeltaX = 80;
     constexpr int textDeltaY = 40;
@@ -162,5 +167,16 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_>
 
 void Ap_dynamicsAudioProcessorEditor::timerCallback()
 {
+    auto window = juce::Desktop::getInstance().getComponent(0);
+    auto pos = juce::Desktop::getInstance().getMousePosition();
+    mouseX = pos.x - window->getX();
+    mouseY = pos.y - window->getY();
+
+//    juce::uint8 mappedColor = juce::jmap(mouseY , 0, getHeight(),0, 255);
+//    auto color = juce::Colour(mappedColor, mappedColor, mappedColor, (juce::uint8) 255);
+//    thresholdLabel_->setColour(juce::Label::textColourId, AP::Colors::DarkGrey);
+//    ratioLabel_->setColour(juce::Label::textColourId, AP::Colors::DarkGrey);
+//    styleLabel_->setColour(juce::Label::textColourId, AP::Colors::DarkGrey);
+
     repaint();
 }
