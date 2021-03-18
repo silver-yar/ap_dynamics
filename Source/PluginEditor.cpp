@@ -53,6 +53,10 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
 
     setSize (M_WIDTH, M_HEIGHT);
     startTimerHz (60);
+
+    kernel_.createGaussianBlur (8.0f);
+    auto logoBounds = getLocalBounds().removeFromTop(getHeight() * 0.45f).reduced(80, 40);
+    kernel_.applyToImage(textShadow_, textShadow_, textShadow_.getBounds());
     
 //    testBox_.setBounds(0, 0, 100, 150);
 //    addAndMakeVisible (testBox_);
@@ -62,6 +66,9 @@ Ap_dynamicsAudioProcessorEditor::~Ap_dynamicsAudioProcessorEditor()
 {
     stopTimer();
 }
+
+int mouseX = 0;
+int mouseY = 0;
 
 //==============================================================================
 void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
@@ -80,8 +87,17 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
             .reduced(textDeltaX, textDeltaY)
             .toFloat();
 
+    // Draw Test Label
+//    shadow_.drawForImage(g, labelImage_);
+//    g.drawImage(labelImage_,
+//                juce::Rectangle<float> (mouseX, mouseY, 200, 100),
+//                juce::RectanglePlacement::fillDestination);
+
     // Draw Logo Shadow
-    g.drawImage (textShadow_, 
+//    shadowEffect.applyEffect (bgText_, g, 1.0f, 0.5f);
+//    shadow.drawForImage(g, bgText_);
+//    g.setOpacity(1.0f);
+    g.drawImage (textShadow_,
                  textBounds.withY(textBounds.getY() - 15).expanded(testBox_.shadowDeltaXY * 1.5f) +
                  testBox_.offset,
                  juce::RectanglePlacement::fillDestination);

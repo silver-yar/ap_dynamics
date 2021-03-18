@@ -51,10 +51,16 @@ public:
 private:
     Ap_dynamicsAudioProcessor& audioProcessor;
 
+    juce::ImageConvolutionKernel kernel_ { 16 };
+    juce::Rectangle<int> textB_ {getLocalBounds().removeFromTop(getHeight() * 0.45f)
+    .reduced(80, 40)};
+
     juce::Image bgText_ {juce::ImageCache::getFromMemory(BinaryData::logo_clean_png,
                                                          BinaryData::logo_clean_pngSize)};
     juce::Image textShadow_ {juce::ImageCache::getFromMemory(BinaryData::shadow_png,
                                                             BinaryData::shadow_pngSize)};
+    juce::Image labelImage_ {juce::ImageCache::getFromMemory(BinaryData::label_png,
+                                                             BinaryData::label_pngSize)};
 
     juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                 BinaryData::VarelaRound_ttfSize)};

@@ -59,7 +59,7 @@ void MixerButton::paint (juce::Graphics& g)
 
     // Selector Shadow
     g.setColour(juce::Colours::black.withAlpha(0.1f));
-    g.fillEllipse(bubbleBounds.withPosition(bubbleBounds.getX() - 10, bubbleBounds.getY() + 10));
+    g.fillEllipse(bubbleBounds.withPosition(bubbleBounds.getX(), bubbleBounds.getY() + 10));
 
     // Selector
     g.setGradientFill(juce::ColourGradient(juce::Colours::grey.withAlpha(0.3f),
