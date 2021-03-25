@@ -18,6 +18,12 @@
     <GROUP id="{51C09136-CC53-80CE-892F-F27B65CEA6E4}" name="Resources">
       <GROUP id="{C88675DC-2475-43F0-41FB-33DE2BF63323}" name="cube">
         <FILE id="ajg7FI" name="back.png" compile="0" resource="1" file="Resources/cube/back.png"/>
+        <FILE id="YJy9Td" name="blurCube1.png" compile="0" resource="1" file="Resources/cube/blurCube1.png"/>
+        <FILE id="aTGZq8" name="blurCube2.png" compile="0" resource="1" file="Resources/cube/blurCube2.png"/>
+        <FILE id="TbW7tK" name="blurCube3.png" compile="0" resource="1" file="Resources/cube/blurCube3.png"/>
+        <FILE id="Z1Rnwg" name="blurCube4.png" compile="0" resource="1" file="Resources/cube/blurCube4.png"/>
+        <FILE id="NABO2Q" name="blurCube5.png" compile="0" resource="1" file="Resources/cube/blurCube5.png"/>
+        <FILE id="nw5dmw" name="blurCube6.png" compile="0" resource="1" file="Resources/cube/blurCube6.png"/>
         <FILE id="bSS32i" name="bottom.png" compile="0" resource="1" file="Resources/cube/bottom.png"/>
         <FILE id="IFhz82" name="front.png" compile="0" resource="1" file="Resources/cube/front.png"/>
         <FILE id="aghwvw" name="left.png" compile="0" resource="1" file="Resources/cube/left.png"/>
@@ -34,21 +40,20 @@
       <FILE id="YqqlR6" name="ap_logo_groovees.png" compile="0" resource="1"
             file="Resources/ap_logo_groovees.png"/>
       <FILE id="EVTkfD" name="cantaloupe.png" compile="0" resource="1" file="Resources/cantaloupe.png"/>
-      <FILE id="dzFd1B" name="label.png" compile="0" resource="1" file="Resources/label.png"/>
       <FILE id="hR5R13" name="logo.png" compile="0" resource="1" file="Resources/logo.png"/>
       <FILE id="j1lpij" name="logo_clean.png" compile="0" resource="1" file="Resources/logo_clean.png"/>
       <FILE id="oJP67f" name="logo2.png" compile="0" resource="1" file="Resources/logo2.png"/>
       <FILE id="PLf08W" name="logo3.png" compile="0" resource="1" file="Resources/logo3.png"/>
+      <FILE id="U4Ivq0" name="shadow.png" compile="0" resource="1" file="Resources/shadow.png"/>
       <FILE id="MXshGb" name="logo4.png" compile="0" resource="1" file="Resources/logo4.png"/>
       <FILE id="m530MY" name="organic.png" compile="0" resource="1" file="Resources/organic.png"/>
       <FILE id="n742va" name="refl.png" compile="0" resource="1" file="Resources/refl.png"/>
       <FILE id="sKxg0j" name="settings.svg" compile="0" resource="1" file="Resources/settings.svg"/>
-      <FILE id="dXbmi4" name="shadow.png" compile="0" resource="1" file="Resources/shadow.png"/>
       <FILE id="eHycAp" name="VarelaRound.ttf" compile="0" resource="1" file="Resources/VarelaRound.ttf"/>
     </GROUP>
     <GROUP id="{EDFDECA6-21B2-2E2E-F4BB-E88C8EE0426B}" name="Source">
-      <FILE id="PB29t5" name="APDefines.cpp" compile="1" resource="0" file="Source/APDefines.cpp"/>
-      <FILE id="Kebx9p" name="APDefines.h" compile="0" resource="0" file="Source/APDefines.h"/>
+      <FILE id="Vokg5b" name="APDefines.cpp" compile="1" resource="0" file="Source/APDefines.cpp"/>
+      <FILE id="g8PCyZ" name="APDefines.h" compile="0" resource="0" file="Source/APDefines.h"/>
       <FILE id="bLNdCg" name="ShowHideContainer.h" compile="0" resource="0"
             file="Source/ShowHideContainer.h"/>
       <GROUP id="{C26112AF-5A97-8FAC-DC64-A186E03357A0}" name="OpenGL">

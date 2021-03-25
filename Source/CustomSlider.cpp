@@ -9,6 +9,7 @@
 */
 
 #include "CustomSlider.h"
+#include "PluginEditor.h"
 
 using namespace juce;
 
@@ -124,9 +125,6 @@ juce::Label* MyLookAndFeel::createSliderTextBox(Slider &slider) {
 }
 
 void MyLookAndFeel::drawLabel(Graphics &g, Label &label) {
-    g.setColour(AP::Colors::DarkGrey);
-    g.setFont(labelFont_.withHeight(16.0f));
-
     Rectangle<int> labelBounds;
 
     switch (sliderType_) {
@@ -146,6 +144,28 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label) {
         default:
             break;
     }
+
+    const auto name = label.getText();
+    auto shadowBounds = labelBounds
+            .withX (labelBounds.getX() + 11)
+            .withY(labelBounds.getY() - 10)
+            .toFloat();
+
+    kernel_.createGaussianBlur (3.2f);
+
+    shadow_ = juce::Image (juce::Image::PixelFormat::ARGB, label.getWidth(),
+                          (int) SHADOW_FONT_HEIGHT, true);
+    juce::Graphics graphics (shadow_);
+    graphics.setColour (SHADOW_COLOR);
+    graphics.setFont (labelFont_.withHeight (20.0f));
+    graphics.drawText(name, 0, 0, shadow_.getWidth(), shadow_.getHeight(),
+                      juce::Justification::centred, false);
+    kernel_.applyToImage(shadow_, shadow_, shadow_.getBounds());
+    g.drawImage(shadow_, shadowBounds, juce::RectanglePlacement::fillDestination);
+
+
+    g.setColour(AP::Colors::DarkGrey);
+    g.setFont(labelFont_.withHeight(16.0f));
     g.drawFittedText(label.getText().substring(0, 9), labelBounds,
                      juce::Justification::centredRight, 1);
 }

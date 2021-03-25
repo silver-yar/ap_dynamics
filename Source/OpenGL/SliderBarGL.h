@@ -30,7 +30,7 @@ public:
     void openGLContextClosing() override;
     void renderOpenGL() override;
 
-    GLint loadCubeMap(std::vector<juce::Image> texture_images);
+    void loadCubeMap(std::vector<juce::Image>& texture_images);
 
     // JUCE Callbacks
     void paint(juce::Graphics&) override;
@@ -111,28 +111,28 @@ private:
 
     std::vector<juce::Image> textureFaces_ { // right, left, top, bottom, back, front
             juce::Image {
-                juce::ImageCache::getFromMemory(BinaryData::right_png,
-                                                BinaryData::right_pngSize)
+                juce::ImageCache::getFromMemory(BinaryData::blurCube1_png,
+                                                BinaryData::blurCube1_pngSize)
             },
             juce::Image {
-                juce::ImageCache::getFromMemory(BinaryData::left_png,
-                                                BinaryData::left_pngSize)
+                juce::ImageCache::getFromMemory(BinaryData::blurCube2_png,
+                                                BinaryData::blurCube2_pngSize)
             },
             juce::Image {
-                juce::ImageCache::getFromMemory(BinaryData::top_png,
-                                                BinaryData::top_pngSize)
+                juce::ImageCache::getFromMemory(BinaryData::blurCube3_png,
+                                                BinaryData::blurCube3_pngSize)
             },
             juce::Image {
-                juce::ImageCache::getFromMemory(BinaryData::bottom_png,
-                                                BinaryData::bottom_pngSize)
+                juce::ImageCache::getFromMemory(BinaryData::blurCube4_png,
+                                                BinaryData::blurCube4_pngSize)
             },
             juce::Image {
-                juce::ImageCache::getFromMemory(BinaryData::back_png,
-                                                BinaryData::back_pngSize)
+                juce::ImageCache::getFromMemory(BinaryData::blurCube5_png,
+                                                BinaryData::blurCube5_pngSize)
             },
             juce::Image {
-                juce::ImageCache::getFromMemory(BinaryData::front_png,
-                                                BinaryData::front_pngSize)
+                juce::ImageCache::getFromMemory(BinaryData::blurCube6_png,
+                                                BinaryData::blurCube6_pngSize)
             },
     };
 

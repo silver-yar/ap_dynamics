@@ -46,16 +46,8 @@ void SliderBarGL::newOpenGLContextCreated()
     // Load image for texture
     diffTexture_.loadImage (diffImage_);
 
-    // Load images for cubemap texture
-//    rightTex_.loadImage(textureFaces_[0]);
-//    leftTex_.loadImage(textureFaces_[1]);
-//    topTex_.loadImage(textureFaces_[2]);
-//    bottomTex_.loadImage(textureFaces_[3]);
-//    backTex_.loadImage(textureFaces_[4]);
-//    frontTex_.loadImage(textureFaces_[5]);
-
-//    specTexture_.loadImage (diffImage_);
     openGLContext_.setTextureMagnificationFilter(juce::OpenGLContext::TextureMagnificationFilter::linear);
+    loadCubeMap (textureFaces_);
 
     // Setup Buffer Objects
     openGLContext_.extensions.glGenBuffers (1, &VBO_); // Vertex Buffer Object
@@ -145,7 +137,7 @@ void SliderBarGL::renderOpenGL()
 
     if (uniforms_->specTexture != nullptr)
     {
-        uniforms_->specTexture->set((GLint) loadCubeMap(textureFaces_));
+        uniforms_->specTexture->set((GLint) specTexture_.getTextureID());
     }
 
     if (uniforms_->runTime != nullptr) {
@@ -203,24 +195,25 @@ void SliderBarGL::renderOpenGL()
     //openGLContext_.extensions.glBindVertexArray(0);
 }
 
-GLint SliderBarGL::loadCubeMap(std::vector<juce::Image> texture_images)
+void SliderBarGL::loadCubeMap(std::vector<juce::Image>& texture_images)
 {
     auto texID = specTexture_.getTextureID();
     glActiveTexture (GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
 
-    for (auto i = 0; i < textureFaces_.size(); i++)
+    for (auto i = 0; i < texture_images.size(); i++)
     {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
                      0,
-                     GL_RGBA,
-                     textureFaces_[i].getWidth(),
-                     textureFaces_[i].getHeight(),
+                     GL_RGBA8,
+                     texture_images[i].getWidth(),
+                     texture_images[i].getHeight(),
                      0,
                      GL_RGBA,
                      GL_UNSIGNED_BYTE,
-                     (GLvoid*) textureFaces_[i].getPixelData()
+                     (GLvoid*) texture_images[i].getPixelData()
         );
+        DBG("width: " << texture_images[i].getWidth() << ", height: " << texture_images[i].getHeight());
     }
 
     glEnable (GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -230,8 +223,6 @@ GLint SliderBarGL::loadCubeMap(std::vector<juce::Image> texture_images)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    return specTexture_.getTextureID();
 }
 
 void SliderBarGL::paint (juce::Graphics& g)

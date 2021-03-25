@@ -65,6 +65,10 @@ public:
 
 private:
     Ap_dynamicsAudioProcessor& audioProcessor;
+
+    juce::ImageConvolutionKernel kernel_ { 16 };
+    juce::Image shadow_;
+
     juce::Font labelFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                 BinaryData::VarelaRound_ttfSize)};
     SliderType sliderType_;
