@@ -16,6 +16,7 @@
             file="DSP/APTubeDistortion.h"/>
     </GROUP>
     <GROUP id="{51C09136-CC53-80CE-892F-F27B65CEA6E4}" name="Resources">
+      <FILE id="nmxjak" name="blue_noise.png" compile="0" resource="1" file="Resources/blue_noise.png"/>
       <GROUP id="{C88675DC-2475-43F0-41FB-33DE2BF63323}" name="cube">
         <FILE id="ajg7FI" name="back.png" compile="0" resource="1" file="Resources/cube/back.png"/>
         <FILE id="YJy9Td" name="blurCube1.png" compile="0" resource="1" file="Resources/cube/blurCube1.png"/>

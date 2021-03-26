@@ -106,8 +106,8 @@ private:
 //    };
 
     // Texture Imagesjuce::OpenGLTexture()
-    juce::Image diffImage_ {juce::ImageCache::getFromMemory(BinaryData::organic_png,
-                                                            BinaryData::organic_pngSize)};
+    juce::Image diffImage_ {juce::ImageCache::getFromMemory(BinaryData::blue_noise_png,
+                                                            BinaryData::blue_noise_pngSize)};
 
     std::vector<juce::Image> textureFaces_ { // right, left, top, bottom, back, front
             juce::Image {
