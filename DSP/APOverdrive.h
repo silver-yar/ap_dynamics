@@ -20,5 +20,9 @@ public:
                   float mix,
                   float* audioOut,
                   int numSamplesToRender);
+
+    float softClipping(float sample);
+    float hardClipping(float sample);
+
 private:
 };

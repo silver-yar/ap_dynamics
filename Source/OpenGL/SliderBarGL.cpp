@@ -201,6 +201,7 @@ void SliderBarGL::loadCubeMap(std::vector<juce::Image>& texture_images)
     glActiveTexture (GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
 
+
     for (auto i = 0; i < texture_images.size(); i++)
     {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -213,7 +214,6 @@ void SliderBarGL::loadCubeMap(std::vector<juce::Image>& texture_images)
                      GL_UNSIGNED_BYTE,
                      (GLvoid*) texture_images[i].getPixelData()
         );
-        DBG("width: " << texture_images[i].getWidth() << ", height: " << texture_images[i].getHeight());
     }
 
     glEnable (GL_TEXTURE_CUBE_MAP_SEAMLESS);

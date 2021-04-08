@@ -163,26 +163,29 @@ void Ap_dynamicsAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
-        auto channelMaxVal = 0.0f;
 
+        {
+            // Find the channel max gain value
+            auto channelMaxVal = 0.0f;
+
+            for (int sample = 0; sample < numSamples; ++sample) {
+
+                auto rectifiedVal = std::abs(channelData[sample]);
+                if (channelMaxVal < rectifiedVal) channelMaxVal = rectifiedVal;
+                if (currentMaxVal < rectifiedVal) currentMaxVal = rectifiedVal;
+            }
+
+            sumMaxVal += channelMaxVal; // Sum of channel 0 and channel 1 max values
+
+            meterGlobalMaxVal.store(currentMaxVal);
+        }
+
+        // DSP Processing
         compressor_->process(channelData, channelData, buffer.getNumSamples());
         overdrive_->process(channelData, mixValue_, channelData, buffer.getNumSamples());
         tubeDistortion_->process(channelData, 1.0f, -0.2f, 8.0f, mixValue_,
                                           channelData, buffer.getNumSamples());
         makeup_.applyGain (channelData, numSamples);
-
-        // Find max value in buffer channel
-        for (int sample = 0; sample < numSamples; ++sample)
-        {
-
-            auto rectifiedVal = std::abs (channelData[sample]);
-            if (channelMaxVal < rectifiedVal) channelMaxVal = rectifiedVal;
-            if (currentMaxVal < rectifiedVal) currentMaxVal = rectifiedVal;
-        }
-
-        sumMaxVal += channelMaxVal; // Sum of channel 0 and channel 1 max values
-
-        meterGlobalMaxVal.store (currentMaxVal);
     }
 
     meterLocalMaxVal.store (sumMaxVal / (float) numChannels);
