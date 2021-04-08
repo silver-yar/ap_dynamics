@@ -28,7 +28,6 @@ void APOverdrive::process (float* audioIn,
 {
     for (auto i = 0; i < numSamplesToRender; ++i) {
         const auto& sample = audioIn[i];
-        float x_uni = abs(sample);
         float out = 0;
 
         // TODO: Fix Overdrive incoming samples modified based on value via piecewise
