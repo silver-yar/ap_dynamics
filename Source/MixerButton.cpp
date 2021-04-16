@@ -39,26 +39,26 @@ void MixerButton::paint (juce::Graphics& g)
     // Labels
     g.setColour(juce::Colours::snow);
     g.setFont(labelFont_.withHeight (24.0f));
-    g.drawFittedText("clean", bounds.removeFromTop(getHeight() / 3),
+    g.drawFittedText("dirtier", bounds.removeFromTop(getHeight() / 3),
                      juce::Justification::centred, 1);
 
     // dB
-    if (showdB) {
-        g.setFont(8.0f);
-        g.drawFittedText("-20 dB", juce::Rectangle<int>(70, bounds.getY() + (getHeight() / 6) - 4,
-                                                        20, 10),
-                         juce::Justification::centred, 1);
-        g.drawFittedText("+20 dB", juce::Rectangle<int>(bounds.getRight() - 30, bounds.getY() + (getHeight() / 6) - 4,
-                                                        20, 10),
-                         juce::Justification::centred, 1);
-    }
+//    if (showdB) {
+//        g.setFont(8.0f);
+//        g.drawFittedText("-20 dB", juce::Rectangle<int>(70, bounds.getY() + (getHeight() / 6) - 4,
+//                                                        20, 10),
+//                         juce::Justification::centred, 1);
+//        g.drawFittedText("+20 dB", juce::Rectangle<int>(bounds.getRight() - 30, bounds.getY() + (getHeight() / 6) - 4,
+//                                                        20, 10),
+//                         juce::Justification::centred, 1);
+//    }
 
     g.setFont (24.0f);
     g.drawLine(70, getHeight() / 3, getWidth() - 20, getHeight() / 3, 1);
     g.drawFittedText("dirty", bounds.removeFromTop(getHeight() / 3),
                      juce::Justification::centred, 1);
     g.drawLine(70, getHeight() / 3 * 2, getWidth() - 20, getHeight() / 3 * 2, 1);
-    g.drawFittedText("dirtier", bounds,
+    g.drawFittedText("clean", bounds,
                      juce::Justification::centred, 1);
 
 //    auto bubbleBounds = juce::Rectangle<float> (pointerPos_.getX() - 10, pointerPos_.getY() - 10, 20, 20);
@@ -133,7 +133,7 @@ void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
 //                           0.0f, 100.0f);
 //    gainOutdB_ = juce::jmap((float) pointerPos_.getX(), x_min, x_max, -40.0f, 40.0f);
     audioProcessor.setMixValue (juce::jmap((float) pointerPos_.getY(), y_min, y_max,
-                                           0.0f, 1.0f));
-    audioProcessor.setOutputGain (juce::jmap((float) pointerPos_.getX(), x_min, x_max,
-                                             -20.0f, 20.0f));
+                                           1.0f, 0.0f));
+//    audioProcessor.setOutputGain (juce::jmap((float) pointerPos_.getX(), x_min, x_max,
+//                                             -20.0f, 20.0f));
 }
