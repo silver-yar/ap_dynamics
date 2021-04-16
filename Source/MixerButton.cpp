@@ -11,6 +11,10 @@
 #include <JuceHeader.h>
 #include "MixerButton.h"
 
+namespace {
+    constexpr float kHandleHeight = 28.0f;
+}
+
 //==============================================================================
 MixerButton::MixerButton(Ap_dynamicsAudioProcessor& p) : audioProcessor (p)
 {
@@ -22,13 +26,15 @@ MixerButton::~MixerButton()
 
 void MixerButton::paint (juce::Graphics& g)
 {
-
-    auto bounds = juce::Rectangle<int> (60, 0, getWidth() - 70, getHeight());
+    constexpr int cornerRadius = 10;
+    constexpr int sliderMargin = 70;
+    auto sliderWidth = getWidth() - sliderMargin;
+    auto bounds = juce::Rectangle<int> (60, 0, sliderWidth, getHeight());
     // Background
     g.setGradientFill (
             juce::ColourGradient (juce::Colours::grey, getWidth() / 2, getHeight() / 2,juce::Colours::darkgrey,0,0,true)
     );
-    g.fillRoundedRectangle (bounds.toFloat(), 10);
+    g.fillRoundedRectangle (bounds.toFloat(), cornerRadius);
 
     // Labels
     g.setColour(juce::Colours::snow);
@@ -55,20 +61,30 @@ void MixerButton::paint (juce::Graphics& g)
     g.drawFittedText("dirtier", bounds,
                      juce::Justification::centred, 1);
 
-    auto bubbleBounds = juce::Rectangle<float> (pointerPos_.getX() - 10, pointerPos_.getY() - 10, 20, 20);
+//    auto bubbleBounds = juce::Rectangle<float> (pointerPos_.getX() - 10, pointerPos_.getY() - 10, 20, 20);
 
     // Selector Shadow
-    g.setColour(juce::Colours::black.withAlpha(0.1f));
-    g.fillEllipse(bubbleBounds.withPosition(bubbleBounds.getX(), bubbleBounds.getY() + 10));
+//    g.setColour(juce::Colours::black.withAlpha(0.1f));
+//    g.fillEllipse(bubbleBounds.withPosition(bubbleBounds.getX(), bubbleBounds.getY() + 10));
 
     // Selector
+//    g.setGradientFill(juce::ColourGradient(juce::Colours::grey.withAlpha(0.3f),
+//                         bubbleBounds.getCentreX(),
+//                         bubbleBounds.getCentreY(),
+//                         juce::Colours::white,
+//                         bubbleBounds.getX(), bubbleBounds.getY(), true)
+//                         );
+//    g.fillEllipse (bubbleBounds);
+    auto barBounds = juce::Rectangle<float> (sliderWidth, kHandleHeight)
+            .withCentre(bounds.getCentre().withY(pointerPos_.getY()).toFloat());
     g.setGradientFill(juce::ColourGradient(juce::Colours::grey.withAlpha(0.3f),
-                         bubbleBounds.getCentreX(),
-                         bubbleBounds.getCentreY(),
-                         juce::Colours::white,
-                         bubbleBounds.getX(), bubbleBounds.getY(), true)
-                         );
-    g.fillEllipse(bubbleBounds);
+                         barBounds.getCentreX(),
+                         barBounds.getCentreY(),
+                         juce::Colours::white.withAlpha(0.7f),
+                         barBounds.getX() - (sliderWidth * 0.3f), barBounds.getY() + 2, true));
+    g.fillRoundedRectangle(barBounds, cornerRadius);
+    g.setColour (juce::Colours::white.withAlpha(0.3f));
+    g.drawRoundedRectangle(barBounds, cornerRadius, 1.0f);
 }
 
 void MixerButton::resized()
@@ -106,8 +122,8 @@ void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
 {
     auto x_min = 70.0f;
     auto x_max = getWidth() - 20.0f;
-    auto y_min = 10.0f;
-    auto y_max = getWidth() - 25.0f;
+    auto y_min = kHandleHeight / 2.0f;
+    auto y_max = getHeight() - (kHandleHeight / 2.0f);
 
     auto x = juce::jlimit(x_min, x_max, (float) mPoint.getX());
     auto y = juce::jlimit(y_min, y_max, (float) mPoint.getY());
