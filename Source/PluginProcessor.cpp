@@ -16,8 +16,7 @@ Ap_dynamicsAudioProcessor::Ap_dynamicsAudioProcessor()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
                        .withInput  ("Input",
-                                    getTotalNumInputChannels() > 1 ? juce::AudioChannelSet::stereo()
-                                                                                : juce::AudioChannelSet::mono(),
+                                    juce::AudioChannelSet::stereo(),
                                     true)
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)

@@ -36,13 +36,6 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
     styleLabel_ -> setColour (juce::Label::textColourId, AP::Colors::DarkGrey);
     styleLabel_ -> attachToComponent (&stylePicker_, false);
 
-//    lshdwS_ = std::make_unique<juce::Label> ("", "style");
-//    lshdwS_ -> setJustificationType (juce::Justification::centred);
-//    lshdwS_ -> setText("style", juce::dontSendNotification);
-//    lshdwS_ -> setFont (myFont_.withHeight (SHADOW_FONT_HEIGHT));
-//    lshdwS_ -> setBorderSize(juce::BorderSize<int> (10, 50, 38, 0));
-//    lshdwS_ -> setColour (juce::Label::textColourId, SHADOW_COLOR);
-//    lshdwS_ -> attachToComponent (&stylePicker_, false);
     addAndMakeVisible (stylePicker_);
 
     thresholdBounds_ = juce::Rectangle<int> (40, SLIDER_Y, SLIDER_WIDTH, sliderHeight_);
@@ -52,11 +45,8 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
     setSize (M_WIDTH, M_HEIGHT);
     startTimerHz (60);
 
-    auto start = juce::Time::getMillisecondCounterHiRes();
     kernel_.createGaussianBlur (5.6f);
     kernel_.applyToImage(textShadow_, textShadow_, textShadow_.getBounds());
-    auto end = juce::Time::getMillisecondCounterHiRes();
-    DBG("time (ms): " << end - start);
 
     kernel_.clear();
     kernel_.createGaussianBlur(3.2f);
@@ -66,9 +56,7 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor (Ap_dynamicsAud
     setupSliderShadow (tSliderShadow_);
     setupSliderShadow (rSliderShadow_);
     setupSliderShadow (sSliderShadow_);
-    
-//    testBox_.setBounds(0, 0, 100, 150);
-//    addAndMakeVisible (testBox_);
+
 }
 
 Ap_dynamicsAudioProcessorEditor::~Ap_dynamicsAudioProcessorEditor()
@@ -84,11 +72,6 @@ void Ap_dynamicsAudioProcessorEditor::paint (juce::Graphics& g)
                                   OUTER_GRADIENT_BG,-80,-80,true)
     );
     g.fillAll();
-
-//    g.setColour(juce::Colours::black);
-//    g.drawText("x: " + juce::String((float) mouseX / getWidth()) + ", y: " +
-//                juce::String((float) mouseY / getHeight()), 10, 10, 200, 50,
-//               juce::Justification::centred, false);
 
     // Logo
     constexpr int textDeltaX = 80;
@@ -214,29 +197,10 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_>
     label -> setFont (myFont_.withHeight (FONT_HEIGHT));
     label -> attachToComponent(slider.get(), false);
 
-//    labelShadow = std::make_unique<juce::Label> ("", name);
-//    labelShadow -> setJustificationType(juce::Justification::centred);
-//    labelShadow -> setText (name.toLowerCase(), juce::dontSendNotification);
-//    labelShadow -> setBorderSize(juce::BorderSize<int> (10, 0, 38, 70));
-//    labelShadow -> setColour (juce::Label::textColourId, SHADOW_COLOR);
-//    labelShadow -> setFont (myFont_.withHeight (SHADOW_FONT_HEIGHT));
-//    labelShadow -> attachToComponent(slider.get(), false);
-
     addAndMakeVisible(slider.get());
 }
 
 void Ap_dynamicsAudioProcessorEditor::timerCallback()
 {
-//    auto window = juce::Desktop::getInstance().getComponent(0);
-//    auto pos = juce::Desktop::getInstance().getMousePosition();
-//    mouseX = pos.x - window->getX();
-//    mouseY = pos.y - window->getY();
-
-//    juce::uint8 mappedColor = juce::jmap(mouseY , 0, getHeight(),0, 255);
-//    auto color = juce::Colour(mappedColor, mappedColor, mappedColor, (juce::uint8) 255);
-//    thresholdLabel_->setColour(juce::Label::textColourId, AP::Colors::DarkGrey);
-//    ratioLabel_->setColour(juce::Label::textColourId, AP::Colors::DarkGrey);
-//    styleLabel_->setColour(juce::Label::textColourId, AP::Colors::DarkGrey);
-
     repaint();
 }

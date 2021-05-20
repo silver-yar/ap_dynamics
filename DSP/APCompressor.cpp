@@ -33,8 +33,8 @@ void APCompressor::process (float* audioIn,
 
 float APCompressor::applyFFCompression (float sample)
 {
-    auto alphaA = exp(-log(9) / (sampleRate_ * attack_));
-    auto alphaR = exp(-log(9) / (sampleRate_ * release_));
+    const auto alphaA = exp(-log(9) / (sampleRate_ * attack_));
+    const auto alphaR = exp(-log(9) / (sampleRate_ * release_));
 
     float gainSmooth = 0;
     float gain_sc = 0;
@@ -50,9 +50,6 @@ float APCompressor::applyFFCompression (float sample)
         gain_sc = x_dB + ((1 / ratio_ - 1) * powf((x_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
     else
         gain_sc = x_dB;
-
-    curr_xdB_ = x_dB;
-    curr_gainsc_ = gain_sc;
 
     float gainChange_dB = gain_sc - x_dB;
 
@@ -76,8 +73,8 @@ float APCompressor::applyFFCompression (float sample)
 
 float APCompressor::applyFBCompression (float sample)
 {
-    auto alphaA = exp(-log(9) / (sampleRate_ * attack_));
-    auto alphaR = exp(-log(9) / (sampleRate_ * release_));
+    const auto alphaA = exp(-log(9) / (sampleRate_ * attack_));
+    const auto alphaR = exp(-log(9) / (sampleRate_ * release_));
 
     float gainSmooth = 0;
     float gain_sc = 0;
@@ -93,9 +90,6 @@ float APCompressor::applyFBCompression (float sample)
         gain_sc = y_dB + ((1 / ratio_ - 1) * powf((y_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_); // Compression with ramp
     else
         gain_sc = y_dB;
-
-    curr_xdB_ = y_dB;
-    curr_gainsc_ = gain_sc;
 
     float gainChange_dB = gain_sc - y_dB;
 
@@ -120,8 +114,8 @@ float APCompressor::applyFBCompression (float sample)
 
 float APCompressor::applyRMSCompression (float sample)
 {
-    auto alphaA = exp(-log(9) / (sampleRate_ * attack_));
-    auto alphaR = exp(-log(9) / (sampleRate_ * release_));
+    const auto alphaA = exp(-log(9) / (sampleRate_ * attack_));
+    const auto alphaR = exp(-log(9) / (sampleRate_ * release_));
 
     float gainSmooth = 0;
     float gain_sc = 0;
@@ -137,9 +131,6 @@ float APCompressor::applyRMSCompression (float sample)
         gain_sc = x_dB + ((1 / ratio_ - 1) * powf((x_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
     else
         gain_sc = x_dB;
-
-    curr_xdB_ = x_dB;
-    curr_gainsc_ = gain_sc;
 
     float gainChange_dB = gain_sc - x_dB;
 

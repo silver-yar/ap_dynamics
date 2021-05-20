@@ -40,6 +40,4 @@ private:
     float kneeWidth_ = 6.0f;
     float prevGainSmooth_ = 0.0f;
     float y_prev_ = 0.0f;
-    float curr_xdB_ = 0.0f;
-    float curr_gainsc_ = 0.0f;
 };
