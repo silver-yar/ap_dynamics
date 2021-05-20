@@ -30,40 +30,40 @@ float APCompressor::applyRMSCompression(float sample)
   const float alphaR = exp(-log(9) / (sampleRate_ * release_));
 
   auto xUni = abs(sample);
-  auto xDB  = 20 * log10(xUni);
-  if (xDB < MIN_DB)
-    xDB = MIN_DB;
+  auto xDb  = 20 * log10(xUni);
+  if (xDb < MIN_DB)
+    xDb = MIN_DB;
 
   float gainSmooth = 0;
-  float gain_sc    = 0;
+  float gainSc     = 0;
 
   // Static Characteristics
-  if (xDB > (threshold_ + kneeWidth_ / 2))
-    gain_sc = threshold_ + (xDB - threshold_) / ratio_;  // Perform downwards compression
-  else if (xDB > (threshold_ - kneeWidth_ / 2))
-    gain_sc = xDB + ((1 / ratio_ - 1) * powf((xDB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
+  if (xDb > (threshold_ + kneeWidth_ / 2))
+    gainSc = threshold_ + (xDb - threshold_) / ratio_;  // Perform downwards compression
+  else if (xDb > (threshold_ - kneeWidth_ / 2))
+    gainSc = xDb + ((1 / ratio_ - 1) * powf((xDb - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
   else
-    gain_sc = xDB;
+    gainSc = xDb;
 
-  const float gainChange_dB = gain_sc - xDB;
+  const float gainChangeDb = gainSc - xDb;
 
   // Smooth gain change (RMS Approximation)
-  if (gainChange_dB < prevGainSmooth_)
+  if (gainChangeDb < prevGainSmooth_)
   {
     // attack mode
-    gainSmooth = -sqrt(((1.0f - alphaA) * powf(gainChange_dB, 2.0f)) + (alphaA * powf(prevGainSmooth_, 2.0f)));
+    gainSmooth = -sqrt(((1.0f - alphaA) * powf(gainChangeDb, 2.0f)) + (alphaA * powf(prevGainSmooth_, 2.0f)));
   }
   else
   {
     // release mode
-    gainSmooth = -sqrt(((1.0f - alphaR) * powf(gainChange_dB, 2.0f)) + (alphaR * powf(prevGainSmooth_, 2.0f)));
+    gainSmooth = -sqrt(((1.0f - alphaR) * powf(gainChangeDb, 2.0f)) + (alphaR * powf(prevGainSmooth_, 2.0f)));
   }
 
   // Convert back to linear amplitude scalar
-  auto lin_a  = powf(10, gainSmooth / 20);
-  float x_out = lin_a * sample;
+  const auto linA = powf(10, gainSmooth / 20);
+  float xOut      = linA * sample;
 
   prevGainSmooth_ = gainSmooth;
 
-  return x_out;
+  return xOut;
 }

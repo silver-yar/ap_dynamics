@@ -17,12 +17,12 @@ class APTubeDistortion
   ~APTubeDistortion();
 
   // Based off DAFX 2nd edition pg. 123
-  void process(float* audioIn,
-               float distGain,  // distortion amount
-               float Q,         // work point
-               float distChar,  // distortion character
-               float mix,       // mix of original and distorted sample
-               float* audioOut, float numSamplesToRender);
+  static void process(const float* audioIn,
+                      float distGain,  // distortion amount
+                      float Q,         // work point
+                      float distChar,  // distortion character
+                      float mix,       // mix of original and distorted sample
+                      float* audioOut, float numSamplesToRender);
 
  private:
 };

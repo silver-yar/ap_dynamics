@@ -12,39 +12,39 @@
 
 #include "JuceHeader.h"
 
-APTubeDistortion::APTubeDistortion() { }
+APTubeDistortion::APTubeDistortion() = default;
 
-APTubeDistortion::~APTubeDistortion() { }
+APTubeDistortion::~APTubeDistortion() = default;
 
-void APTubeDistortion::process(float* audioIn, float distGain, float Q, float distChar, float mix, float* audioOut,
+void APTubeDistortion::process(const float* audioIn, float distGain, float Q, float distChar, float mix, float* audioOut,
                                float numSamplesToRender)
 {
   for (auto i = 0; i < numSamplesToRender; ++i)
   {
     const auto& in = audioIn[i];
-    double z;
-    double out;
-    auto q = in * distGain / abs(in);
+    double z       = 0.0;
+    double out     = 0.0;
+    auto q         = in * distGain / abs(in);
 
-    if (!Q)
+    if (Q == 0)
     {
-      z = q / (1 - exp(-distChar * q));
+      z = q / (1.0 - exp(-distChar * q));
       if (q == Q)
       {
-        z = 1 / distChar;
+        z = 1.0 / distChar;
       }
     }
     else
     {
-      z = (q - Q) / (1 - exp(-distChar * (q - Q))) + Q / (1 - exp(distChar * Q));
+      z = (q - Q) / (1.0 - exp(-distChar * (q - Q))) + Q / (1.0 - exp(distChar * Q));
       if (q == Q)
       {
-        z = 1 / distChar + Q / (1 - exp(distChar * Q));
+        z = 1 / distChar + Q / (1.0 - exp(distChar * Q));
       }
     }
-    out = mix * z * abs(in) / abs(z) + (1 - mix) * in;
+    out = mix * z * abs(in) / abs(z) + (1.0 - mix) * in;
     out *= abs(in) / abs(out);
 
-    audioOut[i] = in != 0 ? out : in;
+    audioOut[i] = in != 0 ? (float)out : (float)in;
   }
 }
