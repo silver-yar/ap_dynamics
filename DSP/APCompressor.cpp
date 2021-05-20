@@ -29,23 +29,23 @@ float APCompressor::applyRMSCompression(float sample)
   const float alphaA = exp(-log(9) / (sampleRate_ * attack_));
   const float alphaR = exp(-log(9) / (sampleRate_ * release_));
 
-  auto x_uni = abs(sample);
-  auto x_dB  = 20 * log10(x_uni);
-  if (x_dB < MIN_DB)
-    x_dB = MIN_DB;
+  auto xUni = abs(sample);
+  auto xDB  = 20 * log10(xUni);
+  if (xDB < MIN_DB)
+    xDB = MIN_DB;
 
   float gainSmooth = 0;
   float gain_sc    = 0;
 
   // Static Characteristics
-  if (x_dB > (threshold_ + kneeWidth_ / 2))
-    gain_sc = threshold_ + (x_dB - threshold_) / ratio_;  // Perform downwards compression
-  else if (x_dB > (threshold_ - kneeWidth_ / 2))
-    gain_sc = x_dB + ((1 / ratio_ - 1) * powf((x_dB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
+  if (xDB > (threshold_ + kneeWidth_ / 2))
+    gain_sc = threshold_ + (xDB - threshold_) / ratio_;  // Perform downwards compression
+  else if (xDB > (threshold_ - kneeWidth_ / 2))
+    gain_sc = xDB + ((1 / ratio_ - 1) * powf((xDB - threshold_ + kneeWidth_ / 2), 2)) / (2 * kneeWidth_);
   else
-    gain_sc = x_dB;
+    gain_sc = xDB;
 
-  const float gainChange_dB = gain_sc - x_dB;
+  const float gainChange_dB = gain_sc - xDB;
 
   // Smooth gain change (RMS Approximation)
   if (gainChange_dB < prevGainSmooth_)
