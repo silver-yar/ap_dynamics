@@ -12,17 +12,14 @@
 
 class APOverdrive
 {
-public:
-    APOverdrive();
-    ~APOverdrive();
+ public:
+  APOverdrive();
+  ~APOverdrive();
 
-    void process (float* audioIn,
-                  float mix,
-                  float* audioOut,
-                  int numSamplesToRender);
+  void process(float* audioIn, float mix, float* audioOut, int numSamplesToRender);
 
-    float softClipping(float sample);
-    float hardClipping(float sample);
+  float softClipping(float sample);
+  float hardClipping(float sample);
 
-private:
+ private:
 };

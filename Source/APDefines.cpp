@@ -12,8 +12,8 @@
 
 namespace AP
 {
-    namespace Colors
-    {
-        const juce::Colour DarkGrey = juce::Colours::darkgrey;
-    }
-}
+  namespace Colors
+  {
+    const juce::Colour DarkGrey = juce::Colours::darkgrey;
+  }
+}  // namespace AP

@@ -13,9 +13,8 @@
 
 namespace AP
 {
-    namespace Colors
-    {
-        extern const juce::Colour DarkGrey;
-    }
-}
-
+  namespace Colors
+  {
+    extern const juce::Colour DarkGrey;
+  }
+}  // namespace AP

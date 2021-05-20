@@ -13,22 +13,22 @@
 
 class APSliderLook : public juce::LookAndFeel_V4
 {
-public:
-    juce::Label* createSliderTextBox (juce::Slider& slider) override
+ public:
+  juce::Label* createSliderTextBox(juce::Slider& slider) override
+  {
+    auto* l = juce::LookAndFeel_V4::createSliderTextBox(slider);
+
+    if (getCurrentColourScheme() == juce::LookAndFeel_V4::getGreyColourScheme() &&
+        (slider.getSliderStyle() == juce::Slider::LinearBar || slider.getSliderStyle() == juce::Slider::LinearBarVertical))
     {
-        auto* l = juce::LookAndFeel_V4::createSliderTextBox (slider);
-
-        if (getCurrentColourScheme() == juce::LookAndFeel_V4::getGreyColourScheme() && (slider.getSliderStyle() == juce::Slider::LinearBar
-                                                                                   || slider.getSliderStyle() == juce::Slider::LinearBarVertical))
-        {
-            l->setColour (juce::Label::textColourId, juce::Colours::black.withAlpha (0.7f));
-            l->setFont (myFont_);
-        }
-
-        return l;
+      l->setColour(juce::Label::textColourId, juce::Colours::black.withAlpha(0.7f));
+      l->setFont(myFont_);
     }
 
-private:
-    juce::Font myFont_ {juce::Typeface::createSystemTypefaceFor(BinaryData::Antipasto_Med_ttf,
-                                                                BinaryData::Antipasto_Med_ttfSize)};
+    return l;
+  }
+
+ private:
+  juce::Font myFont_{ juce::Typeface::createSystemTypefaceFor(BinaryData::Antipasto_Med_ttf,
+                                                              BinaryData::Antipasto_Med_ttfSize) };
 };
