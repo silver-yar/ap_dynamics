@@ -10,7 +10,7 @@
 
 #pragma once
 
-const static int MIN_DB = -144;
+const static float MIN_DB = -144;
 
 class APCompressor
 {
@@ -32,12 +32,10 @@ class APCompressor
 
   void process(float* audioIn, float* audioOut, float numSamplesToRender);
 
-  float applyFFCompression(float sample);
-  float applyFBCompression(float sample);
   float applyRMSCompression(float sample);
 
  private:
-  float sampleRate_;
+  float sampleRate_     = 0.0f;
   float threshold_      = 0.0f;
   float ratio_          = 1.0f;
   float attack_         = 0.02f;  // 50 ms
