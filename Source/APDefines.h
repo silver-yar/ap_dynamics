@@ -17,4 +17,9 @@ namespace AP
   {
     extern const juce::Colour DarkGrey;
   }
+
+  namespace Constants
+  {
+    extern const float minusInfinityDb = -96.0f;
+  }
 }  // namespace AP

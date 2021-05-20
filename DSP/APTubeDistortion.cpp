@@ -45,6 +45,6 @@ void APTubeDistortion::process(const float* audioIn, float distGain, float Q, fl
     out = mix * z * abs(in) / abs(z) + (1.0 - mix) * in;
     out *= abs(in) / abs(out);
 
-    audioOut[i] = in != 0 ? (float)out : (float)in;
+    audioOut[i] = in != 0 ? static_cast<float>(out) : static_cast<float>(in);
   }
 }

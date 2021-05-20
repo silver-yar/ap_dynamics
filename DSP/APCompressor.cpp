@@ -10,6 +10,7 @@
 
 #include "APCompressor.h"
 
+#include "../Source/APDefines.h"
 #include "JuceHeader.h"
 
 APCompressor::APCompressor() = default;
@@ -30,7 +31,7 @@ float APCompressor::applyRMSCompression(float sample)
   const float alphaR = exp(-log(9) / (sampleRate_ * release_));
 
   auto xUni = abs(sample);
-  auto xDb  = 20 * log10(xUni);
+  auto xDb  = juce::Decibels::gainToDecibels(xUni, AP::Constants::minusInfinityDb);
   if (xDb < MIN_DB)
     xDb = MIN_DB;
 

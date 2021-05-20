@@ -15,13 +15,13 @@
 #include "./OpenGL/SliderBarGL.h"
 #include "PluginProcessor.h"
 
-static int ap_slider_height = 0;
-
-enum SliderType
+enum class SliderType
 {
   Normal = 1,
   Invert = 2
 };
+
+int apSliderHeight = 0;
 
 class APSlider : public juce::Component, public juce::Timer
 {
@@ -62,6 +62,6 @@ class MyLookAndFeel : public juce::LookAndFeel_V4
   SliderType sliderType_;
 
   int labelMargin_     = 70;
-  float lastSliderPos_ = 0;
-  float sliderWidth_   = 0;
+  float lastSliderPos_ = 0.0f;
+  float sliderWidth_   = 0.0f;
 };

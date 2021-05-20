@@ -34,7 +34,7 @@ const static juce::Colour OUTER_GRADIENT_BG = juce::Colour(0xFFFFC446);
 class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, public juce::Timer
 {
  public:
-  Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudioProcessor&);
+  explicit Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudioProcessor&);
   ~Ap_dynamicsAudioProcessorEditor() override;
 
   //==============================================================================
@@ -52,7 +52,6 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   Ap_dynamicsAudioProcessor& audioProcessor;
 
   juce::ImageConvolutionKernel kernel_{ 16 };
-  juce::Rectangle<int> textB_{ getLocalBounds().removeFromTop(getHeight() * 0.45f).reduced(80, 40) };
 
   juce::Image thresholdShadow_, ratioShadow_, styleShadow_;
   juce::Image tSliderShadow_, rSliderShadow_, sSliderShadow_;
@@ -70,12 +69,11 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, styleLabel_;
   std::unique_ptr<juce::Label> lshdwT_, lshdwR_, lshdwS_;
 
-  juce::Point<float> offset_{ 0, -16 };
+  juce::Point<float> offset_{ 0.0f, -16.0f };
   int shadowDeltaXY_      = 10;
   const int sliderHeight_ = 185;
   juce::Rectangle<int> thresholdBounds_, ratioBounds_, pickerBounds_;
   ShowHideContainer testBox_;
-  //    juce::TextEditor xOffset_, yOffset_, deltaEditor_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Ap_dynamicsAudioProcessorEditor)
 };

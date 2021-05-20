@@ -10,6 +10,8 @@
 
 #include "APSlider.h"
 
+#include "APDefines.h"
+
 using namespace juce;
 
 APSlider::APSlider(Ap_dynamicsAudioProcessor &p, SliderType sliderType) : audioProcessor(p), sliderType_(sliderType)
@@ -35,42 +37,40 @@ void APSlider::resized()
   auto offset = 72.0f;
   switch (sliderType_)
   {
-    case Normal:
-      ratioBounds_ = Rectangle<int>(1, 10, getWidth() - offset, ap_slider_height - 20);
+    case SliderType::Normal:
+      ratioBounds_ = Rectangle<int>(1, 10, getWidth() - offset, apSliderHeight - 20);
       ratioSliderBar_.setBounds(ratioBounds_);
       slider.setBounds(getLocalBounds());
       break;
-    case Invert:
-      //            ratioBounds_ = Rectangle<int> (1, 10,
-      //                                        getWidth() - offset, getHeight() - 20);
-      threshBounds_ = Rectangle<int>(1, 10, getWidth() - offset, ap_slider_height - 20);
-      //            ratioSliderBar_.setBounds(ratioBounds_);
+    case SliderType::Invert:
+      threshBounds_ = Rectangle<int>(1, 10, getWidth() - offset, apSliderHeight - 20);
       threshSliderBar_.setBounds(threshBounds_);
       slider.setBounds(getLocalBounds());
       break;
-    default: break;
+    default: jassertfalse; break;
   }
 }
 
 void APSlider::timerCallback()
 {
-  auto gaindB = juce::Decibels::gainToDecibels(audioProcessor.meterLocalMaxVal.load(), -96.0f);
+  auto gaindB = juce::Decibels::gainToDecibels(audioProcessor.meterLocalMaxVal.load(), AP::Constants::minusInfinityDb);
 
   switch (sliderType_)
   {
     case SliderType::Normal:
     {
       const float sliderPos   = slider.getPositionOfValue(slider.getValue());
-      const float sliderValue = juce::jmap(sliderPos, (float)ap_slider_height, 0.0f, 0.0f, 1.0f);
+      const float sliderValue = juce::jmap(sliderPos, static_cast<float>(apSliderHeight), 0.0f, 0.0f, 1.0f);
       ratioSliderBar_.setSliderValue(sliderValue);
     }
     break;
     case SliderType::Invert:
-      threshSliderBar_.setSliderValue(
-          juce::jmap((float)slider.getValue(), (float)slider.getMinimum(), (float)slider.getMaximum(), 0.0f, 1.0f));
-      threshSliderBar_.setMeterValue(juce::jmap(gaindB, -96.0f, 0.0f, 0.0f, 1.0f));
+      threshSliderBar_.setSliderValue(juce::jmap(static_cast<float>(slider.getValue()),
+                                                 static_cast<float>(slider.getMinimum()),
+                                                 static_cast<float>(slider.getMaximum()), 0.0f, 1.0f));
+      threshSliderBar_.setMeterValue(juce::jmap(gaindB, AP::Constants::minusInfinityDb, 0.0f, 0.0f, 1.0f));
       break;
-    default: break;
+    default: jassertfalse; break;
   }
   resized();
 }
@@ -84,13 +84,13 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
                                      float minSliderPos, float maxSliderPos, const juce::Slider::SliderStyle style,
                                      juce::Slider &slider)
 {
-  lastSliderPos_   = sliderPos;
-  sliderWidth_     = width - labelMargin_ + 1.0f;
-  ap_slider_height = height;
+  lastSliderPos_ = sliderPos;
+  sliderWidth_   = width - labelMargin_ + 1.0f;
+  apSliderHeight = height;
 
   // Background
   g.setColour(juce::Colours::darkgrey);
-  g.fillRoundedRectangle(x, y, width - labelMargin_, ap_slider_height, 10);
+  g.fillRoundedRectangle(x, y, width - labelMargin_, apSliderHeight, 10);
 }
 
 void MyLookAndFeel::drawLinearSliderBackground(Graphics &g, int x, int y, int width, int height, float sliderPos,
@@ -121,15 +121,12 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label)
 
   switch (sliderType_)
   {
-    case Normal:
-      // DBG("lastSliderPos: " << lastSliderPos_);
-      labelBounds = Rectangle<int>(sliderWidth_, lastSliderPos_, labelMargin_, 20);
-      break;
-    case Invert:
+    case SliderType::Normal: labelBounds = Rectangle<int>(sliderWidth_, lastSliderPos_, labelMargin_, 20); break;
+    case SliderType::Invert:
       labelBounds =
           Rectangle<int>(sliderWidth_, lastSliderPos_ > 20 ? lastSliderPos_ - 20 : lastSliderPos_, labelMargin_, 20);
       break;
-    default: break;
+    default: jassertfalse; break;
   }
   g.drawFittedText(label.getText().substring(0, 9), labelBounds, label.getJustificationType(), 1);
 }

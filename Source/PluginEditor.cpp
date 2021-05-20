@@ -78,18 +78,18 @@ void Ap_dynamicsAudioProcessorEditor::paint(juce::Graphics& g)
   g.drawImage(bgText_, textBounds, juce::RectanglePlacement::fillDestination);
 
   // Draw Label Shadows
-  auto shadow_height = SLIDER_Y - 68;
+  auto shadowHeight = SLIDER_Y - 68;
   g.drawImage(thresholdShadow_,
-              juce::Rectangle<float>(thresholdSlider_->getX() + 6, shadow_height, thresholdShadow_.getWidth(),
+              juce::Rectangle<float>(thresholdSlider_->getX() + 6, shadowHeight, thresholdShadow_.getWidth(),
                                      thresholdShadow_.getHeight()),
               juce::RectanglePlacement::fillDestination);
   g.drawImage(
       ratioShadow_,
-      juce::Rectangle<float>(ratioSlider_->getX() + 6, shadow_height, ratioShadow_.getWidth(), ratioShadow_.getHeight()),
+      juce::Rectangle<float>(ratioSlider_->getX() + 6, shadowHeight, ratioShadow_.getWidth(), ratioShadow_.getHeight()),
       juce::RectanglePlacement::fillDestination);
   g.drawImage(
       styleShadow_,
-      juce::Rectangle<float>(stylePicker_.getX() + 66, shadow_height, styleShadow_.getWidth(), styleShadow_.getHeight()),
+      juce::Rectangle<float>(stylePicker_.getX() + 66, shadowHeight, styleShadow_.getWidth(), styleShadow_.getHeight()),
       juce::RectanglePlacement::fillDestination);
 
   // Slider Shadows
