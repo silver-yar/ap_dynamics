@@ -20,6 +20,6 @@ namespace AP
 
   namespace Constants
   {
-    const float minusInfinityDb = -96.0f;
+    constexpr float minusInfinityDb = -96.0f;
   }
 }  // namespace AP

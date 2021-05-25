@@ -32,8 +32,8 @@ float APCompressor::applyRMSCompression(float sample)
 
   auto xUni = abs(sample);
   auto xDb  = juce::Decibels::gainToDecibels(xUni, AP::Constants::minusInfinityDb);
-  if (xDb < MIN_DB)
-    xDb = MIN_DB;
+  if (xDb < AP::Constants::minusInfinityDb)
+    xDb = AP::Constants::minusInfinityDb;
 
   float gainSmooth = 0;
   float gainSc     = 0;

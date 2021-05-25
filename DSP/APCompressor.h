@@ -10,8 +10,6 @@
 
 #pragma once
 
-const static float MIN_DB = -144;
-
 class APCompressor
 {
  public:
