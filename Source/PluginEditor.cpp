@@ -39,6 +39,7 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   pickerBounds_    = juce::Rectangle<int>(470, SLIDER_Y, SLIDER_WIDTH, sliderHeight_);
 
   setSize(M_WIDTH, M_HEIGHT);
+  setResizable(false, false);
   startTimerHz(60);
 
   kernel_.createGaussianBlur(5.6f);
