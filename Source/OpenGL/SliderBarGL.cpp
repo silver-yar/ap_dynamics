@@ -45,7 +45,7 @@ void SliderBarGL::newOpenGLContextCreated()
   diffTexture_.loadImage(diffImage_);
 
   openGLContext_.setTextureMagnificationFilter(juce::OpenGLContext::TextureMagnificationFilter::linear);
-  loadCubeMap(textureFaces_);
+//  loadCubeMap(textureFaces_);
 
   // Setup Buffer Objects
   openGLContext_.extensions.glGenBuffers(1, &VBO_);  // Vertex Buffer Object

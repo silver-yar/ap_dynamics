@@ -111,15 +111,15 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
   // Texture Imagesjuce::OpenGLTexture()
   juce::Image diffImage_{ juce::ImageCache::getFromMemory(BinaryData::blue_noise_png, BinaryData::blue_noise_pngSize) };
 
-  std::vector<juce::Image> textureFaces_{
-    // right, left, top, bottom, back, front
-    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube1_png, BinaryData::blurCube1_pngSize) },
-    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube2_png, BinaryData::blurCube2_pngSize) },
-    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube3_png, BinaryData::blurCube3_pngSize) },
-    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube4_png, BinaryData::blurCube4_pngSize) },
-    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube5_png, BinaryData::blurCube5_pngSize) },
-    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube6_png, BinaryData::blurCube6_pngSize) },
-  };
+//  std::vector<juce::Image> textureFaces_{
+//    // right, left, top, bottom, back, front
+//    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube1_png, BinaryData::blurCube1_pngSize) },
+//    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube2_png, BinaryData::blurCube2_pngSize) },
+//    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube3_png, BinaryData::blurCube3_pngSize) },
+//    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube4_png, BinaryData::blurCube4_pngSize) },
+//    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube5_png, BinaryData::blurCube5_pngSize) },
+//    juce::Image{ juce::ImageCache::getFromMemory(BinaryData::blurCube6_png, BinaryData::blurCube6_pngSize) },
+//  };
 
   juce::OpenGLShaderProgram shader_;
   std::unique_ptr<Uniforms> uniforms_;
