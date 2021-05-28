@@ -63,7 +63,6 @@ target_sources(ap_dynamics
         Source/OpenGL/SliderBarGL.cpp
         Source/PluginEditor.cpp
         Source/PluginProcessor.cpp
-#        Tests/temp-test.cpp
         )
         # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use
@@ -119,3 +118,21 @@ target_link_libraries(ap_dynamics
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
+
+# Testing
+enable_testing()
+list(APPEND FILES_tests Tests/temp-test.cpp DSP/APOverdrive.cpp)
+add_executable(catch-test ${FILES_tests})
+add_test(Catch-Test catch-test)
+target_link_libraries(
+        catch-test
+        PRIVATE
+        Catch2::Catch2
+        juce::juce_core
+)
+target_include_directories(
+        catch-test
+        PRIVATE
+        DSP
+)
+

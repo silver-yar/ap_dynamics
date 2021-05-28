@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
-#include "../DSP/APOverdrive.h"
+#include "APOverdrive.h"
 
 TEST_CASE("DSP Soft Clipping Test")
 {
