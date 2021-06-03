@@ -123,6 +123,10 @@ target_link_libraries(
           juce::juce_audio_utils juce::juce_opengl
   PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_lto_flags juce::juce_recommended_warning_flags)
 
+add_library(project_warnings INTERFACE)
+include(CompilerWarnings.cmake)
+set_project_warnings(project_warnings)
+
 # Testing
 enable_testing()
 list(
