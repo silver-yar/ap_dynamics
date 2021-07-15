@@ -9,10 +9,13 @@
 */
 
 #pragma once
+#include <utility>
 
 class APCompressor
 {
  public:
+  static constexpr float minusInfinityDb = -96.0f;
+
   APCompressor();
   ~APCompressor();
 
@@ -25,11 +28,13 @@ class APCompressor
   void reset()
   {
     prevGainSmooth_ = 0;
-    y_prev_         = 0;
   };
 
-  void process(float* audioIn, float* audioOut, float numSamplesToRender);
+  void process(const float* audioIn, float* audioOut, float numSamplesToRender);
 
+  static std::pair<float, float> _applyRMSCompression(float sample,  float sampleRate, float threshold, float ratio,
+                                    float attack, float release, float kneeWidth,
+                                    float prevGainSmoothed);
   float applyRMSCompression(float sample);
 
  private:
@@ -40,5 +45,4 @@ class APCompressor
   float release_        = 0.08f;  // 80 ms
   float kneeWidth_      = 6.0f;
   float prevGainSmooth_ = 0.0f;
-  float y_prev_         = 0.0f;
 };

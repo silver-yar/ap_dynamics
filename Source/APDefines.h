@@ -9,8 +9,10 @@
 */
 
 #pragma once
-#include "JuceHeader.h"
+#include <juce_core/juce_core.h>
+#include <juce_graphics/juce_graphics.h>
 
+// Breakout into two files for graphics and logic constants
 namespace AP
 {
   namespace Colors

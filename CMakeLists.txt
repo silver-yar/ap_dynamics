@@ -73,12 +73,11 @@ target_sources(
           Source/OpenGL/SliderBarGL.cpp
           Source/PluginEditor.cpp
           Source/PluginProcessor.cpp)
-# `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
-# project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use of compile
-# definitions to switch certain features on/off, so if there's a particular feature you need that's not on by default,
-# check the module header for the correct flag to set here. These definitions will be visible both to your code, and
-# also the JUCE module code, so for new definitions, pick unique names that are unlikely to collide! This is a standard
-# CMake command.
+# `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer project, these might be
+# passed in the 'Preprocessor Definitions' field. JUCE modules also make use of compile definitions to switch certain
+# features on/off, so if there's a particular feature you need that's not on by default, check the module header for the
+# correct flag to set here. These definitions will be visible both to your code, and also the JUCE module code, so for
+# new definitions, pick unique names that are unlikely to collide! This is a standard CMake command.
 
 target_compile_definitions(
   ap_dynamics
@@ -133,8 +132,13 @@ list(
   APPEND
   FILES_tests
   Tests/tester.cpp
-  DSP/APOverdrive.cpp)
+  DSP/APCompressor.cpp)
 add_executable(catch-test ${FILES_tests})
 add_test(Catch-Test catch-test)
-target_link_libraries(catch-test PRIVATE Catch2::Catch2 juce::juce_core)
+target_link_libraries(catch-test
+        PRIVATE
+        Catch2::Catch2
+        juce::juce_core
+        juce::juce_audio_basics
+        )
 target_include_directories(catch-test PRIVATE DSP)
