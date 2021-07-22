@@ -140,5 +140,6 @@ target_link_libraries(catch-test
         Catch2::Catch2
         juce::juce_core
         juce::juce_audio_basics
+        juce::juce_graphics
         )
 target_include_directories(catch-test PRIVATE DSP)

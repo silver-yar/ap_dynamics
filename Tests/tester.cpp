@@ -2,6 +2,7 @@
 
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_core/juce_core.h>
+#include <juce_graphics/juce_graphics.h>
 
 #include <catch2/catch.hpp>
 #include <iostream>
@@ -71,7 +72,7 @@ TEST_CASE("DSP TESTS")
 
       auto sp_end        = std::chrono::high_resolution_clock::now();
       auto sample_period = std::chrono::duration_cast<std::chrono::duration<double>>(sp_end - sp_start);
-      DBG("Sample Processing Period (s): " << sample_period.count() << " s");
+//      DBG("Sample Processing Period (s): " << sample_period.count() << " s");
       sample_periods.emplace_back(sample_period.count());
 
       prevGainSmoothed = gainSmoothed;
@@ -88,15 +89,46 @@ TEST_CASE("DSP TESTS")
     sp_avg += sp;
   }
   sp_avg = sp_avg / sample_periods.size();
-  DBG("\nAverage Sample Processing Period (s): " << sp_avg << " s");
-  DBG("Average Sample Processing Frequency (Hz): " << 1.0 / sp_avg << " Hz");
+//  DBG("\nAverage Sample Processing Period (s): " << sp_avg << " s");
+//  DBG("Average Sample Processing Frequency (Hz): " << 1.0 / sp_avg << " Hz");
 
   CHECK(allGood);
+}
+
+
+void plot(const juce::String& plotData) {
+  juce::ScopedJuceInitialiser_GUI myInit;
+
+//  auto plot_image = std::make_unique<juce::Image>
+//      (juce::Image::PixelFormat::ARGB, 200, 200, true);
+  juce::Image plot_image (juce::Image::PixelFormat::ARGB, 200, 200, true);
+//  auto plot_graphics = std::make_unique<juce::Graphics> (plot_image);
+  auto plot_graphics = juce::Graphics(plot_image);
+  plot_graphics.fillAll(juce::Colours::yellow);
+
+  juce::File plot_file = juce::File::createTempFile( ".png");
+  juce::PNGImageFormat plot_format;
+  juce::FileOutputStream plot_output_stream (plot_file);
+  auto write_result = plot_format.writeImageToStream(plot_image, plot_output_stream);
+  if (!write_result) { DBG("Image write unsuccessful");}
+
+  DBG(plot_file.getFullPathName());
+}
+
+void callGraphics() {
+  juce::ScopedJuceInitialiser_GUI myInit;
+
+  juce::Image my_image (juce::Image::PixelFormat::ARGB, 200, 200, true);
+  {
+    juce::Graphics myGraphics(my_image);
+  }
 }
 
 int main(int argc, char* argv[])
 {
   int testResult = Catch::Session().run(argc, argv);
+  plot("Hello");
+//  callGraphics();
 
   return testResult;
 }
