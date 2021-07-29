@@ -34,24 +34,21 @@ void processSamples (juce::AudioBuffer<float>& buffer, APCompressor& compressor)
 void plotData(juce::Graphics& g, juce::Rectangle<int>& bounds, juce::AudioBuffer<float>& buffer) {
   g.setColour(juce::Colours::lightcoral);
   g.fillRect(bounds);
-  auto num_samples = buffer.getNumSamples();
-  std::vector<float> x_scaled_audio;
-  auto x_ratio = num_samples / bounds.toFloat().getWidth();
-  auto buffer_read = buffer.getReadPointer (0);
-  for (int sample = 0; sample < num_samples; sample+=x_ratio)
-  {
-    x_scaled_audio.emplace_back (buffer_read[sample]);
-  }
+  auto buffer_read = buffer.getReadPointer(0);
+  float num_samples = buffer.getNumSamples();
+  float x_ratio = num_samples / bounds.toFloat().getWidth();
+  jassert(x_ratio > 0.0f);
 
   juce::Path p;
   p.startNewSubPath(bounds.getX(), bounds.getCentreY());
-  for (auto i = 0; i < x_scaled_audio.size(); i++) {
-    auto y_value = juce::jmap(buffer_read[i], -1.0f, 1.0f,
-                              static_cast<float> (bounds.getHeight()), static_cast<float> (bounds.getY()));
-    p.lineTo(i, y_value);
-//    p.lineTo(bounds.getX() + (i * step_size), juce::jmap(buffer.getSample(0,i), -1.0f, 1.0f,
-//                                             (float) bounds.getBottom(), (float) bounds.getY()));
+  for (int i = 0; i < bounds.getWidth(); i++) {
+    int sample_index = static_cast<int> (static_cast<float>(i) * x_ratio);
+    auto y_value = juce::jmap(buffer_read[sample_index], -1.0f, 1.0f,
+                              static_cast<float> (bounds.getBottom()), static_cast<float> (bounds.getY()));
+    p.lineTo(bounds.getX() + i, y_value);
+    DBG("index: " << i);
   }
+  DBG("Bounds Width: " << bounds.getWidth());
 
   g.setColour(juce::Colours::black);
   g.strokePath(p, juce::PathStrokeType(2));
@@ -67,6 +64,8 @@ void generatePlots(const juce::String& plotName) {
   int buffer_size = 256;
   juce::AudioBuffer<float> audio_buffer {2, buffer_size};
   APCompressor compressor;
+  compressor.setSampleRate(44100.0f);
+  compressor.updateParameters(-20.0f, 10.0f);
   juce::String file_path = "/Users/silveryar/development/juce/ap_dynamics/Tests/noise.wav";
 
   loadFile(file_path, &audio_buffer, buffer_size);
