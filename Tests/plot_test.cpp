@@ -46,15 +46,13 @@ void plotData(juce::Graphics& g, juce::Rectangle<int>& bounds, juce::AudioBuffer
     auto y_value = juce::jmap(buffer_read[sample_index], -1.0f, 1.0f,
                               static_cast<float> (bounds.getBottom()), static_cast<float> (bounds.getY()));
     p.lineTo(bounds.getX() + i, y_value);
-    DBG("index: " << i);
   }
-  DBG("Bounds Width: " << bounds.getWidth());
 
   g.setColour(juce::Colours::black);
   g.strokePath(p, juce::PathStrokeType(2));
 }
 
-void generatePlots(const juce::String& plotName) {
+void generatePlots(const juce::String& file_path) {
   juce::ScopedJuceInitialiser_GUI myInit;
 
   juce::Image plot_image (juce::Image::PixelFormat::ARGB, 500, 500, true);
@@ -66,7 +64,6 @@ void generatePlots(const juce::String& plotName) {
   APCompressor compressor;
   compressor.setSampleRate(44100.0f);
   compressor.updateParameters(-20.0f, 10.0f);
-  juce::String file_path = "/Users/silveryar/development/juce/ap_dynamics/Tests/noise.wav";
 
   loadFile(file_path, &audio_buffer, buffer_size);
   plotData(plot_graphics, top_plot_bounds, audio_buffer); // Before compression
@@ -84,7 +81,7 @@ void generatePlots(const juce::String& plotName) {
 
 int main()
 {
-  generatePlots("Hello");
+  generatePlots("/Users/silveryar/development/juce/ap_dynamics/Tests/noise.wav");
 
   return 1;
 }
