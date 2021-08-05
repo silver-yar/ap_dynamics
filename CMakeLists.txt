@@ -147,7 +147,9 @@ list(
         APPEND
         FILES_plot
         Tests/plot_test.cpp
-        DSP/APCompressor.cpp)
+        DSP/APCompressor.cpp
+        DSP/APTubeDistortion.cpp
+        DSP/APOverdrive.cpp)
 add_executable(plot-test ${FILES_plot})
 target_link_libraries(plot-test
         PRIVATE

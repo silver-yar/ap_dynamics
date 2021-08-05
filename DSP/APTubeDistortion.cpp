@@ -9,8 +9,8 @@
 */
 
 #include "APTubeDistortion.h"
-
-#include "JuceHeader.h"
+#include <stdlib.h>
+#include <math.h>
 
 APTubeDistortion::APTubeDistortion() = default;
 

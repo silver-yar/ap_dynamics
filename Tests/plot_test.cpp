@@ -3,6 +3,8 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_formats/juce_audio_formats.h>
 #include "../DSP/APCompressor.h"
+#include "../DSP/APTubeDistortion.h"
+#include "../DSP/APOverdrive.h"
 
 // Create a juce audio buffer - x
 // Add data to buffer via generated sample values or from file
@@ -21,13 +23,33 @@ void loadFile(const juce::String& path, juce::AudioBuffer<float>* buffer, int bu
   format_reader->read(buffer, 0, bufferSize, 0, true, true);
 }
 
-void processSamples (juce::AudioBuffer<float>& buffer, APCompressor& compressor) {
+void processSamplesWithCompression(juce::AudioBuffer<float>& buffer, APCompressor& compressor) {
   juce::ScopedNoDenormals noDenormals;
   auto numChannels            = 2;
 
   for (int channel = 0; channel < numChannels; ++channel) {
     auto* channelData = buffer.getWritePointer(channel);
     compressor.process(channelData, channelData, buffer.getNumSamples());
+  }
+}
+
+void processSamplesWithDistortion(juce::AudioBuffer<float>& buffer, APTubeDistortion& distortion) {
+  juce::ScopedNoDenormals noDenormals;
+  auto numChannels            = 2;
+
+  for (int channel = 0; channel < numChannels; ++channel) {
+    auto* channelData = buffer.getWritePointer(channel);
+    distortion.process(channelData, 1.0f, -0.2f, 8.0f, 1.0f, channelData, buffer.getNumSamples());
+  }
+}
+
+void processSamplesWithOverdrive(juce::AudioBuffer<float>& buffer, APOverdrive& overdrive) {
+  juce::ScopedNoDenormals noDenormals;
+  auto numChannels            = 2;
+
+  for (int channel = 0; channel < numChannels; ++channel) {
+    auto* channelData = buffer.getWritePointer(channel);
+    overdrive.process(channelData, 1.0f, channelData, buffer.getNumSamples());
   }
 }
 
@@ -52,7 +74,7 @@ void plotData(juce::Graphics& g, juce::Rectangle<int>& bounds, juce::AudioBuffer
   g.strokePath(p, juce::PathStrokeType(2));
 }
 
-void generatePlots(const juce::String& file_path) {
+juce::Image generatePlots(const juce::String& file_path, int plot_type) {
   juce::ScopedJuceInitialiser_GUI myInit;
 
   juce::Image plot_image (juce::Image::PixelFormat::ARGB, 500, 500, true);
@@ -61,27 +83,60 @@ void generatePlots(const juce::String& file_path) {
   auto bottom_plot_bounds = juce::Rectangle<int> (30, 265, 440, 205);
   int buffer_size = 256;
   juce::AudioBuffer<float> audio_buffer {2, buffer_size};
-  APCompressor compressor;
-  compressor.setSampleRate(44100.0f);
-  compressor.updateParameters(-20.0f, 10.0f);
 
   loadFile(file_path, &audio_buffer, buffer_size);
   plotData(plot_graphics, top_plot_bounds, audio_buffer); // Before compression
-  processSamples (audio_buffer, compressor);
+
+  APCompressor compressor;
+  compressor.setSampleRate(44100.0f);
+  compressor.updateParameters(-20.0f, 10.0f);
+  APTubeDistortion distortion;
+  APOverdrive overdrive;
+  switch (plot_type)  // 1 = compression, 2 = tube distortion, 3 = overdrive, 4 = all
+  {
+    case 1:
+      processSamplesWithCompression(audio_buffer, compressor);
+      break;
+    case 2:
+      processSamplesWithDistortion(audio_buffer, distortion);
+      break;
+    case 3:
+      processSamplesWithOverdrive(audio_buffer, overdrive);
+      break;
+    case 4:
+      processSamplesWithCompression(audio_buffer, compressor);
+      processSamplesWithDistortion(audio_buffer, distortion);
+      processSamplesWithOverdrive(audio_buffer, overdrive);
+      break;
+    default: break;
+  }
   plotData(plot_graphics, bottom_plot_bounds, audio_buffer); // After compression
 
-  juce::File plot_file = juce::File::createTempFile( ".png");
+  return plot_image;
+}
+
+bool writeImageToPngFile(const juce::Image& plot_image, juce::File& plot_file) {
   juce::PNGImageFormat plot_format;
   juce::FileOutputStream plot_output_stream (plot_file);
   auto write_result = plot_format.writeImageToStream(plot_image, plot_output_stream);
-  if (!write_result) { DBG("Image write unsuccessful");}
 
-  DBG(plot_file.getFullPathName());
+  return write_result;
 }
 
 int main()
 {
-  generatePlots("/Users/silveryar/development/juce/ap_dynamics/Tests/noise.wav");
+//  const auto plot_image_comp =
+//      generatePlots("/Users/silveryar/development/juce/ap_dynamics/Tests/noise.wav", 1);
+  const auto plot_image_all =
+      generatePlots("/Users/silveryar/development/juce/ap_dynamics/Tests/noise.wav", 4);
+
+  juce::File plot_file = juce::File::createTempFile( ".png");
+  auto write_result = writeImageToPngFile(plot_image_all, plot_file);
+  if (write_result) {
+    plot_file.startAsProcess ();
+  } else {
+    DBG("Image write unsuccessful");
+  }
 
   return 1;
 }
