@@ -28,7 +28,7 @@ class APCompressor
   void reset()
   {
     prevGainSmooth_ = 0;
-  };
+  }
 
   void process(const float* audioIn, float* audioOut, float numSamplesToRender);
 

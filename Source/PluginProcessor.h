@@ -83,7 +83,7 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   // Overrides AudioProcessor reset, reset DSP parameters
   void reset() override;
   // Create parameter layout for apvts
-  juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
+  static juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
 
  private:
   bool mustUpdateProcessing_{ false }, isActive_{ false };
@@ -98,8 +98,12 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   // Callback for DSP parameter changes
   void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyChanged, const juce::Identifier& property) override
   {
+    // Function parameters not needed for value tree state
+    ignoreUnused(treeWhosePropertyChanged);
+    ignoreUnused(property);
+
     mustUpdateProcessing_ = true;
-  };
+  }
   //==============================================================================
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Ap_dynamicsAudioProcessor)
 };

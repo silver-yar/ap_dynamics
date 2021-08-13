@@ -30,8 +30,8 @@ std::pair<float, float> APCompressor::_applyRMSCompression(float sample, float s
                                   float attack, float release, float kneeWidth,
                                   float prevGainSmoothed)
 {
-  const float alphaA = exp(-log(9) / (sampleRate * attack));
-  const float alphaR = exp(-log(9) / (sampleRate * release));
+  const float alphaA = static_cast<float>(exp(-log(9) / (sampleRate * attack)));
+  const float alphaR = static_cast<float>(exp(-log(9) / (sampleRate * release)));
 
   auto xUni = abs(sample);
   auto xDb  = juce::Decibels::gainToDecibels(xUni, minusInfinityDb);

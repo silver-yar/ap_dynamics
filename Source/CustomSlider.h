@@ -37,7 +37,7 @@ class CustomSlider_ : public juce::Component, public juce::Timer
   static constexpr float cornerSize = 10.0f;
 
   CustomSlider_(Ap_dynamicsAudioProcessor &, SliderType);
-  ~CustomSlider_();
+  ~CustomSlider_() override;
 
   void resized() override;
   void timerCallback() override;
@@ -76,6 +76,6 @@ class MyLookAndFeel : public juce::LookAndFeel_V4
   SliderType sliderType_;
 
   int labelMargin_     = 70;
-  float lastSliderPos_ = 0;
-  float sliderWidth_   = 0;
+  int lastSliderPos_ = 0;
+  int sliderWidth_   = 0;
 };

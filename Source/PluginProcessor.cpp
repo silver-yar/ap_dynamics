@@ -75,16 +75,33 @@ int Ap_dynamicsAudioProcessor::getNumPrograms()
 
 int Ap_dynamicsAudioProcessor::getCurrentProgram() { return 0; }
 
-void Ap_dynamicsAudioProcessor::setCurrentProgram(int index) { }
+void Ap_dynamicsAudioProcessor::setCurrentProgram(int index)
+{
+  // Unused Parameters
+  ignoreUnused(index);
+}
 
-const juce::String Ap_dynamicsAudioProcessor::getProgramName(int index) { return {}; }
+const juce::String Ap_dynamicsAudioProcessor::getProgramName(int index)
+{
+  // Unused Parameters
+  ignoreUnused(index);
+  return {};
+}
 
-void Ap_dynamicsAudioProcessor::changeProgramName(int index, const juce::String& newName) { }
+void Ap_dynamicsAudioProcessor::changeProgramName(int index, const juce::String& newName)
+{
+  // Unused Parameters
+  ignoreUnused(index);
+  ignoreUnused(newName);
+}
 
 //==============================================================================
 void Ap_dynamicsAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-  compressor_->setSampleRate(sampleRate);
+  // Unused Parameters
+  ignoreUnused(samplesPerBlock);
+
+  compressor_->setSampleRate(static_cast<float>(sampleRate));
   update();
   reset();
   isActive_ = true;
@@ -122,6 +139,9 @@ bool Ap_dynamicsAudioProcessor::isBusesLayoutSupported(const BusesLayout& layout
 
 void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+  // Unused Parameters
+  ignoreUnused(midiMessages);
+
   if (!isActive_)
     return;
   if (mustUpdateProcessing_)
@@ -253,7 +273,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
 
         return std::pow(proportion, ratioSkew);
       },
-      [](auto start, auto end, auto value) { return value; });
+      [](auto start, auto end, auto value)
+      {
+        // Unused Parameters
+        ignoreUnused(start);
+        ignoreUnused(end);
+
+        return value;
+      });
 
   // **Threshold**
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(

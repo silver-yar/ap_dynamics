@@ -14,9 +14,9 @@
 
 using namespace juce;
 
-CustomSlider::CustomSlider() { }
+CustomSlider::CustomSlider() = default;
 
-CustomSlider::~CustomSlider() { }
+CustomSlider::~CustomSlider() = default;
 
 CustomSlider_::CustomSlider_(Ap_dynamicsAudioProcessor &p, SliderType sliderType)
     : audioProcessor(p), sliderType_(sliderType)
@@ -39,7 +39,7 @@ CustomSlider_::~CustomSlider_()
 
 void CustomSlider_::resized()
 {
-  auto offset = 72.0f;
+  auto offset = 72;
   switch (sliderType_)
   {
     case Normal:
@@ -91,17 +91,32 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
                                      float minSliderPos, float maxSliderPos, const juce::Slider::SliderStyle style,
                                      juce::Slider &slider)
 {
-  lastSliderPos_ = sliderPos;
-  sliderWidth_   = width - labelMargin_ + 1.0f;
+  // Unused Parameters
+  ignoreUnused(minSliderPos);
+  ignoreUnused(maxSliderPos);
+  ignoreUnused(style);
+  ignoreUnused(slider);
+
+  lastSliderPos_ = static_cast<int>(sliderPos);
+  sliderWidth_   = width - labelMargin_ + 1;
   // Background
   g.setColour(AP::Colors::DarkGrey);
-  g.fillRoundedRectangle(x, y, width - labelMargin_, height, CustomSlider_::cornerSize);
+  g.fillRoundedRectangle(static_cast<float>(x), static_cast<float>(y),
+                         static_cast<float>(width - labelMargin_),
+                         static_cast<float>(height), CustomSlider_::cornerSize);
 }
 
 void MyLookAndFeel::drawLinearSliderBackground(Graphics &g, int x, int y, int width, int height, float sliderPos,
                                                float minSliderPos, float maxSliderPos, const juce::Slider::SliderStyle style,
                                                Slider &slider)
 {
+  // Unused Parameters
+  ignoreUnused(sliderPos);
+  ignoreUnused(minSliderPos);
+  ignoreUnused(maxSliderPos);
+  ignoreUnused(style);
+  ignoreUnused(slider);
+
   g.setColour(Colours::indianred);
   g.fillRect(x, y, width, height);
 }
@@ -109,11 +124,6 @@ void MyLookAndFeel::drawLinearSliderBackground(Graphics &g, int x, int y, int wi
 juce::Label *MyLookAndFeel::createSliderTextBox(Slider &slider)
 {
   auto *l = LookAndFeel_V2::createSliderTextBox(slider);
-
-  //    l->setColour (Label::textColourId, Colours::snow);
-  //    l->setFont(labelFont_);
-  //    l->setFont (16);
-  //    l->setBounds(slider.getLocalBounds().removeFromTop(100));
 
   return l;
 }
@@ -125,7 +135,6 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label)
   switch (sliderType_)
   {
     case Normal:
-      // DBG("lastSliderPos: " << lastSliderPos_);
       labelBounds = Rectangle<int>(sliderWidth_, lastSliderPos_, labelMargin_, 20);
       break;
     case Invert:

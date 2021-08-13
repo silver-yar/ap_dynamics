@@ -34,7 +34,7 @@ APSlider::~APSlider()
 
 void APSlider::resized()
 {
-  auto offset = 72.0f;
+  auto offset = 72;
   switch (sliderType_)
   {
     case SliderType::Normal:
@@ -84,19 +84,34 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
                                      float minSliderPos, float maxSliderPos, const juce::Slider::SliderStyle style,
                                      juce::Slider &slider)
 {
-  lastSliderPos_ = sliderPos;
-  sliderWidth_   = width - labelMargin_ + 1.0f;
+  // Unused Parameters
+  ignoreUnused(minSliderPos);
+  ignoreUnused(maxSliderPos);
+  ignoreUnused(style);
+  ignoreUnused(slider);
+
+  lastSliderPos_ = static_cast<int>(sliderPos);
+  sliderWidth_   = width - labelMargin_ + 1;
   apSliderHeight = height;
 
   // Background
   g.setColour(juce::Colours::darkgrey);
-  g.fillRoundedRectangle(x, y, width - labelMargin_, apSliderHeight, 10);
+  g.fillRoundedRectangle(static_cast<float>(x), static_cast<float>(y),
+                         static_cast<float>(width - labelMargin_),
+                         static_cast<float>(apSliderHeight), 10);
 }
 
 void MyLookAndFeel::drawLinearSliderBackground(Graphics &g, int x, int y, int width, int height, float sliderPos,
                                                float minSliderPos, float maxSliderPos, const juce::Slider::SliderStyle style,
                                                Slider &slider)
 {
+  // Unused Parameters
+  ignoreUnused(sliderPos);
+  ignoreUnused(minSliderPos);
+  ignoreUnused(maxSliderPos);
+  ignoreUnused(style);
+  ignoreUnused(slider);
+
   g.setColour(Colours::indianred);
   g.fillRect(x, y, width, height);
 }

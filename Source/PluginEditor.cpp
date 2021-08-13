@@ -14,12 +14,12 @@
 Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p), thresholdLook_(p, Invert), ratioLook_(p, Normal), stylePicker_(p)
 {
-  setupSlider(thresholdSlider_, thresholdLabel_, lshdwT_, "Threshold", SliderType::Invert, "dB");
+  setupSlider(thresholdSlider_, thresholdLabel_, "Threshold", SliderType::Invert, "dB");
   thresholdSlider_->slider.setLookAndFeel(&thresholdLook_);
   thresholdAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "THR",
                                                                                                 thresholdSlider_->slider);
 
-  setupSlider(ratioSlider_, ratioLabel_, lshdwR_, "Ratio", SliderType::Normal, ": 1");
+  setupSlider(ratioSlider_, ratioLabel_, "Ratio", SliderType::Normal, ": 1");
   ratioSlider_->slider.setLookAndFeel(&ratioLook_);
   ratioAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "RAT",
                                                                                             ratioSlider_->slider);
@@ -67,7 +67,7 @@ void Ap_dynamicsAudioProcessorEditor::paint(juce::Graphics& g)
   // Logo
   constexpr int textDeltaX = 80;
   constexpr int textDeltaY = 50;
-  const int textHeight     = getHeight() * 0.45f;
+  const int textHeight     = static_cast<const int>(static_cast<float>(getHeight()) * 0.45f);
   const auto textBounds =
       getLocalBounds().removeFromTop(textHeight).reduced(textDeltaX, textDeltaY).withBottomY(SLIDER_Y - 100).toFloat();
 
@@ -104,12 +104,11 @@ void Ap_dynamicsAudioProcessorEditor::paint(juce::Graphics& g)
   g.drawImage(sSliderShadow_, shadowBounds.withX(530).expanded(shadowDeltaXY_) + offset_,
               juce::RectanglePlacement::fillDestination);
 
-  //    g.fillRoundedRectangle(shadowBounds.expanded(testBox_.shadowDeltaXY) +
-  //                                                        testBox_.offset, 10.0f);
-  //    g.fillRoundedRectangle(shadowBounds.withX(280).expanded(testBox_.shadowDeltaXY) +
-  //                                                        testBox_.offset, 10.0f);
-  //    g.fillRoundedRectangle(shadowBounds.withX(530).expanded(testBox_.shadowDeltaXY) +
-  //                                                        testBox_.offset, 10.0f);
+  // Version No.
+  juce::String version = JUCE_APPLICATION_VERSION_STRING;
+  g.setColour(juce::Colours::darkgrey);
+  g.drawFittedText("Version #: " + version, getWidth() - 105, getHeight() - 20,
+                   100, 15, juce::Justification::centred, 1);
 }
 
 void Ap_dynamicsAudioProcessorEditor::resized()
@@ -147,7 +146,7 @@ void Ap_dynamicsAudioProcessorEditor::setupSliderShadow(juce::Image& shadow)
 
 void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_>& slider,
                                                   std::unique_ptr<juce::Label>& label,
-                                                  std::unique_ptr<juce::Label>& labelShadow, const juce::String& name,
+                                                  const juce::String& name,
                                                   SliderType sliderType, const juce::String& suffix)
 {
   slider = std::make_unique<CustomSlider_>(audioProcessor, sliderType);

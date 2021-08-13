@@ -62,7 +62,7 @@ class ShowHideContainer : public juce::Component
     {
       if (!deltaEditor_.isEmpty())
       {
-        shadowDeltaXY = deltaEditor_.getText().getFloatValue();
+        shadowDeltaXY = static_cast<int>(deltaEditor_.getText().getFloatValue());
         resized();
       }
     };

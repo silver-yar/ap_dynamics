@@ -27,7 +27,7 @@ class APSlider : public juce::Component, public juce::Timer
 {
  public:
   APSlider(Ap_dynamicsAudioProcessor &, SliderType);
-  ~APSlider();
+  ~APSlider() override;
 
   void resized() override;
   void timerCallback() override;
@@ -62,6 +62,6 @@ class MyLookAndFeel : public juce::LookAndFeel_V4
   SliderType sliderType_;
 
   int labelMargin_     = 70;
-  float lastSliderPos_ = 0.0f;
-  float sliderWidth_   = 0.0f;
+  int lastSliderPos_ = 0;
+  int sliderWidth_   = 0;
 };

@@ -48,8 +48,8 @@ void SliderBarGL::newOpenGLContextCreated()
 //  loadCubeMap(textureFaces_);
 
   // Setup Buffer Objects
-  openGLContext_.extensions.glGenBuffers(1, &VBO_);  // Vertex Buffer Object
-  openGLContext_.extensions.glGenBuffers(1, &EBO_);  // Element Buffer Object
+  juce::OpenGLExtensionFunctions::glGenBuffers(1, &VBO_);  // Vertex Buffer Object
+  juce::OpenGLExtensionFunctions::glGenBuffers(1, &EBO_);  // Element Buffer Object
 }
 
 void SliderBarGL::openGLContextClosing()
@@ -141,8 +141,8 @@ void SliderBarGL::renderOpenGL()
   {
     auto now      = std::chrono::high_resolution_clock::now();
     auto sysTime  = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
-    auto elapsed  = sysTime - startTime;
-    float seconds = elapsed / 1000000000.0;
+    auto elapsed  = static_cast<double>(sysTime - startTime);
+    auto seconds = static_cast<float>(elapsed / 1000000000.0);
     uniforms_->runTime->set((GLfloat)seconds);
   }
 
@@ -165,54 +165,36 @@ void SliderBarGL::renderOpenGL()
   // openGLContext_.extensions.glBindVertexArray(VAO);
 
   // VBO (Vertex Buffer Object) - Bind and Write to Buffer
-  openGLContext_.extensions.glBindBuffer(GL_ARRAY_BUFFER, VBO_);
-  openGLContext_.extensions.glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
+  juce::OpenGLExtensionFunctions::glBindBuffer(GL_ARRAY_BUFFER, VBO_);
+  juce::OpenGLExtensionFunctions::glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
 
   // EBO (Element Buffer Object) - Bind and Write to Buffer
-  openGLContext_.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
-  openGLContext_.extensions.glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
+  juce::OpenGLExtensionFunctions::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
+  juce::OpenGLExtensionFunctions::glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
   // Setup Vertex Attributes
-  openGLContext_.extensions.glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
-  openGLContext_.extensions.glEnableVertexAttribArray(0);
+  juce::OpenGLExtensionFunctions::glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)nullptr);
+  juce::OpenGLExtensionFunctions::glEnableVertexAttribArray(0);
 
   // Setup Texture Coordinate Attributes
-  openGLContext_.extensions.glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
+  juce::OpenGLExtensionFunctions::glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
                                                   (GLvoid*)(2 * sizeof(GLfloat)));
-  openGLContext_.extensions.glEnableVertexAttribArray(1);
+  juce::OpenGLExtensionFunctions::glEnableVertexAttribArray(1);
 
   // Draw Vertices
   // glDrawArrays (GL_TRIANGLES, 0, 6); // For just VBO's (Vertex Buffer Objects)
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);  // For EBO's (Element Buffer Objects) (Indices)
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);  // For EBO's (Element Buffer Objects) (Indices)
 
   // Reset the element buffers so child Components draw correctly
-  openGLContext_.extensions.glBindBuffer(GL_ARRAY_BUFFER, 0);
-  openGLContext_.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  juce::OpenGLExtensionFunctions::glBindBuffer(GL_ARRAY_BUFFER, 0);
+  juce::OpenGLExtensionFunctions::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   // openGLContext_.extensions.glBindVertexArray(0);
 }
 
-void SliderBarGL::loadCubeMap(std::vector<juce::Image>& texture_images)
+void SliderBarGL::paint(juce::Graphics& g)
 {
-  auto texID = specTexture_.getTextureID();
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
-
-  for (auto i = 0; i < texture_images.size(); i++)
-  {
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, texture_images[i].getWidth(),
-                 texture_images[i].getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)texture_images[i].getPixelData());
-  }
-
-  glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-  glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+  ignoreUnused(g);
 }
-
-void SliderBarGL::paint(juce::Graphics& g) { }
 
 void SliderBarGL::resized() { }
 
