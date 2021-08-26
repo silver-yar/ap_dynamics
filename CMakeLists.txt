@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 3.15)
 # `project()` sets up some helpful variables that describe source/binary directories, and the current project version.
 # This is a standard CMake command.
 
+#SET(MACOSX_DEPLOYMENT_TARGET ${DARWIN_MAJOR_SDK_VERSION}.${DARWIN_MINOR_SDK_VERSION})
+#SET(CMAKE_CXX_FLAGS "--sysroot ${CMAKE_OSX_SYSROOT} ${CMAKE_CXX_FLAGS}")
+#MESSAGE("Setting MACOSX_DEPLOYMENT_TARGET to '${MACOSX_DEPLOYMENT_TARGET}'.")
+
 project(ap_dynamics VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -45,6 +49,7 @@ juce_add_plugin(
         # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
         FORMATS
         AU
+        AUv3
         VST3
         Standalone # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
         PRODUCT_NAME
@@ -160,6 +165,7 @@ target_link_libraries(plot-test
         juce::juce_graphics
         juce::juce_audio_basics
         juce::juce_audio_formats
+        juce::juce_dsp
         )
 
 
