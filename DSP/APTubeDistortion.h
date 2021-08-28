@@ -22,7 +22,7 @@ class APTubeDistortion
                       float Q,         // work point
                       float distChar,  // distortion character
                       float mix,       // mix of original and distorted sample
-                      float* audioOut, float numSamplesToRender);
+                      float* audioOut, int numSamplesToRender);
 
  private:
 };

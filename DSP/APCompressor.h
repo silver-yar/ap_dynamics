@@ -30,7 +30,7 @@ class APCompressor
     prevGainSmooth_ = 0;
   }
 
-  void process(const float* audioIn, float* audioOut, float numSamplesToRender);
+  void process(const float* audioIn, float* audioOut, int numSamplesToRender);
 
   static std::pair<float, float> _applyRMSCompression(float sample,  float sampleRate, float threshold, float ratio,
                                     float attack, float release, float kneeWidth,

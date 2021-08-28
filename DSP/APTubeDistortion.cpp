@@ -17,7 +17,7 @@ APTubeDistortion::APTubeDistortion() = default;
 APTubeDistortion::~APTubeDistortion() = default;
 
 void APTubeDistortion::process(const float* audioIn, float distGain, float Q, float distChar, float mix, float* audioOut,
-                               float numSamplesToRender)
+                               int numSamplesToRender)
 {
   for (auto i = 0; i < numSamplesToRender; ++i)
   {

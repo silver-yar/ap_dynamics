@@ -18,7 +18,7 @@ APCompressor::APCompressor() = default;
 
 APCompressor::~APCompressor() = default;
 
-void APCompressor::process(const float* audioIn, float* audioOut, float numSamplesToRender)
+void APCompressor::process(const float* audioIn, float* audioOut, int numSamplesToRender)
 {
   for (int i = 0; i < numSamplesToRender; ++i)
   {
