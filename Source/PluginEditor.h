@@ -15,7 +15,6 @@
 #include "CustomSlider.h"
 #include "MixerButton.h"
 #include "PluginProcessor.h"
-#include "ShowHideContainer.h"
 
 //==============================================================================
 /**
@@ -70,10 +69,9 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   std::unique_ptr<juce::Label> lshdwT_, lshdwR_, lshdwS_;
 
   juce::Point<float> offset_{ 0.0f, -16.0f };
-  int shadowDeltaXY_      = 10;
+  int shadowDeltaXY_      = 8;
   const int sliderHeight_ = 185;
   juce::Rectangle<int> thresholdBounds_, ratioBounds_, pickerBounds_;
-  ShowHideContainer testBox_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Ap_dynamicsAudioProcessorEditor)
 };

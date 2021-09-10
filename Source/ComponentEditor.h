@@ -15,10 +15,10 @@
 //==============================================================================
 /*
  */
-class ShowHideContainer : public juce::Component
+class ComponentEditor : public juce::Component
 {
  public:
-  ShowHideContainer()
+  ComponentEditor()
   {
     setAlpha(0.2f);
 
@@ -71,7 +71,7 @@ class ShowHideContainer : public juce::Component
     addAndMakeVisible(deltaEditor_);
   }
 
-  ~ShowHideContainer() override { }
+  ~ComponentEditor() override { }
 
   juce::Point<float> offset{ 0, -16 };
   int shadowDeltaXY = 8;

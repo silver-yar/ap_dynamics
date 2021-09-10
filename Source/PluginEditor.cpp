@@ -73,7 +73,7 @@ void Ap_dynamicsAudioProcessorEditor::paint(juce::Graphics& g)
 
   // Draw Logo Shadow
   g.drawImage(textShadow_,
-              textBounds.withY(textBounds.getY() - 10).expanded(testBox_.shadowDeltaXY * 1.5f) + testBox_.offset,
+              textBounds.withY(textBounds.getY() - 10).expanded(shadowDeltaXY_ * 1.5f) + offset_,
               juce::RectanglePlacement::fillDestination);
 
   g.drawImage(bgText_, textBounds, juce::RectanglePlacement::fillDestination);
