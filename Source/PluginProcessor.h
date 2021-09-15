@@ -69,7 +69,6 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   std::atomic<float> meterLocalMaxVal, meterGlobalMaxVal;  // std::atomic to make value thread safe
 
   // Setters
-  void setMixValue(float value) { mixValue_ = value; }
   void setOutputGain(float value)
   {
     for (int channel = 0; channel < 2; ++channel)
@@ -93,7 +92,8 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   std::unique_ptr<APOverdrive> overdrive_;
 
   juce::LinearSmoothedValue<float> makeup_;
-  float mixValue_ = 0.0f;
+  float mix_ = 0.0f;
+  float disQ_ = 0.0f;
 
   // Callback for DSP parameter changes
   void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyChanged, const juce::Identifier& property) override

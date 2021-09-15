@@ -8,7 +8,8 @@
 #include "../DSP/APOverdrive.h"
 #include "../DSP/APTubeDistortion.h"
 
-enum class ProcessType {
+enum class ProcessType
+{
   Compression,
   Distortion,
   Overdrive,
@@ -24,14 +25,14 @@ juce::AudioBuffer<float> loadFile(const juce::String& path)
 
   std::unique_ptr<juce::AudioFormatReader> format_reader{ format_manager.createReaderFor(file) };
   auto num_samples = static_cast<int>(format_reader->lengthInSamples);
-  juce::AudioBuffer<float> returnBuffer {1, num_samples};
-  format_reader->read(&returnBuffer, 0, num_samples, 0,
-                      true, false); // [td] could mix down to mono
+  juce::AudioBuffer<float> returnBuffer{ 1, num_samples };
+  format_reader->read(&returnBuffer, 0, num_samples, 0, true, false);  // [td] could mix down to mono
 
   return returnBuffer;
 }
 
-void processSamplesWithCompression(juce::AudioBuffer<float>& buffer, APCompressor& compressor) // [td] make process non-destructive
+void processSamplesWithCompression(juce::AudioBuffer<float>& buffer,
+                                   APCompressor& compressor)  // [td] make process non-destructive
 {
   juce::ScopedNoDenormals noDenormals;
   auto numChannels = buffer.getNumChannels();
@@ -48,11 +49,15 @@ void processSamplesWithDistortion(juce::AudioBuffer<float>& buffer, APTubeDistor
   juce::ScopedNoDenormals noDenormals;
   auto numChannels = buffer.getNumChannels();
 
+  DBG(buffer.getSample(0,100));
+
   for (int channel = 0; channel < numChannels; ++channel)
   {
     auto* channelData = buffer.getWritePointer(channel);
-    APTubeDistortion::process(channelData, 1.0f, -0.2f, 8.0f, 1.0f, channelData, buffer.getNumSamples());
+    APTubeDistortion::process(channelData, 3.0f, -0.2f, 8.0f, 0.8f, channelData, buffer.getNumSamples());
   }
+
+  DBG(buffer.getSample(0, 100));
 }
 
 void processSamplesWithOverdrive(juce::AudioBuffer<float>& buffer, APOverdrive& overdrive)
@@ -63,12 +68,12 @@ void processSamplesWithOverdrive(juce::AudioBuffer<float>& buffer, APOverdrive& 
   for (int channel = 0; channel < numChannels; ++channel)
   {
     auto* channelData = buffer.getWritePointer(channel);
-    APOverdrive::process(channelData, 1.0f, channelData, buffer.getNumSamples());
+    APOverdrive::process(channelData, 0.5f, channelData, buffer.getNumSamples());
   }
 }
 
-void plotData(juce::Graphics& g, juce::Rectangle<int>& bounds,
-              const juce::AudioBuffer<float>& buffer, const juce::Colour& lineColor = juce::Colours::black)
+void plotData(juce::Graphics& g, juce::Rectangle<int>& bounds, const juce::AudioBuffer<float>& buffer,
+              const juce::Colour& lineColor = juce::Colours::black)
 {
   auto buffer_read  = buffer.getReadPointer(0);
   float num_samples = buffer.getNumSamples();
@@ -90,12 +95,11 @@ void plotData(juce::Graphics& g, juce::Rectangle<int>& bounds,
 
   // Draw plot title
   g.setColour(juce::Colours::black);
-  g.drawFittedText("Waveform", bounds.getCentreX() - 50, bounds.getY() + 20,
-                   100, 10, juce::Justification::centred, 1);
+  g.drawFittedText("Waveform", bounds.getCentreX() - 50, bounds.getY() + 20, 100, 10, juce::Justification::centred, 1);
 }
 
-void plotSpectrum(juce::Graphics& g, juce::Rectangle<int>& bounds,
-                  const juce::AudioBuffer<float>& buffer, const juce::Colour& lineColor = juce::Colours::white)
+void plotSpectrum(juce::Graphics& g, juce::Rectangle<int>& bounds, const juce::AudioBuffer<float>& buffer,
+                  const juce::Colour& lineColor = juce::Colours::white)
 {
   // Determine the size of the fft window by 2^order
   constexpr auto fftOrder = 11;
@@ -108,7 +112,7 @@ void plotSpectrum(juce::Graphics& g, juce::Rectangle<int>& bounds,
   juce::dsp::WindowingFunction<float> window{ fftSize, juce::dsp::WindowingFunction<float>::hann };
   std::array<float, fftSize * 2> fftData{};
   std::array<float, fftSize> summedFft{};
-  const int numLoops = static_cast<int>(ceilf( static_cast<float> (buffer.getNumSamples()) / fftSize ));
+  const int numLoops = static_cast<int>(ceilf(static_cast<float>(buffer.getNumSamples()) / fftSize));
 
   jassert(buffer.getNumSamples() > fftSize);
   for (auto i = 0; i < numLoops; ++i)
@@ -132,7 +136,6 @@ void plotSpectrum(juce::Graphics& g, juce::Rectangle<int>& bounds,
   }
   juce::FloatVectorOperations::multiply(summedFft.data(), 1.0f / static_cast<float>(numLoops), fftSize);
 
-
   // Define dB bounds
   auto mindB = -100.0f;
   auto maxdB = 0.0f;
@@ -143,12 +146,11 @@ void plotSpectrum(juce::Graphics& g, juce::Rectangle<int>& bounds,
 
   for (int i = 0; i < width; ++i)
   {
-    auto skewedProportionX = 1.0f - std::exp(std::log(1.0f - (float) i / (float) width) * 0.2f);
-    auto fftDataIndex      = juce::jlimit(0, fftSize / 2,
-                                     (int) (skewedProportionX * (float) fftSize * 0.5f));
+    auto skewedProportionX = 1.0f - std::exp(std::log(1.0f - (float)i / (float)width) * 0.2f);
+    auto fftDataIndex      = juce::jlimit(0, fftSize / 2, (int)(skewedProportionX * (float)fftSize * 0.5f));
     auto y                 = juce::jmap(juce::jlimit(mindB, maxdB,
                                      juce::Decibels::gainToDecibels(summedFft[fftDataIndex]) -
-                                         juce::Decibels::gainToDecibels((float) fftSize)),
+                                         juce::Decibels::gainToDecibels((float)fftSize)),
                         mindB, maxdB, static_cast<float>(bounds.getY()), static_cast<float>(bounds.getBottom()));
 
     auto x = bounds.getX() + i;
@@ -162,7 +164,8 @@ void plotSpectrum(juce::Graphics& g, juce::Rectangle<int>& bounds,
   // Draw plot title
   g.setColour(juce::Colours::white);
   g.drawFittedText("Spectrum Analyzer", bounds.getCentreX() - 50, bounds.getY() + 20,
-                   100, 10, juce::Justification::centred, 1);
+                   100, 10, juce::Justification::centred,
+                   1);
 }
 
 juce::Image generatePlots(const juce::String& file_path, ProcessType type)
@@ -178,7 +181,7 @@ juce::Image generatePlots(const juce::String& file_path, ProcessType type)
 
   APCompressor compressor;
   compressor.setSampleRate(44100.0f);
-  compressor.updateParameters(-20.0f, 10.0f);
+  compressor.updateParameters(-24.0f, 14.0f);
   APTubeDistortion distortion;
   APOverdrive overdrive;
 
@@ -189,15 +192,15 @@ juce::Image generatePlots(const juce::String& file_path, ProcessType type)
   plot_graphics.fillRect(bottom_plot_bounds);
 
   auto beforeColor = juce::Colours::red;
-  plotData(plot_graphics, top_plot_bounds, audio_buffer, beforeColor);  // Before compression
+  plotData(plot_graphics, top_plot_bounds, audio_buffer, beforeColor);         // Before compression
   plotSpectrum(plot_graphics, bottom_plot_bounds, audio_buffer, beforeColor);  // Before compression
 
   switch (type)
   {
-    case ProcessType::Compression : processSamplesWithCompression(audio_buffer, compressor); break;
-    case ProcessType::Distortion : processSamplesWithDistortion(audio_buffer, distortion); break;
-    case ProcessType::Overdrive : processSamplesWithOverdrive(audio_buffer, overdrive); break;
-    case ProcessType::All :
+    case ProcessType::Compression: processSamplesWithCompression(audio_buffer, compressor); break;
+    case ProcessType::Distortion: processSamplesWithDistortion(audio_buffer, distortion); break;
+    case ProcessType::Overdrive: processSamplesWithOverdrive(audio_buffer, overdrive); break;
+    case ProcessType::All:
       processSamplesWithCompression(audio_buffer, compressor);
       processSamplesWithDistortion(audio_buffer, distortion);
       processSamplesWithOverdrive(audio_buffer, overdrive);
@@ -206,7 +209,7 @@ juce::Image generatePlots(const juce::String& file_path, ProcessType type)
   }
 
   auto afterColor = juce::Colours::green;
-  plotData(plot_graphics, top_plot_bounds, audio_buffer, afterColor);  // After compression
+  plotData(plot_graphics, top_plot_bounds, audio_buffer, afterColor);         // After compression
   plotSpectrum(plot_graphics, bottom_plot_bounds, audio_buffer, afterColor);  // After compression
 
   return plot_image;
@@ -224,7 +227,7 @@ bool writeImageToPngFile(const juce::Image& plot_image, juce::File& plot_file)
 int main()
 {
   const auto plot_image_all =
-      generatePlots("/Users/silveryar/development/juce/ap_dynamics/Tests/conk.wav", ProcessType::All);
+      generatePlots("/Users/silveryar/development/juce/ap_dynamics/Tests/conk.wav", ProcessType::Distortion);
 
   juce::File plot_file = juce::File::createTempFile(".png");
   auto write_result    = writeImageToPngFile(plot_image_all, plot_file);

@@ -185,8 +185,8 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
     // DSP Processing
     compressor_->process(channelData, channelData, buffer.getNumSamples());
-    overdrive_->process(channelData, mixValue_, channelData, buffer.getNumSamples());
-    tubeDistortion_->process(channelData, 1.0f, -0.2f, 8.0f, mixValue_, channelData, buffer.getNumSamples());
+    overdrive_->process(channelData, mix_, channelData, buffer.getNumSamples());
+    tubeDistortion_->process(channelData, 1.0f, -0.2f, 8.0f, mix_, channelData, buffer.getNumSamples());
     makeup_.applyGain(channelData, numSamples);
   }
 
@@ -221,7 +221,9 @@ void Ap_dynamicsAudioProcessor::update()
 {
   mustUpdateProcessing_ = false;
 
-  compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(), apvts.getRawParameterValue("RAT")->load());
+  compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(),
+                                apvts.getRawParameterValue("RAT")->load());
+  mix_ = apvts.getRawParameterValue("MIX")->load();
 
   //    threshold_ = apvts.getRawParameterValue("THR")->load();
   //    ratio_ = apvts.getRawParameterValue("RAT")->load();
@@ -291,8 +293,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
       "RAT", "Ratio", juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.3f), 1.0f, "",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
   // **Makeup Gain Parameter** - in dB
+//  parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
+//      "MUP", "Makeup", juce::NormalisableRange<float>(-40.0f, 40.0f, 0.01f), 3.0f, "dB",
+//      juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
-      "MU", "Makeup", juce::NormalisableRange<float>(-40.0f, 40.0f, 0.01f), 3.0f, "dB",
+      "MIX", "Global Mix", juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f, "",
+      juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
+  parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
+      "DSQ", "Distortion Q", juce::NormalisableRange<float>(-1.0f, 1.0f, 0.1f), 0.0f, "",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
 
   return { parameters.begin(), parameters.end() };

@@ -22,4 +22,5 @@ class APOverdrive
   static float hardClipping(float sample);
 
  private:
+  float mix_ = 0.0f;
 };
