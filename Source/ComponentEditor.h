@@ -15,68 +15,29 @@
 //==============================================================================
 /*
  */
+// JUCE_DECLARE_SINGLETON - maybe add?
 class ComponentEditor : public juce::Component
 {
  public:
-  ComponentEditor()
-  {
-    setAlpha(0.2f);
+  using Listener = std::function<void(void)>;
 
-    xOffset_.setInputRestrictions(0, "1234567890-");
-    xOffset_.setText(juce::String(offset.getX()), false);
-    xOffset_.setReturnKeyStartsNewLine(false);
-    xOffset_.setMultiLine(false);
-    xOffset_.onReturnKey = [this]()
-    {
-      if (!xOffset_.isEmpty())
-      {
-        offset.setX(xOffset_.getText().getFloatValue());
-        resized();
-      }
-    };
+  ComponentEditor();
 
-    xOffset_.setBounds(0, 0, 100, 50);
-    addAndMakeVisible(xOffset_);
+  ~ComponentEditor() override;
 
-    yOffset_.setInputRestrictions(0, "1234567890-");
-    yOffset_.setText(juce::String(offset.getY()), false);
-    yOffset_.setReturnKeyStartsNewLine(false);
-    yOffset_.setMultiLine(false);
-    yOffset_.onReturnKey = [this]()
-    {
-      if (!yOffset_.isEmpty())
-      {
-        offset.setY(yOffset_.getText().getFloatValue());
-        resized();
-      }
-    };
+  void addListener (Listener);
 
-    yOffset_.setBounds(0, 50, 100, 50);
-    addAndMakeVisible(yOffset_);
-
-    deltaEditor_.setInputRestrictions(0, "1234567890");
-    deltaEditor_.setText(juce::String(shadowDeltaXY), false);
-    deltaEditor_.setReturnKeyStartsNewLine(false);
-    deltaEditor_.setMultiLine(false);
-    deltaEditor_.onReturnKey = [this]()
-    {
-      if (!deltaEditor_.isEmpty())
-      {
-        shadowDeltaXY = static_cast<int>(deltaEditor_.getText().getFloatValue());
-        resized();
-      }
-    };
-
-    deltaEditor_.setBounds(0, 100, 100, 50);
-    addAndMakeVisible(deltaEditor_);
-  }
-
-  ~ComponentEditor() override { }
-
-  juce::Point<float> offset{ 0, -16 };
-  int shadowDeltaXY = 8;
+  float getValue(const juce::String&);
 
  private:
-  juce::TextEditor xOffset_, yOffset_, deltaEditor_;
+  juce::Array<Listener> listeners_;
+  juce::Array<std::pair<std::unique_ptr<juce::TextEditor>, std::unique_ptr<juce::TextEditor>>> fieldPairs_;
+
+  juce::HashMap<juce::String, float> fieldData_;
+
+  void addField();
+  void updateValue (const juce::String& key, float value);
+  void notifyListeners();
+
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShowHideContainer)
 };
