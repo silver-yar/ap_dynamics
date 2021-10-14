@@ -46,6 +46,7 @@ void MixerButton::paint(juce::Graphics& g)
   g.drawLine(70, thirdHeight * 2, static_cast<float>(getWidth() - 20), thirdHeight * 2, 1);
   g.drawFittedText("clean", bounds, juce::Justification::centred, 1);
 
+  // Selector Bar
   auto barBounds =
       juce::Rectangle<float>(sliderWidth, kHandleHeight).withCentre(bounds.getCentre().withY(pointerPos_.getY()).toFloat());
   g.setGradientFill(juce::ColourGradient(juce::Colours::grey.withAlpha(0.3f), barBounds.getCentreX(), barBounds.getCentreY(),
@@ -64,7 +65,6 @@ void MixerButton::mouseDown(const juce::MouseEvent& event)
 
   if (bounds.contains(event.getMouseDownPosition()))
   {
-    showdB = true;
     mapMouseToValue(event.getMouseDownPosition());
   }
 }
@@ -75,7 +75,6 @@ void MixerButton::mouseDrag(const juce::MouseEvent& event)
 
   if (bounds.contains(event.getMouseDownPosition()))
   {
-    showdB = true;
     mapMouseToValue(event.getPosition());
   }
 }
@@ -101,7 +100,8 @@ void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
   auto y = juce::jlimit(yMin, yMax, (float)mPoint.getY());
 
   pointerPos_ = juce::Point<int>(static_cast<int>(x), static_cast<int>(y));
-  audioProcessor.apvts.getParameterAsValue("MIX").setValue(
-      juce::jmap((float)pointerPos_.getY(), yMin, yMax, 1.0f, 0.0f));
+  auto mappedVal = juce::jmap((float)pointerPos_.getY(), yMin, yMax, 1.0f, 0.0f);
+  DBG("mix: " << mappedVal);
+  audioProcessor.apvts.getParameterAsValue("MIX").setValue(mappedVal);
 //  audioProcessor.setMixValue(juce::jmap((float)pointerPos_.getY(), yMin, yMax, 1.0f, 0.0f));
 }

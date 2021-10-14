@@ -16,15 +16,6 @@ enum class ProcessType
   All
 };
 
-void debugBufferVals(const juce::AudioBuffer<float>& buffer)
-{
-  for (auto i = 0; i < buffer.getNumSamples(); ++i)
-  {
-    auto value = buffer.getSample(0, i);
-    DBG("buf val: " << value);
-  }
-}
-
 juce::AudioBuffer<float> loadFile(const juce::String& path)
 {
   auto file = juce::File(path);
@@ -74,7 +65,7 @@ void processSamplesWithDistortion(juce::AudioBuffer<float>& buffer, APTubeDistor
     DBG("bufferMaxVal: " << bufferMaxVal );
 
     APTubeDistortion::processDAFX(channelData, bufferMaxVal,
-                                  2.0f, -0.4, 8.0f, 1.0f, channelData, numSamples);
+                                  1.0f, -0.4, 8.0f, 1.0f, channelData, numSamples);
 
 
 //    APTubeDistortion::process(channelData, 3.0f, -0.2f, 8.0f, 0.8f, channelData, buffer.getNumSamples());
@@ -98,11 +89,8 @@ void processSamplesWithOverdrive(juce::AudioBuffer<float>& buffer, APOverdrive& 
 void plotData(juce::Graphics& g, juce::Rectangle<int>& bounds, const juce::AudioBuffer<float>& buffer,
               const juce::Colour& lineColor = juce::Colours::black)
 {
-  auto buffer_read  = buffer.getReadPointer(0);
   float num_samples = buffer.getNumSamples();
   float x_ratio     = num_samples / bounds.toFloat().getWidth();
-  int sample_index = 0;
-  DBG("x_ratio: " << x_ratio);
   jassert(x_ratio > 0.0f);
 
   std::vector<float> audioPoints;
@@ -113,21 +101,15 @@ void plotData(juce::Graphics& g, juce::Rectangle<int>& bounds, const juce::Audio
   for (auto sample = 0; sample < num_samples; sample += x_ratio)
   {
     auto sampleVal = buffer.getSample(0, sample);
-    DBG("sampleIndex: " << sample);
     if (isnan(sampleVal)) sampleVal = 0;
     audioPoints.push_back(sampleVal);
-    DBG("sampleValue: " << sampleVal);
   }
 
   for (int i = 0; i < bounds.getWidth(); ++i)
   {
-//    auto i_sample = juce::jmap()
-//    int sample_index = static_cast<int>(static_cast<float>(i) * x_ratio);
     auto sampleVal = audioPoints[i];
-    DBG("buffer_read: " << sampleVal);
     auto y_value     = juce::jmap(sampleVal, -1.0f, 1.0f, static_cast<float>(bounds.getBottom()),
                               static_cast<float>(bounds.getY()));
-    DBG(y_value);
     p.lineTo(bounds.getX() + i, y_value);
   }
 
@@ -234,7 +216,7 @@ juce::Image generatePlots(const juce::String& file_path, ProcessType type)
 
   auto beforeColor = juce::Colours::red;
   plotData(plot_graphics, top_plot_bounds, audio_buffer, beforeColor);         // Before compression
-//  plotSpectrum(plot_graphics, bottom_plot_bounds, audio_buffer, beforeColor);  // Before compression
+  plotSpectrum(plot_graphics, bottom_plot_bounds, audio_buffer, beforeColor);  // Before compression
 
   switch (type)
   {
@@ -251,7 +233,7 @@ juce::Image generatePlots(const juce::String& file_path, ProcessType type)
 
   auto afterColor = juce::Colours::green;
   plotData(plot_graphics, top_plot_bounds, audio_buffer, afterColor);         // After compression
-//  plotSpectrum(plot_graphics, bottom_plot_bounds, audio_buffer, afterColor);  // After compression
+  plotSpectrum(plot_graphics, bottom_plot_bounds, audio_buffer, afterColor);  // After compression
 
   return plot_image;
 }

@@ -190,10 +190,10 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     auto bufferMaxVal = juce::jmax(minMag, maxMag);
 
     // DSP Processing
-    compressor_->process(channelData, channelData, buffer.getNumSamples());
-    overdrive_->process(channelData, mix_, channelData, buffer.getNumSamples());
-    tubeDistortion_->processDAFX(channelData, bufferMaxVal, 2.0f, -0.2f, 8.0f, 1.0f, channelData, buffer.getNumSamples());
-    makeup_.applyGain(channelData, numSamples);
+//    compressor_->process(channelData, channelData, buffer.getNumSamples());
+//    overdrive_->process(channelData, mix_, channelData, buffer.getNumSamples());
+    tubeDistortion_->processDAFX(channelData, bufferMaxVal, 2.0f, -0.2f, 8.0f, mix_, channelData, buffer.getNumSamples());
+//    makeup_.applyGain(channelData, numSamples);
   }
 
   meterLocalMaxVal.store(sumMaxVal / (float)numChannels);
