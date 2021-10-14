@@ -183,10 +183,16 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
       meterGlobalMaxVal.store(currentMaxVal);
     }
 
+    // Find the buffer's max magnitude
+    auto bufferMinMax = buffer.findMinMax(channel, 0, numSamples);
+    auto minMag = abs(bufferMinMax.getStart());
+    auto maxMag = abs(bufferMinMax.getEnd());
+    auto bufferMaxVal = juce::jmax(minMag, maxMag);
+
     // DSP Processing
     compressor_->process(channelData, channelData, buffer.getNumSamples());
     overdrive_->process(channelData, mix_, channelData, buffer.getNumSamples());
-    tubeDistortion_->process(channelData, 1.0f, -0.2f, 8.0f, mix_, channelData, buffer.getNumSamples());
+    tubeDistortion_->processDAFX(channelData, bufferMaxVal, 2.0f, -0.2f, 8.0f, 1.0f, channelData, buffer.getNumSamples());
     makeup_.applyGain(channelData, numSamples);
   }
 
@@ -261,7 +267,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
           norm = std::exp(std::log(norm) / ratioSkew);
         }
 
-        //                                                          return start + (end - start) * norm;
         return juce::jmap(norm, end, start);
       },
       [ratioSkew](auto start, auto end, auto value)
@@ -292,10 +297,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
       "RAT", "Ratio", juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.3f), 1.0f, "",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
-  // **Makeup Gain Parameter** - in dB
-//  parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
-//      "MUP", "Makeup", juce::NormalisableRange<float>(-40.0f, 40.0f, 0.01f), 3.0f, "dB",
-//      juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
       "MIX", "Global Mix", juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f, "",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));

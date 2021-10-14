@@ -8,11 +8,6 @@
 
 #include "../DSP/APCompressor.h"
 
-/*
- * DSP Tests
- * 6/10/2021
- */
-
 void fillBufferSampleData(juce::AudioBuffer<float>& buffer)
 {
   for (auto channel = 0; channel < buffer.getNumChannels(); ++channel)

@@ -48,3 +48,35 @@ void APTubeDistortion::process(const float* audioIn, float distGain, float Q, fl
     audioOut[i] = in != 0 ? static_cast<float>(out) : static_cast<float>(in);
   }
 }
+void APTubeDistortion::processDAFX(const float* audioIn, const float maxBufferVal, float distGain, float Q, float distChar,
+                                   float mix, float* audioOut, int numSamplesToRender)
+{
+  for (auto i = 0; i < numSamplesToRender; ++i)
+  {
+    const auto& in = audioIn[i];
+    double z       = 0.0;
+    double out     = 0.0;
+    auto q         = in * distGain / maxBufferVal; // Normalization
+
+    if (Q == 0)
+    {
+      z = q / (1.0 - exp(-distChar * q));
+      if (q == Q)
+      {
+        z = 1.0 / distChar;
+      }
+    }
+    else
+    {
+      z = (q - Q) / (1.0 - exp(-distChar * (q - Q))) + Q / (1.0 - exp(distChar * Q));
+      if (q == Q)
+      {
+        z = 1 / distChar + Q / (1.0 - exp(distChar * Q));
+      }
+    }
+    out = (mix * z * abs(in)) / (abs(z) + (1.0 - mix) * in);
+    out *= abs(in) / abs(out);
+
+    audioOut[i] = static_cast<float>(out);
+  }
+}

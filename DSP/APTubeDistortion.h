@@ -24,5 +24,12 @@ class APTubeDistortion
                       float mix,       // mix of original and distorted sample
                       float* audioOut, int numSamplesToRender);
 
+  static void processDAFX(const float* audioIn, const float maxBufferVal,
+                          float distGain,  // distortion amount
+                          float Q,         // work point
+                          float distChar,  // distortion character
+                          float mix,       // mix of original and distorted sample
+                          float* audioOut, int numSamplesToRender);
+
  private:
 };

@@ -66,7 +66,7 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
 
   // ValueTree
   juce::AudioProcessorValueTreeState apvts;
-  std::atomic<float> meterLocalMaxVal, meterGlobalMaxVal;  // std::atomic to make value thread safe
+  std::atomic<float> meterLocalMaxVal, meterGlobalMaxVal;
 
   // Setters
   void setOutputGain(float value)
