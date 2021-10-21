@@ -47,8 +47,11 @@ void MixerButton::paint(juce::Graphics& g)
   g.drawFittedText("clean", bounds, juce::Justification::centred, 1);
 
   // Selector Bar
+  auto paramRange = audioProcessor.apvts.getParameterRange("MIX");
+  auto param = audioProcessor.apvts.getParameter("MIX");
+  auto mappedParamVal = juce::jmap(param->getValue(), paramRange.start, paramRange.end, getHeight() - kHandleHeight / 2, kHandleHeight / 2);
   auto barBounds =
-      juce::Rectangle<float>(sliderWidth, kHandleHeight).withCentre(bounds.getCentre().withY(pointerPos_.getY()).toFloat());
+      juce::Rectangle<float>(sliderWidth, kHandleHeight).withCentre(bounds.getCentre().withY(mappedParamVal).toFloat());
   g.setGradientFill(juce::ColourGradient(juce::Colours::grey.withAlpha(0.3f), barBounds.getCentreX(), barBounds.getCentreY(),
                                          juce::Colours::white.withAlpha(0.7f), barBounds.getX() - (sliderWidth * 0.3f),
                                          barBounds.getY() + 2, true));
@@ -81,27 +84,23 @@ void MixerButton::mouseDrag(const juce::MouseEvent& event)
 
 void MixerButton::mouseUp(const juce::MouseEvent& event)
 {
-  const auto bounds = getLocalBounds();
+  auto bounds = getLocalBounds();
 
   if (bounds.contains(event.getMouseDownPosition()))
   {
-    showdB = false;
+    mapMouseToValue(event.getPosition());
   }
 }
 
 void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
 {
-  constexpr float xMin = 70.0f;
-  const float xMax     = static_cast<float>(getWidth()) - 20.0f;
   constexpr auto yMin  = kHandleHeight / 2.0f;
   const auto yMax      = static_cast<float>(getHeight()) - (kHandleHeight / 2.0f);
 
-  auto x = juce::jlimit(xMin, xMax, (float)mPoint.getX());
-  auto y = juce::jlimit(yMin, yMax, (float)mPoint.getY());
-
-  pointerPos_ = juce::Point<int>(static_cast<int>(x), static_cast<int>(y));
-  auto mappedVal = juce::jmap((float)pointerPos_.getY(), yMin, yMax, 1.0f, 0.0f);
-  DBG("mix: " << mappedVal);
-  audioProcessor.apvts.getParameterAsValue("MIX").setValue(mappedVal);
+  auto mappedVal = juce::jmap(static_cast<float> (mPoint.getY()), yMin, yMax, 1.0f, 0.0f);
+  auto limitedVal = juce::jlimit(0.0f, 1.0f, mappedVal);
+//  DBG("mix: " << mappedVal);
+  DBG("mouse pointer y value: " << mPoint.getY());
+  audioProcessor.apvts.getParameterAsValue("MIX").setValue(limitedVal);
 //  audioProcessor.setMixValue(juce::jmap((float)pointerPos_.getY(), yMin, yMax, 1.0f, 0.0f));
 }

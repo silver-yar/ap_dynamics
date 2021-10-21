@@ -35,9 +35,6 @@ class MixerButton : public juce::Component
   Ap_dynamicsAudioProcessor& audioProcessor;
   juce::Font labelFont_{ juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                  BinaryData::VarelaRound_ttfSize) };
-  juce::Point<int> pointerPos_{ 100, 50 };
-  float gainOutdB_ = 0.0f;
-  float mixValue_  = 0.0f;
-  bool showdB      = false;
+
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MixerButton)
 };

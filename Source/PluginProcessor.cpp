@@ -297,7 +297,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
       "RAT", "Ratio", juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.3f), 1.0f, "",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
-  parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
+  auto& mixParam = parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
       "MIX", "Global Mix", juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f, "",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
