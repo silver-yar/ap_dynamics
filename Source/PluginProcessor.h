@@ -58,24 +58,11 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   void setStateInformation(const void* data, int sizeInBytes) override;
 
   //==============================================================================
-  enum ValType
-  {
-    sampleVal,
-    gainsc
-  };
 
   // ValueTree
   juce::AudioProcessorValueTreeState apvts;
-  std::atomic<float> meterLocalMaxVal, meterGlobalMaxVal;
 
-  // Setters
-  void setOutputGain(float value)
-  {
-    for (int channel = 0; channel < 2; ++channel)
-    {
-      makeup_.setTargetValue(juce::Decibels::decibelsToGain(value));
-    }
-  }
+  std::atomic<float> meterLocalMaxVal, meterGlobalMaxVal;
 
   // Updates DSP when user changes parameters
   void update();
@@ -85,15 +72,13 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   static juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
 
  private:
-  bool mustUpdateProcessing_{ false }, isActive_{ false };
+  bool mustUpdateProcessing_{ false }, isActive_{ false }; // TODO: Consider making std::atomic<bool>
 
   std::unique_ptr<APCompressor> compressor_;
   std::unique_ptr<APTubeDistortion> tubeDistortion_;
   std::unique_ptr<APOverdrive> overdrive_;
 
-  juce::LinearSmoothedValue<float> makeup_;
-  float mix_ = 0.0f;
-  float disQ_ = 0.0f;
+  float mix_  = 0.0f; // TODO: Move to DSP updateParameter method
 
   // Callback for DSP parameter changes
   void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyChanged, const juce::Identifier& property) override

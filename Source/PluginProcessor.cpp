@@ -30,7 +30,6 @@ Ap_dynamicsAudioProcessor::Ap_dynamicsAudioProcessor()
   overdrive_      = std::make_unique<APOverdrive>();
 
   apvts.state.addListener(this);
-  setOutputGain(0.0f);
 }
 
 Ap_dynamicsAudioProcessor::~Ap_dynamicsAudioProcessor() { }
@@ -148,17 +147,17 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     update();
 
   juce::ScopedNoDenormals noDenormals;
-  auto totalNumInputChannels  = getTotalNumInputChannels();
-  auto totalNumOutputChannels = getTotalNumOutputChannels();
-  auto numChannels            = juce::jmin(totalNumInputChannels, totalNumOutputChannels);
-  auto numSamples             = buffer.getNumSamples();
+  const auto totalNumInputChannels  = getTotalNumInputChannels();
+  const auto totalNumOutputChannels = getTotalNumOutputChannels();
+  const auto numChannels            = juce::jmin(totalNumInputChannels, totalNumOutputChannels);
+  const auto numSamples             = buffer.getNumSamples();
 
   auto sumMaxVal     = 0.0f;
   auto currentMaxVal = meterGlobalMaxVal.load();
 
   for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
   {
-    buffer.clear(i, 0, buffer.getNumSamples());
+    buffer.clear(i, 0, numSamples);
   }
 
   for (int channel = 0; channel < totalNumInputChannels; ++channel)
@@ -184,16 +183,16 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     }
 
     // Find the buffer's max magnitude
-    auto bufferMinMax = buffer.findMinMax(channel, 0, numSamples);
-    auto minMag = abs(bufferMinMax.getStart());
-    auto maxMag = abs(bufferMinMax.getEnd());
-    auto bufferMaxVal = juce::jmax(minMag, maxMag);
+    const auto bufferMinMax = buffer.findMinMax(channel, 0, numSamples);
+    const auto minMag = abs(bufferMinMax.getStart());
+    const auto maxMag = abs(bufferMinMax.getEnd());
+    const auto bufferMaxVal = juce::jmax(minMag, maxMag);
 
     // DSP Processing
-//    compressor_->process(channelData, channelData, buffer.getNumSamples());
-//    overdrive_->process(channelData, mix_, channelData, buffer.getNumSamples());
-    tubeDistortion_->processDAFX(channelData, bufferMaxVal, 2.0f, -0.2f, 8.0f, mix_, channelData, buffer.getNumSamples());
-//    makeup_.applyGain(channelData, numSamples);
+    compressor_->process(channelData, channelData, buffer.getNumSamples());
+    overdrive_->process(channelData, mix_, channelData, buffer.getNumSamples());
+    tubeDistortion_->processDAFX(channelData, bufferMaxVal, 2.0f, -0.2f,
+                                 8.0f, mix_, channelData, buffer.getNumSamples());
   }
 
   meterLocalMaxVal.store(sumMaxVal / (float)numChannels);
@@ -211,15 +210,15 @@ juce::AudioProcessorEditor* Ap_dynamicsAudioProcessor::createEditor() { return n
 void Ap_dynamicsAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
   // Save state information to xml -> binary to retrieve on startup
-  juce::ValueTree copyState             = apvts.copyState();
-  std::unique_ptr<juce::XmlElement> xml = copyState.createXml();
+  const auto copyState             = apvts.copyState();
+  auto xml = copyState.createXml();
   copyXmlToBinary(*xml, destData);
 }
 
 void Ap_dynamicsAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-  std::unique_ptr<juce::XmlElement> xml = getXmlFromBinary(data, sizeInBytes);
-  juce::ValueTree copyState             = juce::ValueTree::fromXml(*xml);
+  auto xml = getXmlFromBinary(data, sizeInBytes);
+  const auto copyState             = juce::ValueTree::fromXml(*xml);
   apvts.replaceState(copyState);
 }
 
@@ -230,24 +229,15 @@ void Ap_dynamicsAudioProcessor::update()
   compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(),
                                 apvts.getRawParameterValue("RAT")->load());
   mix_ = apvts.getRawParameterValue("MIX")->load();
-
-  //    threshold_ = apvts.getRawParameterValue("THR")->load();
-  //    ratio_ = apvts.getRawParameterValue("RAT")->load();
-
-  //    for (int channel = 0; channel < 2; ++channel) {
-  //        makeup_[channel].setTargetValue(juce::Decibels::decibelsToGain(
-  //                apvts.getRawParameterValue("MU")->load()
-  //                ));
-  //    }
 }
 
 void Ap_dynamicsAudioProcessor::reset()
 {
   compressor_->reset();
-  makeup_.reset(getSampleRate(), 0.050);
 
-  meterLocalMaxVal.store(0.0f);
-  meterGlobalMaxVal.store(0.0f);
+  auto zero_f = 0.0f;
+  meterLocalMaxVal.store(zero_f);
+  meterGlobalMaxVal.store(zero_f);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::createParameters()
@@ -255,39 +245,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
   // Create parameter layout for apvts
   std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
 
-  auto valueToTextFunction = [](float val, int len) { return juce::String(val, len); };
-  auto textToValueFunction = [](const juce::String& text) { return text.getFloatValue(); };
-  const float ratioSkew    = 0.25f;
-  auto ratioRange          = juce::NormalisableRange<float>(
-      1.0f, 100.0f,
-      [ratioSkew](auto start, auto end, auto norm)
-      {
-        if (ratioSkew != 1.0f && norm > 0.0f)
-        {
-          norm = std::exp(std::log(norm) / ratioSkew);
-        }
-
-        return juce::jmap(norm, end, start);
-      },
-      [ratioSkew](auto start, auto end, auto value)
-      {
-        auto proportion = juce::jmap(value, start, end, 0.0f, 1.0f);
-
-        if (ratioSkew == 1.0f)
-        {
-          return proportion;
-        }
-
-        return std::pow(proportion, ratioSkew);
-      },
-      [](auto start, auto end, auto value)
-      {
-        // Unused Parameters
-        ignoreUnused(start);
-        ignoreUnused(end);
-
-        return value;
-      });
+  const auto valueToTextFunction = [](float val, int len) { return juce::String(val, len); };
+  const auto textToValueFunction = [](const juce::String& text) { return text.getFloatValue(); };
 
   // **Threshold**
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
@@ -297,7 +256,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
       "RAT", "Ratio", juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.3f), 1.0f, "",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
-  auto& mixParam = parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
+  parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
       "MIX", "Global Mix", juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f, "",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
