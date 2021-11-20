@@ -72,7 +72,8 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   static juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
 
  private:
-  bool mustUpdateProcessing_{ false }, isActive_{ false }; // TODO: Consider making std::atomic<bool>
+  std::atomic<bool> mustUpdateProcessing_{ false }, isActive_{ false }; // TODO: Consider making std::atomic<bool>
+  std::atomic<float> makeupSmoothed_;
 
   std::unique_ptr<APCompressor> compressor_;
   std::unique_ptr<APTubeDistortion> tubeDistortion_;

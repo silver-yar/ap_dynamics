@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 
+#include "APDefines.h"
 #include "PluginEditor.h"
 
 //==============================================================================
@@ -179,23 +180,28 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
       sumMaxVal += channelMaxVal;  // Sum of channel 0 and channel 1 max values
 
-      meterGlobalMaxVal.store(currentMaxVal);
+      meterGlobalMaxVal = currentMaxVal;
     }
 
     // Find the buffer's max magnitude
     const auto bufferMinMax = buffer.findMinMax(channel, 0, numSamples);
-    const auto minMag = abs(bufferMinMax.getStart());
-    const auto maxMag = abs(bufferMinMax.getEnd());
+    const auto minMag       = abs(bufferMinMax.getStart());
+    const auto maxMag       = abs(bufferMinMax.getEnd());
     const auto bufferMaxVal = juce::jmax(minMag, maxMag);
 
     // DSP Processing
     compressor_->process(channelData, channelData, buffer.getNumSamples());
     overdrive_->process(channelData, mix_, channelData, buffer.getNumSamples());
-    tubeDistortion_->processDAFX(channelData, bufferMaxVal, 2.0f, -0.2f,
-                                 8.0f, mix_, channelData, buffer.getNumSamples());
+    tubeDistortion_->processDAFX(channelData, bufferMaxVal, 1.0f, -0.2f, 4.0f, mix_, channelData, buffer.getNumSamples());
+
+    // Makeup
+    for (int sample = 0; sample < numSamples; ++sample)
+    {
+      channelData[sample] *= makeupSmoothed_;
+    }
   }
 
-  meterLocalMaxVal.store(sumMaxVal / (float)numChannels);
+  meterLocalMaxVal = sumMaxVal / static_cast<float>(numChannels);
 }
 
 //==============================================================================
@@ -210,15 +216,15 @@ juce::AudioProcessorEditor* Ap_dynamicsAudioProcessor::createEditor() { return n
 void Ap_dynamicsAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
   // Save state information to xml -> binary to retrieve on startup
-  const auto copyState             = apvts.copyState();
-  auto xml = copyState.createXml();
+  const auto copyState = apvts.copyState();
+  auto xml             = copyState.createXml();
   copyXmlToBinary(*xml, destData);
 }
 
 void Ap_dynamicsAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-  auto xml = getXmlFromBinary(data, sizeInBytes);
-  const auto copyState             = juce::ValueTree::fromXml(*xml);
+  auto xml             = getXmlFromBinary(data, sizeInBytes);
+  const auto copyState = juce::ValueTree::fromXml(*xml);
   apvts.replaceState(copyState);
 }
 
@@ -226,9 +232,12 @@ void Ap_dynamicsAudioProcessor::update()
 {
   mustUpdateProcessing_ = false;
 
-  compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(),
-                                apvts.getRawParameterValue("RAT")->load());
+  compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(), apvts.getRawParameterValue("RAT")->load());
   mix_ = apvts.getRawParameterValue("MIX")->load();
+
+  const auto makeup =
+      juce::Decibels::decibelsToGain(apvts.getRawParameterValue("MUP")->load(), AP::Constants::minusInfinityDb);
+  makeupSmoothed_ = makeupSmoothed_ - 0.004f * (makeupSmoothed_ - makeup);
 }
 
 void Ap_dynamicsAudioProcessor::reset()
@@ -238,6 +247,7 @@ void Ap_dynamicsAudioProcessor::reset()
   auto zero_f = 0.0f;
   meterLocalMaxVal.store(zero_f);
   meterGlobalMaxVal.store(zero_f);
+  makeupSmoothed_.store(zero_f);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::createParameters()
@@ -257,10 +267,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
       "RAT", "Ratio", juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.3f), 1.0f, "",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
-      "MIX", "Global Mix", juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f, "",
+      "MIX", "Global Mix", juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f, "%",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
       "DSQ", "Distortion Q", juce::NormalisableRange<float>(-1.0f, 1.0f, 0.1f), 0.0f, "",
+      juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
+  parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
+      "MUP", "Makeup", juce::NormalisableRange<float>(-40.0f, 40.0f, 1.0f), 6.0f, "dB",
       juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
 
   return { parameters.begin(), parameters.end() };
