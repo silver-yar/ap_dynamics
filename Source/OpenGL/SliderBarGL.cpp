@@ -11,6 +11,7 @@
 #include "SliderBarGL.h"
 
 #include <JuceHeader.h>
+#include <juce_opengl/opengl/juce_gl.h>
 
 #include <fstream>
 #include <string>
@@ -45,7 +46,7 @@ void SliderBarGL::newOpenGLContextCreated()
   diffTexture_.loadImage(diffImage_);
 
   openGLContext_.setTextureMagnificationFilter(juce::OpenGLContext::TextureMagnificationFilter::linear);
-//  loadCubeMap(textureFaces_);
+  //  loadCubeMap(textureFaces_);
 
   // Setup Buffer Objects
   juce::OpenGLExtensionFunctions::glGenBuffers(1, &VBO_);  // Vertex Buffer Object
@@ -54,19 +55,7 @@ void SliderBarGL::newOpenGLContextCreated()
 
 void SliderBarGL::openGLContextClosing()
 {
-  // uniforms_.release();
   diffTexture_.release();
-  //    rightTex_.release();
-  //    leftTex_.release();
-  //    topTex_.release();
-  //    bottomTex_.release();
-  //    backTex_.release();
-  //    frontTex_.release();
-  //    for (auto &texture : cubeMapTextures_)
-  //    {
-  //        texture.release();
-  //    }
-  //    specTexture_.release();
   shader_.release();  // OpenGLProgram release! not unique_ptr release
 }
 
@@ -75,19 +64,19 @@ void SliderBarGL::renderOpenGL()
   jassert(juce::OpenGLHelpers::isContextActive());
 
   // Setup Viewport
-  const float renderingScale = (float)openGLContext_.getRenderingScale();
-  glViewport(0, 0, juce::roundToInt(renderingScale * getWidth()), juce::roundToInt(renderingScale * getHeight()));
+  const auto renderingScale = static_cast<float>(openGLContext_.getRenderingScale());
+  juce::gl::glViewport(0, 0, juce::roundToInt(renderingScale * getWidth()), juce::roundToInt(renderingScale * getHeight()));
 
   // Set background Color
   juce::OpenGLHelpers::clear(juce::Colours::darkgrey);
 
   // Enable Alpha Blending
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  juce::gl::glEnable(juce::gl::GL_BLEND);
+  juce::gl::glBlendFunc(juce::gl::GL_SRC_ALPHA, juce::gl::GL_ONE_MINUS_SRC_ALPHA);
 
   // Enable 2D Diffuse Texture
-  openGLContext_.extensions.glActiveTexture(GL_TEXTURE1);
-  glEnable(GL_TEXTURE_2D);
+  juce::OpenGLExtensionFunctions::glActiveTexture(juce::gl::GL_TEXTURE1);
+  juce::gl::glEnable(juce::gl::GL_TEXTURE_2D);
 
   if (uniforms_ == nullptr)
   {
@@ -104,8 +93,8 @@ void SliderBarGL::renderOpenGL()
   //        specTexture_.bind();
   //    }
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  juce::gl::glTexParameteri(juce::gl::GL_TEXTURE_2D, juce::gl::GL_TEXTURE_WRAP_S, juce::gl::GL_REPEAT);
+  juce::gl::glTexParameteri(juce::gl::GL_TEXTURE_2D, juce::gl::GL_TEXTURE_WRAP_T, juce::gl::GL_REPEAT);
 
   // Use Shader Program that's been defined
   shader_.use();
@@ -139,9 +128,9 @@ void SliderBarGL::renderOpenGL()
 
   if (uniforms_->runTime != nullptr)
   {
-    auto now      = std::chrono::high_resolution_clock::now();
-    auto sysTime  = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
-    auto elapsed  = static_cast<double>(sysTime - startTime);
+    auto now     = std::chrono::high_resolution_clock::now();
+    auto sysTime = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
+    auto elapsed = static_cast<double>(sysTime - startTime);
     auto seconds = static_cast<float>(elapsed / 1000000000.0);
     uniforms_->runTime->set((GLfloat)seconds);
   }
@@ -165,36 +154,37 @@ void SliderBarGL::renderOpenGL()
   // openGLContext_.extensions.glBindVertexArray(VAO);
 
   // VBO (Vertex Buffer Object) - Bind and Write to Buffer
-  juce::OpenGLExtensionFunctions::glBindBuffer(GL_ARRAY_BUFFER, VBO_);
-  juce::OpenGLExtensionFunctions::glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
+  juce::OpenGLExtensionFunctions::glBindBuffer(juce::gl::GL_ARRAY_BUFFER, VBO_);
+  juce::OpenGLExtensionFunctions::glBufferData(juce::gl::GL_ARRAY_BUFFER, sizeof(vertices), vertices,
+                                               juce::gl::GL_STREAM_DRAW);
 
   // EBO (Element Buffer Object) - Bind and Write to Buffer
-  juce::OpenGLExtensionFunctions::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
-  juce::OpenGLExtensionFunctions::glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
+  juce::OpenGLExtensionFunctions::glBindBuffer(juce::gl::GL_ELEMENT_ARRAY_BUFFER, EBO_);
+  juce::OpenGLExtensionFunctions::glBufferData(juce::gl::GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+                                               juce::gl::GL_STREAM_DRAW);
 
   // Setup Vertex Attributes
-  juce::OpenGLExtensionFunctions::glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)nullptr);
+  juce::OpenGLExtensionFunctions::glVertexAttribPointer(0, 2, juce::gl::GL_FLOAT, juce::gl::GL_FALSE, 4 * sizeof(GLfloat),
+                                                        (GLvoid*)nullptr);
   juce::OpenGLExtensionFunctions::glEnableVertexAttribArray(0);
 
   // Setup Texture Coordinate Attributes
-  juce::OpenGLExtensionFunctions::glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
-                                                  (GLvoid*)(2 * sizeof(GLfloat)));
+  juce::OpenGLExtensionFunctions::glVertexAttribPointer(1, 2, juce::gl::GL_FLOAT, juce::gl::GL_FALSE, 4 * sizeof(GLfloat),
+                                                        (GLvoid*)(2 * sizeof(GLfloat)));
   juce::OpenGLExtensionFunctions::glEnableVertexAttribArray(1);
 
   // Draw Vertices
   // glDrawArrays (GL_TRIANGLES, 0, 6); // For just VBO's (Vertex Buffer Objects)
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);  // For EBO's (Element Buffer Objects) (Indices)
+  juce::gl::glDrawElements(juce::gl::GL_TRIANGLES, 6, juce::gl::GL_UNSIGNED_INT,
+                           nullptr);  // For EBO's (Element Buffer Objects) (Indices)
 
   // Reset the element buffers so child Components draw correctly
-  juce::OpenGLExtensionFunctions::glBindBuffer(GL_ARRAY_BUFFER, 0);
-  juce::OpenGLExtensionFunctions::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  juce::OpenGLExtensionFunctions::glBindBuffer(juce::gl::GL_ARRAY_BUFFER, 0);
+  juce::OpenGLExtensionFunctions::glBindBuffer(juce::gl::GL_ELEMENT_ARRAY_BUFFER, 0);
   // openGLContext_.extensions.glBindVertexArray(0);
 }
 
-void SliderBarGL::paint(juce::Graphics& g)
-{
-  ignoreUnused(g);
-}
+void SliderBarGL::paint(juce::Graphics& g) { ignoreUnused(g); }
 
 void SliderBarGL::resized() { }
 
@@ -367,8 +357,8 @@ void SliderBarGL::createShaders()
   }
 
   // Sets up pipeline of shaders and compiles the program
-  if (shader_.addShader(vertexShader_, GL_VERTEX_SHADER) && shader_.addShader(fragmentShader_, GL_FRAGMENT_SHADER) &&
-      shader_.link())
+  if (shader_.addShader(vertexShader_, juce::gl::GL_VERTEX_SHADER) &&
+      shader_.addShader(fragmentShader_, juce::gl::GL_FRAGMENT_SHADER) && shader_.link())
   {
     uniforms_ = std::make_unique<Uniforms>(openGLContext_, shader_);
 
@@ -378,5 +368,4 @@ void SliderBarGL::createShaders()
   {
     statusText_ = shader_.getLastError();
   }
-
 }

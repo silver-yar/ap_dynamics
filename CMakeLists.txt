@@ -53,7 +53,7 @@ juce_add_plugin(
         VST3
         Standalone # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
         PRODUCT_NAME
-        "AP Dynamics") # The name of the final executable, which can differ from the target name
+        "APDynamics") # The name of the final executable, which can differ from the target name
 
 # `juce_generate_juce_header` will create a JuceHeader.h for a given target, which will be generated into your build
 # tree. This should be included with `#include <JuceHeader.h>`. The include path for this header will be automatically
