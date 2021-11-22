@@ -19,16 +19,16 @@
 //==============================================================================
 /**
  */
-const static int M_HEIGHT             = 500;
-const static int M_WIDTH              = 700;
-const static int SLIDER_Y             = 290;
-const static int SLIDER_WIDTH         = 200;
-const static float FONT_HEIGHT        = 24.0f;
-const static float SHADOW_FONT_HEIGHT = 28.0f;
-
-const static juce::Colour SHADOW_COLOR      = juce::Colours::black.withAlpha(0.2f);
-const static juce::Colour INNER_GRADIENT_BG = juce::Colour(0xFFFFDC93);
-const static juce::Colour OUTER_GRADIENT_BG = juce::Colour(0xFFFFC446);
+//const static int M_HEIGHT             = 500;
+//const static int M_WIDTH              = 700;
+//const static int SLIDER_Y             = 290;
+//const static int SLIDER_WIDTH         = 200;
+//const static float FONT_HEIGHT        = 24.0f;
+//const static float SHADOW_FONT_HEIGHT = 28.0f;
+//
+//const static juce::Colour SHADOW_COLOR      = juce::Colours::black.withAlpha(0.2f);
+//const static juce::Colour INNER_GRADIENT_BG = juce::Colour(0xFFFFDC93);
+//const static juce::Colour OUTER_GRADIENT_BG = juce::Colour(0xFFFFC446);
 
 class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, public juce::Timer
 {

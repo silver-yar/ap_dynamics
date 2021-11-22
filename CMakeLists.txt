@@ -71,7 +71,7 @@ target_sources(
         PRIVATE DSP/APCompressor.cpp
         DSP/APOverdrive.cpp
         DSP/APTubeDistortion.cpp
-        Source/APDefines.cpp
+        Source/APDefines.h
         Source/APSlider.cpp
         Source/CustomSlider.cpp
         Source/MixerButton.cpp

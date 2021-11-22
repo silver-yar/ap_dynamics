@@ -236,7 +236,7 @@ void Ap_dynamicsAudioProcessor::update()
   mix_ = apvts.getRawParameterValue("MIX")->load();
 
   const auto makeup =
-      juce::Decibels::decibelsToGain(apvts.getRawParameterValue("MUP")->load(), AP::Constants::minusInfinityDb);
+      juce::Decibels::decibelsToGain(apvts.getRawParameterValue("MUP")->load(), APConstants::Math::minusInfinityDb);
   makeupSmoothed_ = makeupSmoothed_ - 0.004f * (makeupSmoothed_ - makeup);
 }
 

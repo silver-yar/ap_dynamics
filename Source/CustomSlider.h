@@ -75,7 +75,7 @@ class MyLookAndFeel : public juce::LookAndFeel_V4
                                                                  BinaryData::VarelaRound_ttfSize) };
   SliderType sliderType_;
 
-  int labelMargin_     = 70;
+  int labelMargin_   = 70;
   int lastSliderPos_ = 0;
   int sliderWidth_   = 0;
 };

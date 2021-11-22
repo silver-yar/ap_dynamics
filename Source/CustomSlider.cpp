@@ -100,7 +100,7 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
   lastSliderPos_ = static_cast<int>(sliderPos);
   sliderWidth_   = width - labelMargin_ + 1;
   // Background
-  g.setColour(AP::Colors::DarkGrey);
+  g.setColour(APConstants::Colors::DarkGrey);
   g.fillRoundedRectangle(static_cast<float>(x), static_cast<float>(y),
                          static_cast<float>(width - labelMargin_),
                          static_cast<float>(height), CustomSlider_::cornerSize);
@@ -149,15 +149,15 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label)
 
   kernel_.createGaussianBlur(3.2f);
 
-  shadow_ = juce::Image(juce::Image::PixelFormat::ARGB, label.getWidth(), (int)SHADOW_FONT_HEIGHT, true);
+  shadow_ = juce::Image(juce::Image::PixelFormat::ARGB, label.getWidth(), (int)APConstants::Gui::SHADOW_FONT_HEIGHT, true);
   juce::Graphics graphics(shadow_);
-  graphics.setColour(SHADOW_COLOR);
+  graphics.setColour(APConstants::Colors::SHADOW_COLOR);
   graphics.setFont(labelFont_.withHeight(20.0f));
   graphics.drawText(name, 0, 0, shadow_.getWidth(), shadow_.getHeight(), juce::Justification::centred, false);
   kernel_.applyToImage(shadow_, shadow_, shadow_.getBounds());
   g.drawImage(shadow_, shadowBounds, juce::RectanglePlacement::fillDestination);
 
-  g.setColour(AP::Colors::DarkGrey);
+  g.setColour(APConstants::Colors::DarkGrey);
   g.setFont(labelFont_.withHeight(16.0f));
   g.drawFittedText(label.getText().substring(0, 9), labelBounds, juce::Justification::centredRight, 1);
 }

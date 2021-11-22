@@ -53,7 +53,7 @@ void APSlider::resized()
 
 void APSlider::timerCallback()
 {
-  auto gaindB = juce::Decibels::gainToDecibels(audioProcessor.meterLocalMaxVal.load(), AP::Constants::minusInfinityDb);
+  auto gaindB = juce::Decibels::gainToDecibels(audioProcessor.meterLocalMaxVal.load(), APConstants::Math::minusInfinityDb);
 
   switch (sliderType_)
   {
@@ -68,7 +68,7 @@ void APSlider::timerCallback()
       threshSliderBar_.setSliderValue(juce::jmap(static_cast<float>(slider.getValue()),
                                                  static_cast<float>(slider.getMinimum()),
                                                  static_cast<float>(slider.getMaximum()), 0.0f, 1.0f));
-      threshSliderBar_.setMeterValue(juce::jmap(gaindB, AP::Constants::minusInfinityDb, 0.0f, 0.0f, 1.0f));
+      threshSliderBar_.setMeterValue(juce::jmap(gaindB, APConstants::Math::minusInfinityDb, 0.0f, 0.0f, 1.0f));
       break;
     default: jassertfalse; break;
   }
