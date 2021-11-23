@@ -13,19 +13,20 @@
 #include <JuceHeader.h>
 
 #include "./OpenGL/SliderBarGL.h"
+#include "APDefines.h"
 #include "PluginProcessor.h"
 
-enum class SliderType
+enum SliderType
 {
   Normal = 1,
   Invert = 2
 };
 
-int apSliderHeight = 0;
-
 class APSlider : public juce::Component, public juce::Timer
 {
  public:
+  static constexpr float cornerSize = 10.0f;
+
   APSlider(Ap_dynamicsAudioProcessor &, SliderType);
   ~APSlider() override;
 
@@ -37,8 +38,8 @@ class APSlider : public juce::Component, public juce::Timer
  private:
   Ap_dynamicsAudioProcessor &audioProcessor;
   SliderType sliderType_;
-  SliderBarGL threshSliderBar_{ "liquidmetal.shader" };
-  SliderBarGL ratioSliderBar_{ "basic.shader" };
+  std::unique_ptr<SliderBarGL> threshSliderBar_;
+  std::unique_ptr<SliderBarGL> ratioSliderBar_;
 
   juce::Rectangle<int> threshBounds_, ratioBounds_;
 };
@@ -57,11 +58,15 @@ class MyLookAndFeel : public juce::LookAndFeel_V4
 
  private:
   Ap_dynamicsAudioProcessor &audioProcessor;
+
+  juce::ImageConvolutionKernel kernel_{ 16 };
+  juce::Image shadow_;
+
   juce::Font labelFont_{ juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
                                                                  BinaryData::VarelaRound_ttfSize) };
   SliderType sliderType_;
 
-  int labelMargin_     = 70;
+  int labelMargin_   = 70;
   int lastSliderPos_ = 0;
   int sliderWidth_   = 0;
 };

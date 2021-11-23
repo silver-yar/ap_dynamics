@@ -18,7 +18,7 @@
 class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
 {
  public:
-  explicit SliderBarGL(const std::string&);
+  explicit SliderBarGL(std::string );
   ~SliderBarGL() override;
 
   // Context Control Functions
@@ -29,8 +29,6 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
   void newOpenGLContextCreated() override;
   void openGLContextClosing() override;
   void renderOpenGL() override;
-
-  void loadCubeMap(std::vector<juce::Image>& texture_images);
 
   // JUCE Callbacks
   void paint(juce::Graphics&) override;
@@ -69,7 +67,6 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
       runTime     = (createUniform(openGLContext, shaderProgram, "runTime"));
     }
 
-    // ScopedPointer<OpenGLShaderProgram::Uniform> projectionMatrix, viewMatrix;
     std::unique_ptr<juce::OpenGLShaderProgram::Uniform> resolution, sliderVal, vmVal, diffTexture, runTime, specTexture;
 
    private:
@@ -77,18 +74,10 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
                                                                              juce::OpenGLShaderProgram& shaderProgram,
                                                                              const char* uniformName)
     {
-      if (openGLContext.extensions.glGetUniformLocation(shaderProgram.getProgramID(), uniformName) < 0)
+      if (juce::OpenGLExtensionFunctions::glGetUniformLocation(shaderProgram.getProgramID(), uniformName) < 0)
       {
-        //                jassertfalse;
-        //                DBG("Uniform: " << uniformName << ", Location: "
-        //                                << openGLContext.extensions.glGetUniformLocation (shaderProgram.getProgramID(),
-        //                                uniformName));
         return nullptr;
       }
-
-      //            DBG("Uniform: " << uniformName << ", Location: "
-      //                            << openGLContext.extensions.glGetUniformLocation (shaderProgram.getProgramID(),
-      //                            uniformName));
 
       return std::make_unique<juce::OpenGLShaderProgram::Uniform>(shaderProgram, uniformName);
     }
@@ -112,7 +101,6 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
   std::string filename_;
   float value_;
   float vmValue_;
-  float index_ = 0.0f;
   juce::String statusText_;
 
   const char* vertexShader_;

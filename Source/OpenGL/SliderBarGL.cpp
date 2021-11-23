@@ -15,14 +15,14 @@
 
 #include <fstream>
 #include <string>
+#include <utility>
 
 //==============================================================================
-SliderBarGL::SliderBarGL(const std::string& filenameNoPath)
-    : shader_(openGLContext_), filename_(filenameNoPath), value_(0.0f), vmValue_(0.0f)
+SliderBarGL::SliderBarGL(std::string  filenameNoPath)
+    : shader_(openGLContext_), filename_(std::move(filenameNoPath)), value_(0.0f), vmValue_(0.0f)
 {
   auto now  = std::chrono::high_resolution_clock::now();
   startTime = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
-  //    time_ = juce::Time::getCurrentTime();
   // Sets OpenGL version to 3.2
   openGLContext_.setOpenGLVersionRequired(juce::OpenGLContext::OpenGLVersion::openGL3_2);
   // Attach the OpenGL context to SliderBarGL OpenGLRenderer
@@ -46,7 +46,6 @@ void SliderBarGL::newOpenGLContextCreated()
   diffTexture_.loadImage(diffImage_);
 
   openGLContext_.setTextureMagnificationFilter(juce::OpenGLContext::TextureMagnificationFilter::linear);
-  //  loadCubeMap(textureFaces_);
 
   // Setup Buffer Objects
   juce::OpenGLExtensionFunctions::glGenBuffers(1, &VBO_);  // Vertex Buffer Object

@@ -73,7 +73,6 @@ target_sources(
         DSP/APTubeDistortion.cpp
         Source/APDefines.h
         Source/APSlider.cpp
-        Source/CustomSlider.cpp
         Source/MixerButton.cpp
         Source/OpenGL/SliderBarGL.cpp
         Source/PluginEditor.cpp

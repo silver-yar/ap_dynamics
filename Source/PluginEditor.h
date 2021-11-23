@@ -11,24 +11,11 @@
 #include <JuceHeader.h>
 
 #include "APDefines.h"
-#include "APSliderLook.h"
-#include "CustomSlider.h"
+#include "APSlider.h"
 #include "MixerButton.h"
 #include "PluginProcessor.h"
 
 //==============================================================================
-/**
- */
-//const static int M_HEIGHT             = 500;
-//const static int M_WIDTH              = 700;
-//const static int SLIDER_Y             = 290;
-//const static int SLIDER_WIDTH         = 200;
-//const static float FONT_HEIGHT        = 24.0f;
-//const static float SHADOW_FONT_HEIGHT = 28.0f;
-//
-//const static juce::Colour SHADOW_COLOR      = juce::Colours::black.withAlpha(0.2f);
-//const static juce::Colour INNER_GRADIENT_BG = juce::Colour(0xFFFFDC93);
-//const static juce::Colour OUTER_GRADIENT_BG = juce::Colour(0xFFFFC446);
 
 class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, public juce::Timer
 {
@@ -42,7 +29,7 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
 
   void setupLabelShadow(juce::Image& shadow, const juce::String& name);
   void setupSliderShadow(juce::Image& shadow);
-  void setupSlider(std::unique_ptr<CustomSlider_>& slider, std::unique_ptr<juce::Label>& label,
+  void setupSlider(std::unique_ptr<APSlider>& slider, std::unique_ptr<juce::Label>& label,
                    const juce::String& name, SliderType sliderType,
                    const juce::String& suffix = "s");
   void timerCallback() override;
@@ -63,7 +50,7 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   MyLookAndFeel thresholdLook_, ratioLook_;
 
   MixerButton stylePicker_;
-  std::unique_ptr<CustomSlider_> thresholdSlider_, ratioSlider_;
+  std::unique_ptr<APSlider> thresholdSlider_, ratioSlider_;
   std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, ratioAttachment_;
   std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, styleLabel_;
   std::unique_ptr<juce::Label> lshdwT_, lshdwR_, lshdwS_;

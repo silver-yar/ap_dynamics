@@ -145,11 +145,11 @@ void Ap_dynamicsAudioProcessorEditor::setupSliderShadow(juce::Image& shadow)
   kernel_.applyToImage(shadow, shadow, shadow.getBounds());
 }
 
-void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<CustomSlider_>& slider,
+void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<APSlider>& slider,
                                                   std::unique_ptr<juce::Label>& label, const juce::String& name,
                                                   SliderType sliderType, const juce::String& suffix)
 {
-  slider = std::make_unique<CustomSlider_>(audioProcessor, sliderType);
+  slider = std::make_unique<APSlider>(audioProcessor, sliderType);
   slider->slider.setTextBoxIsEditable(false);
   slider->slider.setSliderStyle(juce::Slider::LinearBarVertical);
   slider->slider.setTextValueSuffix(" " + suffix);
