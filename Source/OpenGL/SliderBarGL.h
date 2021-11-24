@@ -18,7 +18,7 @@
 class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
 {
  public:
-  explicit SliderBarGL(std::string );
+  explicit SliderBarGL(std::string);
   ~SliderBarGL() override;
 
   // Context Control Functions
@@ -59,19 +59,18 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
   {
     Uniforms(juce::OpenGLContext& openGLContext, juce::OpenGLShaderProgram& shaderProgram)
     {
-      resolution  = (createUniform(openGLContext, shaderProgram, "resolution"));
-      sliderVal   = (createUniform(openGLContext, shaderProgram, "sliderValue"));
-      vmVal       = (createUniform(openGLContext, shaderProgram, "vomValue"));
-      diffTexture = (createUniform(openGLContext, shaderProgram, "diffTexture"));
-      specTexture = (createUniform(openGLContext, shaderProgram, "specTexture"));
-      runTime     = (createUniform(openGLContext, shaderProgram, "runTime"));
+      resolution  = (createUniform(shaderProgram, "resolution"));
+      sliderVal   = (createUniform(shaderProgram, "sliderValue"));
+      vmVal       = (createUniform(shaderProgram, "vomValue"));
+      diffTexture = (createUniform(shaderProgram, "diffTexture"));
+      specTexture = (createUniform(shaderProgram, "specTexture"));
+      runTime     = (createUniform(shaderProgram, "runTime"));
     }
 
     std::unique_ptr<juce::OpenGLShaderProgram::Uniform> resolution, sliderVal, vmVal, diffTexture, runTime, specTexture;
 
    private:
-    static std::unique_ptr<juce::OpenGLShaderProgram::Uniform> createUniform(juce::OpenGLContext& openGLContext,
-                                                                             juce::OpenGLShaderProgram& shaderProgram,
+    static std::unique_ptr<juce::OpenGLShaderProgram::Uniform> createUniform(juce::OpenGLShaderProgram& shaderProgram,
                                                                              const char* uniformName)
     {
       if (juce::OpenGLExtensionFunctions::glGetUniformLocation(shaderProgram.getProgramID(), uniformName) < 0)
@@ -85,7 +84,7 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
 
   // OpenGL Member Variables
   juce::OpenGLContext openGLContext_;
-  GLuint VBO_, VAO_, EBO_;
+  GLuint VBO_, EBO_;
 
   juce::Time time_;
 

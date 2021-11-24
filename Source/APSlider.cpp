@@ -9,16 +9,33 @@
 */
 
 #include "APSlider.h"
+#include "APDefines.h"
 
-APSlider::APSlider(Ap_dynamicsAudioProcessor &p, SliderType sliderType)
-    : audioProcessor(p), sliderType_(sliderType)
+APSlider::APSlider(Ap_dynamicsAudioProcessor &p, SliderType sliderType) : audioProcessor(p), sliderType_(sliderType)
 {
-  threshSliderBar_ = std::make_unique<SliderBarGL>("liquidmetal.shader");
-  ratioSliderBar_ = std::make_unique<SliderBarGL>("basic.shader");
-  threshSliderBar_->start();
-  addAndMakeVisible(threshSliderBar_.get());
-  ratioSliderBar_->start();
-  addAndMakeVisible(ratioSliderBar_.get());
+  lookAndFeel_ = std::make_unique<MyLookAndFeel>(sliderType_);
+
+//  auto offset = 72;
+
+  switch (sliderType)
+  {
+    case Invert:
+      sliderBarGl_ = std::make_unique<SliderBarGL>("liquidmetal.shader");
+//      openGlBounds_ = Rectangle<int>(1, 10, getWidth() - offset, getHeight() - 20);
+      break;
+    case Normal:
+      sliderBarGl_ = std::make_unique<SliderBarGL>("basic.shader");
+//      openGlBounds_ = Rectangle<int>(1, 10, getWidth() - offset, getHeight() - 20);
+    default: break;
+  }
+
+  //  ratioSliderBar_  = std::make_unique<SliderBarGL>("basic.shader");
+  sliderBarGl_->start();
+  addAndMakeVisible(sliderBarGl_.get());
+//  sliderBarGl_->setBounds(openGlBounds_);
+  //  ratioSliderBar_->start();
+  //  addAndMakeVisible(ratioSliderBar_.get());
+  slider.setLookAndFeel(lookAndFeel_.get());
   addAndMakeVisible(slider);
 
   startTimerHz(30);
@@ -26,55 +43,48 @@ APSlider::APSlider(Ap_dynamicsAudioProcessor &p, SliderType sliderType)
 
 APSlider::~APSlider()
 {
-  ratioSliderBar_->stop();
-  threshSliderBar_->stop();
+//  ratioSliderBar_->stop();
+  sliderBarGl_->stop();
+  slider.setLookAndFeel(nullptr);
   stopTimer();
 }
 
 void APSlider::resized()
 {
   auto offset = 72;
-  switch (sliderType_)
-  {
-    case Normal:
-      ratioBounds_ = Rectangle<int>(1, 10, getWidth() - offset, getHeight() - 20);
-      ratioSliderBar_->setBounds(ratioBounds_);
-      slider.setBounds(getLocalBounds());
-      break;
-    case Invert:
-      threshBounds_ = Rectangle<int>(1, 10, getWidth() - offset, getHeight() - 20);
-      threshSliderBar_->setBounds(threshBounds_);
-      slider.setBounds(getLocalBounds());
-      break;
-    default: break;
-  }
+  openGlBounds_ = Rectangle<int>(1, 10, getWidth() - offset, getHeight() - 20);
+  sliderBarGl_->setBounds(openGlBounds_);
+  slider.setBounds(getLocalBounds());
 }
 
 void APSlider::timerCallback()
 {
-  auto gaindB = juce::Decibels::gainToDecibels(audioProcessor.meterLocalMaxVal.load(), -96.0f);
+  auto gain_dB = juce::Decibels::gainToDecibels(audioProcessor.meterLocalMaxVal.load(), APConstants::Math::minusInfinityDb);
+  auto target_range_min = 0.0f;
+  auto target_range_max = 1.0f;
+  auto source_range_max = 0.0f;
 
   switch (sliderType_)
   {
     case SliderType::Normal:
     {
       const float sliderPos   = slider.getPositionOfValue(slider.getValue());
-      const float sliderValue = juce::jmap(sliderPos, (float)slider.getHeight(), 0.0f, 0.0f, 1.0f);
-      ratioSliderBar_->setSliderValue(sliderValue);
+      const float sliderValue = juce::jmap(sliderPos, (float)slider.getHeight(), source_range_max, target_range_min, target_range_max);
+      sliderBarGl_->setSliderValue(sliderValue);
     }
     break;
     case SliderType::Invert:
-      threshSliderBar_->setSliderValue(
-          juce::jmap((float)slider.getValue(), (float)slider.getMinimum(), (float)slider.getMaximum(), 0.0f, 1.0f));
-      threshSliderBar_->setMeterValue(juce::jmap(gaindB, -96.0f, 0.0f, 0.0f, 1.0f));
+      sliderBarGl_->setSliderValue(
+          juce::jmap((float)slider.getValue(), (float)slider.getMinimum(), (float)slider.getMaximum(), target_range_min, target_range_max));
+      sliderBarGl_->setMeterValue(juce::jmap(gain_dB, APConstants::Math::minusInfinityDb, source_range_max, target_range_min, target_range_max));
       break;
     default: break;
   }
   resized();
 }
 
-MyLookAndFeel::MyLookAndFeel(Ap_dynamicsAudioProcessor &p, SliderType sliderType)
-    : audioProcessor(p), sliderType_(sliderType)
+MyLookAndFeel::MyLookAndFeel(SliderType sliderType)
+    : sliderType_(sliderType)
 {
 }
 
@@ -92,8 +102,7 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
   sliderWidth_   = width - labelMargin_ + 1;
   // Background
   g.setColour(APConstants::Colors::DarkGrey);
-  g.fillRoundedRectangle(static_cast<float>(x), static_cast<float>(y),
-                         static_cast<float>(width - labelMargin_),
+  g.fillRoundedRectangle(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width - labelMargin_),
                          static_cast<float>(height), APSlider::cornerSize);
 }
 
@@ -125,9 +134,7 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label)
 
   switch (sliderType_)
   {
-    case Normal:
-      labelBounds = Rectangle<int>(sliderWidth_, lastSliderPos_, labelMargin_, 20);
-      break;
+    case Normal: labelBounds = Rectangle<int>(sliderWidth_, lastSliderPos_, labelMargin_, 20); break;
     case Invert:
       labelBounds =
           Rectangle<int>(sliderWidth_, lastSliderPos_ > 20 ? lastSliderPos_ - 20 : lastSliderPos_, labelMargin_, 20);
