@@ -14,13 +14,7 @@
 Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p), stylePicker_(p)
 {
-  bgText_ = std::make_unique<juce::Image>(
-      juce::ImageCache::getFromMemory(BinaryData::logo_clean_png, BinaryData::logo_clean_pngSize));
-  textShadow_ =
-      std::make_unique<juce::Image>(juce::ImageCache::getFromMemory(BinaryData::shadow_png, BinaryData::shadow_pngSize));
-  myFont_ = std::make_unique<juce::Font>(
-      juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf, BinaryData::VarelaRound_ttfSize));
-
+  initializeAssets();
   // Slider Setup
   setupSlider(thresholdSlider_, thresholdLabel_, "Threshold", SliderType::Invert, "dB");
   thresholdAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "THR",
@@ -29,15 +23,25 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   ratioAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "RAT",
                                                                                             ratioSlider_->slider);
 
-  styleLabel_ = std::make_unique<juce::Label>("", "style");
   styleLabel_->setJustificationType(juce::Justification::centred);
   styleLabel_->setText("style", juce::dontSendNotification);
   styleLabel_->setFont(myFont_->withHeight(APConstants::Gui::FONT_HEIGHT));
   styleLabel_->setBorderSize(juce::BorderSize<int>(10, 50, 30, 0));
   styleLabel_->setColour(juce::Label::textColourId, APConstants::Colors::DarkGrey);
   styleLabel_->attachToComponent(&stylePicker_, false);
-
   addAndMakeVisible(stylePicker_);
+
+  // Shadow Setup
+  kernel_->createGaussianBlur(5.6f);
+  kernel_->applyToImage(*textShadow_, *textShadow_, textShadow_->getBounds());
+  kernel_->clear();
+  kernel_->createGaussianBlur(3.2f);
+  setupLabelShadow(*thresholdShadow_, thresholdLabel_->getText());
+  setupLabelShadow(*ratioShadow_, ratioLabel_->getText());
+  setupLabelShadow(*styleShadow_, styleLabel_->getText());
+  setupSliderShadow(*tSliderShadow_);
+  setupSliderShadow(*rSliderShadow_);
+  setupSliderShadow(*sSliderShadow_);
 
   thresholdBounds_ = juce::Rectangle<int>(40, APConstants::Gui::SLIDER_Y, APConstants::Gui::SLIDER_WIDTH, sliderHeight_);
   ratioBounds_     = juce::Rectangle<int>(280, APConstants::Gui::SLIDER_Y, APConstants::Gui::SLIDER_WIDTH, sliderHeight_);
@@ -46,30 +50,6 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   setSize(APConstants::Gui::M_WIDTH, APConstants::Gui::M_HEIGHT);
   setResizable(false, false);
   startTimerHz(60);
-
-  kernel_ = std::make_unique<juce::ImageConvolutionKernel>(16);
-  kernel_->createGaussianBlur(5.6f);
-  kernel_->applyToImage(*textShadow_, *textShadow_, textShadow_->getBounds());
-
-  kernel_->clear();
-  kernel_->createGaussianBlur(3.2f);
-
-  // Shadow Setup
-  thresholdShadow_ = std::make_unique<juce::Image>();
-  ratioShadow_     = std::make_unique<juce::Image>();
-  styleShadow_     = std::make_unique<juce::Image>();
-  tSliderShadow_   = std::make_unique<juce::Image>();
-  rSliderShadow_   = std::make_unique<juce::Image>();
-  sSliderShadow_   = std::make_unique<juce::Image>();
-  setupLabelShadow(*thresholdShadow_, thresholdLabel_->getText());
-  setupLabelShadow(*ratioShadow_, ratioLabel_->getText());
-  setupLabelShadow(*styleShadow_, styleLabel_->getText());
-  setupSliderShadow(*tSliderShadow_);
-  setupSliderShadow(*rSliderShadow_);
-  setupSliderShadow(*sSliderShadow_);
-
-//  sliderBarGl.setBounds(thresholdBounds_);
-//  addAndMakeVisible(sliderBarGl);
 }
 
 Ap_dynamicsAudioProcessorEditor::~Ap_dynamicsAudioProcessorEditor() { stopTimer(); }
@@ -182,3 +162,20 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<APSlider>& apS
 }
 
 void Ap_dynamicsAudioProcessorEditor::timerCallback() { repaint(); }
+void Ap_dynamicsAudioProcessorEditor::initializeAssets()
+{
+  bgText_ = std::make_unique<juce::Image>(
+      juce::ImageCache::getFromMemory(BinaryData::logo_clean_png, BinaryData::logo_clean_pngSize));
+  textShadow_ =
+      std::make_unique<juce::Image>(juce::ImageCache::getFromMemory(BinaryData::shadow_png, BinaryData::shadow_pngSize));
+  myFont_ = std::make_unique<juce::Font>(
+      juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf, BinaryData::VarelaRound_ttfSize));
+  styleLabel_ = std::make_unique<juce::Label>("", "style");
+  kernel_ = std::make_unique<juce::ImageConvolutionKernel>(16);
+  thresholdShadow_ = std::make_unique<juce::Image>();
+  ratioShadow_     = std::make_unique<juce::Image>();
+  styleShadow_     = std::make_unique<juce::Image>();
+  tSliderShadow_   = std::make_unique<juce::Image>();
+  rSliderShadow_   = std::make_unique<juce::Image>();
+  sSliderShadow_   = std::make_unique<juce::Image>();
+}

@@ -35,6 +35,8 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   void timerCallback() override;
 
  private:
+  void initializeAssets();
+
   Ap_dynamicsAudioProcessor& audioProcessor;
 
   std::unique_ptr<juce::ImageConvolutionKernel> kernel_;
