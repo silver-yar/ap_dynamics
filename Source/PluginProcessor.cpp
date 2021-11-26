@@ -231,7 +231,7 @@ void Ap_dynamicsAudioProcessor::setStateInformation(const void* data, int sizeIn
 void Ap_dynamicsAudioProcessor::update()
 {
   mustUpdateProcessing_ = false;
-  auto mix = apvts.getRawParameterValue("MIX")->load();
+  const auto mix = apvts.getRawParameterValue("MIX")->load();
 
   compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(), apvts.getRawParameterValue("RAT")->load());
   overdrive_->updateParameters(mix);

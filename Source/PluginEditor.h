@@ -29,15 +29,14 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
 
   void setupLabelShadow(juce::Image& shadow, const juce::String& name);
   void setupSliderShadow(juce::Image& shadow);
-  void setupSlider(std::unique_ptr<APSlider>& apSlider, std::unique_ptr<juce::Label>& label,
-                   const juce::String& name, SliderType sliderType,
-                   const juce::String& suffix = "s");
+  void setupSlider(std::unique_ptr<APSlider>& apSlider, std::unique_ptr<juce::Label>& label, const juce::String& name,
+                   SliderType sliderType, const juce::String& suffix = "s");
   void timerCallback() override;
 
  private:
   void initializeAssets();
 
-  Ap_dynamicsAudioProcessor& audioProcessor;
+  Ap_dynamicsAudioProcessor& audioProcessor_;
 
   std::unique_ptr<juce::ImageConvolutionKernel> kernel_;
 
@@ -51,11 +50,12 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
 
   MixerButton stylePicker_;
   std::unique_ptr<APSlider> thresholdSlider_, ratioSlider_;
-  std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_, ratioAttachment_;
+  std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_,
+      ratioAttachment_;  // Implemented @ initialization
   std::unique_ptr<juce::Label> thresholdLabel_, ratioLabel_, styleLabel_;
 
-  juce::Point<float> offset_{ 0.0f, -16.0f };
-  int shadowDeltaXY_      = 8;
+  const juce::Point<float> offset_{ 0.0f, -16.0f };
+  const float shadowDeltaXY_      = 8.0f;
   const int sliderHeight_ = 185;
   juce::Rectangle<int> thresholdBounds_, ratioBounds_, pickerBounds_;
 

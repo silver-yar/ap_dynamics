@@ -12,15 +12,15 @@
 
 //==============================================================================
 Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudioProcessor& p)
-    : AudioProcessorEditor(&p), audioProcessor(p), stylePicker_(p)
+    : AudioProcessorEditor(&p), audioProcessor_(p), stylePicker_(p)
 {
   initializeAssets();
   // Slider Setup
   setupSlider(thresholdSlider_, thresholdLabel_, "Threshold", SliderType::Invert, "dB");
-  thresholdAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "THR",
+  thresholdAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor_.apvts, "THR",
                                                                                                 thresholdSlider_->slider);
   setupSlider(ratioSlider_, ratioLabel_, "Ratio", SliderType::Normal, ": 1");
-  ratioAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "RAT",
+  ratioAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor_.apvts, "RAT",
                                                                                             ratioSlider_->slider);
 
   styleLabel_->setJustificationType(juce::Justification::centred);
@@ -57,14 +57,15 @@ Ap_dynamicsAudioProcessorEditor::~Ap_dynamicsAudioProcessorEditor() { stopTimer(
 //==============================================================================
 void Ap_dynamicsAudioProcessorEditor::paint(juce::Graphics& g)
 {
-  g.setGradientFill(juce::ColourGradient(APConstants::Colors::INNER_GRADIENT_BG, getWidth() * 0.5f, getHeight() * 0.93f,
-                                         APConstants::Colors::OUTER_GRADIENT_BG, -80, -80, true));
+  g.setGradientFill(juce::ColourGradient(APConstants::Colors::INNER_GRADIENT_BG, static_cast<float>(getWidth()) * 0.5f,
+                                         static_cast<float>(getHeight()) * 0.93f, APConstants::Colors::OUTER_GRADIENT_BG,
+                                         -80, -80, true));
   g.fillAll();
 
   // Logo
   constexpr int textDeltaX = 80;
   constexpr int textDeltaY = 50;
-  const int textHeight     = static_cast<const int>(static_cast<float>(getHeight()) * 0.45f);
+  const int textHeight     = static_cast<int>(static_cast<float>(getHeight()) * 0.45f);
   const auto textBounds    = getLocalBounds()
                               .removeFromTop(textHeight)
                               .reduced(textDeltaX, textDeltaY)
@@ -78,21 +79,24 @@ void Ap_dynamicsAudioProcessorEditor::paint(juce::Graphics& g)
   g.drawImage(*bgText_, textBounds, juce::RectanglePlacement::fillDestination);
 
   // Draw Label Shadows
-  auto shadowHeight = APConstants::Gui::SLIDER_Y - 68;
+  constexpr auto shadowHeight = static_cast<float>(APConstants::Gui::SLIDER_Y - 68);
   g.drawImage(*thresholdShadow_,
-              juce::Rectangle<float>(thresholdSlider_->getX() + 6, shadowHeight, thresholdShadow_->getWidth(),
-                                     thresholdShadow_->getHeight()),
+              juce::Rectangle<float>(static_cast<float>(thresholdSlider_->getX() + 6), shadowHeight,
+                                     static_cast<float>(thresholdShadow_->getWidth()),
+                                     static_cast<float>(thresholdShadow_->getHeight())),
               juce::RectanglePlacement::fillDestination);
   g.drawImage(
       *ratioShadow_,
-      juce::Rectangle<float>(ratioSlider_->getX() + 6, shadowHeight, ratioShadow_->getWidth(), ratioShadow_->getHeight()),
+      juce::Rectangle<float>(static_cast<float>(ratioSlider_->getX() + 6), shadowHeight,
+                             static_cast<float>(ratioShadow_->getWidth()), static_cast<float>(ratioShadow_->getHeight())),
       juce::RectanglePlacement::fillDestination);
   g.drawImage(
       *styleShadow_,
-      juce::Rectangle<float>(stylePicker_.getX() + 66, shadowHeight, styleShadow_->getWidth(), styleShadow_->getHeight()),
+      juce::Rectangle<float>(static_cast<float>(stylePicker_.getX() + 66), shadowHeight,
+                             static_cast<float>(styleShadow_->getWidth()), static_cast<float>(styleShadow_->getHeight())),
       juce::RectanglePlacement::fillDestination);
 
-  auto shadowBounds = juce::Rectangle<float>(40, APConstants::Gui::SLIDER_Y, 130, sliderHeight_);
+  const auto shadowBounds = juce::Rectangle<float>(40, APConstants::Gui::SLIDER_Y, 130, static_cast<float>(sliderHeight_));
 
   g.drawImage(*tSliderShadow_, shadowBounds.expanded(shadowDeltaXY_) + offset_, juce::RectanglePlacement::fillDestination);
   g.drawImage(*rSliderShadow_, shadowBounds.withX(280).expanded(shadowDeltaXY_) + offset_,
@@ -127,15 +131,16 @@ void Ap_dynamicsAudioProcessorEditor::setupLabelShadow(juce::Image& shadow, cons
 
 void Ap_dynamicsAudioProcessorEditor::setupSliderShadow(juce::Image& shadow)
 {
-  auto cornerSize = 10.0f;
-  auto width      = 130;
+  constexpr auto cornerSize = 10.0f;
+  constexpr auto width      = 130;
 
   shadow = juce::Image(juce::Image::PixelFormat::ARGB, width, sliderHeight_, true);
   juce::Graphics graphics(shadow);
   graphics.setColour(APConstants::Colors::SHADOW_COLOR);
-  graphics.fillRoundedRectangle(juce::Rectangle<float>(0, 0, shadow.getWidth() - 8, shadow.getHeight() - 8)
-                                    .withCentre(shadow.getBounds().getCentre().toFloat()),
-                                cornerSize);
+  graphics.fillRoundedRectangle(
+      juce::Rectangle<float>(0, 0, static_cast<float>(shadow.getWidth() - 8), static_cast<float>(shadow.getHeight() - 8))
+          .withCentre(shadow.getBounds().getCentre().toFloat()),
+      cornerSize);
   kernel_->applyToImage(shadow, shadow, shadow.getBounds());
 }
 
@@ -143,7 +148,7 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<APSlider>& apS
                                                   const juce::String& name, const SliderType sliderType,
                                                   const juce::String& suffix)
 {
-  apSlider = std::make_unique<APSlider>(audioProcessor, sliderType);
+  apSlider = std::make_unique<APSlider>(audioProcessor_, sliderType);
   apSlider->slider.setTextBoxIsEditable(false);
   apSlider->slider.setSliderStyle(juce::Slider::LinearBarVertical);
   apSlider->slider.setTextValueSuffix(" " + suffix);
@@ -170,8 +175,8 @@ void Ap_dynamicsAudioProcessorEditor::initializeAssets()
       std::make_unique<juce::Image>(juce::ImageCache::getFromMemory(BinaryData::shadow_png, BinaryData::shadow_pngSize));
   myFont_ = std::make_unique<juce::Font>(
       juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf, BinaryData::VarelaRound_ttfSize));
-  styleLabel_ = std::make_unique<juce::Label>("", "style");
-  kernel_ = std::make_unique<juce::ImageConvolutionKernel>(16);
+  styleLabel_      = std::make_unique<juce::Label>("", "style");
+  kernel_          = std::make_unique<juce::ImageConvolutionKernel>(16);
   thresholdShadow_ = std::make_unique<juce::Image>();
   ratioShadow_     = std::make_unique<juce::Image>();
   styleShadow_     = std::make_unique<juce::Image>();

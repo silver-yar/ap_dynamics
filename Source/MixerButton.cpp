@@ -100,5 +100,5 @@ void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
   auto mappedVal = juce::jmap(static_cast<float> (mPoint.getY()), yMin, yMax, 1.0f, 0.0f);
   auto limitedVal = juce::jlimit(0.0f, 1.0f, mappedVal);
   audioProcessor.apvts.getParameterAsValue("MIX").setValue(limitedVal);
-//  audioProcessor.setMixValue(juce::jmap((float)pointerPos_.getY(), yMin, yMax, 1.0f, 0.0f));
+//  audioProcessor_.setMixValue(juce::jmap((float)pointerPos_.getY(), yMin, yMax, 1.0f, 0.0f));
 }
