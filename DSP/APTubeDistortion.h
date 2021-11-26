@@ -16,20 +16,21 @@ class APTubeDistortion
   APTubeDistortion();
   ~APTubeDistortion();
 
-  // Based off DAFX 2nd edition pg. 123
-  static void process(const float* audioIn,
-                      float distGain,  // distortion amount
-                      float Q,         // work point
-                      float distChar,  // distortion character
-                      float mix,       // mix of original and distorted sample
-                      float* audioOut, int numSamplesToRender);
+  void updateParameters(float mix) { mix_ = mix; }
 
-  static void processDAFX(const float* audioIn, const float maxBufferVal,
-                          float distGain,  // distortion amount
-                          float Q,         // work point
-                          float distChar,  // distortion character
-                          float mix,       // mix of original and distorted sample
-                          float* audioOut, int numSamplesToRender);
+  // Based off DAFX 2nd edition pg. 123
+  void process(const float* audioIn,
+               float distGain,  // distortion amount
+               float Q,         // work point
+               float distChar,  // distortion character
+               float* audioOut, int numSamplesToRender);
+
+  void processDAFX(const float* audioIn, const float maxBufferVal,
+                   float distGain,  // distortion amount
+                   float Q,         // work point
+                   float distChar,  // distortion character
+                   float* audioOut, int numSamplesToRender);
 
  private:
+  float mix_ = 0.0f;
 };

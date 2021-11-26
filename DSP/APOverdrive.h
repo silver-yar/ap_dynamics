@@ -16,10 +16,12 @@ class APOverdrive
   APOverdrive();
   ~APOverdrive();
 
-  static void process(const float* audioIn, float mix, float* audioOut, int numSamplesToRender);
+  void updateParameters(float mix) { mix_ = mix; }
 
-  static float softClipping(float sample);
-  static float hardClipping(float sample);
+  void process(const float* audioIn, float* audioOut, int numSamplesToRender);
+
+  float softClipping(float sample);
+  float hardClipping(float sample);
 
  private:
   float mix_ = 0.0f;

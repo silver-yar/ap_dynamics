@@ -191,8 +191,8 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
     // DSP Processing
     compressor_->process(channelData, channelData, buffer.getNumSamples());
-    overdrive_->process(channelData, mix_, channelData, buffer.getNumSamples());
-    tubeDistortion_->processDAFX(channelData, bufferMaxVal, 1.0f, -0.2f, 4.0f, mix_, channelData, buffer.getNumSamples());
+    overdrive_->process(channelData, channelData, buffer.getNumSamples());
+    tubeDistortion_->processDAFX(channelData, bufferMaxVal, 1.0f, -0.2f, 4.0f, channelData, buffer.getNumSamples());
 
     // Makeup
     for (int sample = 0; sample < numSamples; ++sample)
@@ -231,9 +231,11 @@ void Ap_dynamicsAudioProcessor::setStateInformation(const void* data, int sizeIn
 void Ap_dynamicsAudioProcessor::update()
 {
   mustUpdateProcessing_ = false;
+  auto mix = apvts.getRawParameterValue("MIX")->load();
 
   compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(), apvts.getRawParameterValue("RAT")->load());
-  mix_ = apvts.getRawParameterValue("MIX")->load();
+  overdrive_->updateParameters(mix);
+  tubeDistortion_->updateParameters(mix);
 
   const auto makeup =
       juce::Decibels::decibelsToGain(apvts.getRawParameterValue("MUP")->load(), APConstants::Math::minusInfinityDb);

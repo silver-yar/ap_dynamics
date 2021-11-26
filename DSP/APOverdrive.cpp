@@ -16,36 +16,36 @@ APOverdrive::APOverdrive() = default;
 
 APOverdrive::~APOverdrive() = default;
 
-void APOverdrive::process(const float* audioIn, float mix, float* audioOut, int numSamplesToRender)
+void APOverdrive::process(const float* audioIn, float* audioOut, int numSamplesToRender)
 {
   for (auto i = 0; i < numSamplesToRender; ++i)
   {
     const auto& sample = audioIn[i];
     float out          = 0;
 
-    if (mix >= 0.0f && mix <= 0.3f)
+    if (mix_ >= 0.0f && mix_ <= 0.3f)
     {  // No Clipping
       out = sample;
     }
-    if (mix > 0.3f && mix < 0.34f)
+    if (mix_ > 0.3f && mix_ < 0.34f)
     {
-      out = mix * softClipping(sample) + (1 - mix) * sample;
+      out = mix_ * softClipping(sample) + (1 - mix_) * sample;
     }
-    if (mix >= 0.34f && mix <= 0.6f)
+    if (mix_ >= 0.34f && mix_ <= 0.6f)
     {  // Soft Clipping
       // Dirtier
       out = softClipping(sample);
-      out = mix * out + (1.0f - mix) * sample;
+      out = mix_ * out + (1.0f - mix_) * sample;
     }
-    if (mix > 0.6f && mix < 0.64f)
+    if (mix_ > 0.6f && mix_ < 0.64f)
     {
-      out = mix * softClipping(sample) + (1.0f - mix) * hardClipping(sample);
+      out = mix_ * softClipping(sample) + (1.0f - mix_) * hardClipping(sample);
     }
-    if (mix >= 0.64f && mix <= 1.0f)
+    if (mix_ >= 0.64f && mix_ <= 1.0f)
     {  // Hard Clipping
       // Dirty
       out = hardClipping(sample);
-      out = mix * out + (1.0f - mix) * softClipping(sample);
+      out = mix_ * out + (1.0f - mix_) * softClipping(sample);
     }
     audioOut[i] = out;
   }

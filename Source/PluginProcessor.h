@@ -79,8 +79,6 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   std::unique_ptr<APTubeDistortion> tubeDistortion_;
   std::unique_ptr<APOverdrive> overdrive_;
 
-  float mix_  = 0.0f; // TODO: Move to DSP updateParameter method
-
   // Callback for DSP parameter changes
   void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyChanged, const juce::Identifier& property) override
   {
