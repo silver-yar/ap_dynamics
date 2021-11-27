@@ -105,7 +105,7 @@ void Ap_dynamicsAudioProcessorEditor::paint(juce::Graphics& g)
               juce::RectanglePlacement::fillDestination);
 
   // Version No.
-  juce::String version = JUCE_APPLICATION_VERSION_STRING;
+  const juce::String version = JUCE_APPLICATION_VERSION_STRING;
   g.setColour(juce::Colours::darkgrey);
   g.setFont(APConstants::Gui::SYS_FONT);
   g.drawFittedText("Version #: " + version, getWidth() - 105, getHeight() - 20, 100, 15, juce::Justification::centred, 1);
