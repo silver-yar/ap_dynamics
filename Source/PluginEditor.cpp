@@ -25,7 +25,7 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
 
   styleLabel_->setJustificationType(juce::Justification::centred);
   styleLabel_->setText("style", juce::dontSendNotification);
-  styleLabel_->setFont(myFont_->withHeight(APConstants::Gui::FONT_HEIGHT));
+  styleLabel_->setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::FONT_HEIGHT));
   styleLabel_->setBorderSize(juce::BorderSize<int>(10, 50, 30, 0));
   styleLabel_->setColour(juce::Label::textColourId, APConstants::Colors::DarkGrey);
   styleLabel_->attachToComponent(&stylePicker_, false);
@@ -124,7 +124,7 @@ void Ap_dynamicsAudioProcessorEditor::setupLabelShadow(juce::Image& shadow, cons
   shadow = juce::Image(juce::Image::PixelFormat::ARGB, 120, (int)APConstants::Gui::SHADOW_FONT_HEIGHT, true);
   juce::Graphics graphics(shadow);
   graphics.setColour(APConstants::Colors::SHADOW_COLOR);
-  graphics.setFont(myFont_->withHeight(APConstants::Gui::SHADOW_FONT_HEIGHT));
+  graphics.setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::SHADOW_FONT_HEIGHT));
   graphics.drawText(name, 0, 0, shadow.getWidth(), shadow.getHeight(), juce::Justification::centred, false);
   kernel_->applyToImage(shadow, shadow, shadow.getBounds());
 }
@@ -160,7 +160,7 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<APSlider>& apS
   label->setText(name.toLowerCase(), juce::dontSendNotification);
   label->setBorderSize(juce::BorderSize<int>(10, 0, 30, 70));
   label->setColour(juce::Label::textColourId, APConstants::Colors::DarkGrey);
-  label->setFont(myFont_->withHeight(APConstants::Gui::FONT_HEIGHT));
+  label->setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::FONT_HEIGHT));
   label->attachToComponent(apSlider.get(), false);
 
   addAndMakeVisible(apSlider.get());
@@ -173,8 +173,6 @@ void Ap_dynamicsAudioProcessorEditor::initializeAssets()
       juce::ImageCache::getFromMemory(BinaryData::logo_clean_png, BinaryData::logo_clean_pngSize));
   textShadow_ =
       std::make_unique<juce::Image>(juce::ImageCache::getFromMemory(BinaryData::shadow_png, BinaryData::shadow_pngSize));
-  myFont_ = std::make_unique<juce::Font>(
-      juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf, BinaryData::VarelaRound_ttfSize));
   styleLabel_      = std::make_unique<juce::Label>("", "style");
   kernel_          = std::make_unique<juce::ImageConvolutionKernel>(16);
   thresholdShadow_ = std::make_unique<juce::Image>();

@@ -20,7 +20,7 @@
 class MixerButton : public juce::Component
 {
  public:
-  MixerButton(Ap_dynamicsAudioProcessor&);
+  explicit MixerButton(Ap_dynamicsAudioProcessor&);
   ~MixerButton() override;
 
   void paint(juce::Graphics&) override;
@@ -32,9 +32,7 @@ class MixerButton : public juce::Component
  private:
   void mapMouseToValue(const juce::Point<int>&);
 
-  Ap_dynamicsAudioProcessor& audioProcessor;
-  juce::Font labelFont_{ juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
-                                                                 BinaryData::VarelaRound_ttfSize) };
+  Ap_dynamicsAudioProcessor& audioProcessor_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MixerButton)
 };

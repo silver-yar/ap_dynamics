@@ -46,8 +46,6 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   std::unique_ptr<juce::Image> bgText_;
   std::unique_ptr<juce::Image> textShadow_;
 
-  std::unique_ptr<juce::Font> myFont_;
-
   MixerButton stylePicker_;
   std::unique_ptr<APSlider> thresholdSlider_, ratioSlider_;
   std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_,

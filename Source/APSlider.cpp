@@ -59,7 +59,7 @@ void APSlider::resized()
 
 void APSlider::timerCallback()
 {
-  auto gain_dB = juce::Decibels::gainToDecibels(audioProcessor.meterLocalMaxVal.load(), APConstants::Math::minusInfinityDb);
+  auto gain_dB = juce::Decibels::gainToDecibels(audioProcessor.meterLocalMaxVal.load(), APConstants::Math::MINUS_INF_DB);
   auto target_range_min = 0.0f;
   auto target_range_max = 1.0f;
   auto source_range_max = 0.0f;
@@ -76,7 +76,7 @@ void APSlider::timerCallback()
     case SliderType::Invert:
       sliderBarGl_->setSliderValue(
           juce::jmap((float)slider.getValue(), (float)slider.getMinimum(), (float)slider.getMaximum(), target_range_min, target_range_max));
-      sliderBarGl_->setMeterValue(juce::jmap(gain_dB, APConstants::Math::minusInfinityDb, source_range_max, target_range_min, target_range_max));
+      sliderBarGl_->setMeterValue(juce::jmap(gain_dB, APConstants::Math::MINUS_INF_DB, source_range_max, target_range_min, target_range_max));
       break;
     default: break;
   }

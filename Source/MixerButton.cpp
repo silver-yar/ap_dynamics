@@ -9,6 +9,7 @@
 */
 
 #include "MixerButton.h"
+#include "APDefines.h"
 
 #include <JuceHeader.h>
 
@@ -18,7 +19,7 @@ namespace
 }
 
 //==============================================================================
-MixerButton::MixerButton(Ap_dynamicsAudioProcessor& p) : audioProcessor(p) { }
+MixerButton::MixerButton(Ap_dynamicsAudioProcessor& p) : audioProcessor_(p) { }
 
 MixerButton::~MixerButton() { }
 
@@ -37,7 +38,7 @@ void MixerButton::paint(juce::Graphics& g)
 
   // Labels
   g.setColour(juce::Colours::snow);
-  g.setFont(labelFont_.withHeight(24.0f));
+  g.setFont(APConstants::Gui::SYS_FONT.withHeight(24.0f));
   g.drawFittedText("dirtier", bounds.removeFromTop(static_cast<int>(thirdHeight)), juce::Justification::centred, 1);
 
   g.setFont(24.0f);
@@ -47,8 +48,8 @@ void MixerButton::paint(juce::Graphics& g)
   g.drawFittedText("clean", bounds, juce::Justification::centred, 1);
 
   // Selector Bar
-  auto paramRange = audioProcessor.apvts.getParameterRange("MIX");
-  auto param = audioProcessor.apvts.getParameter("MIX");
+  auto paramRange = audioProcessor_.apvts.getParameterRange("MIX");
+  auto param = audioProcessor_.apvts.getParameter("MIX");
   auto mappedParamVal = juce::jmap(param->getValue(), paramRange.start, paramRange.end, getHeight() - kHandleHeight / 2, kHandleHeight / 2);
   auto barBounds =
       juce::Rectangle<float>(sliderWidth, kHandleHeight).withCentre(bounds.getCentre().withY(mappedParamVal).toFloat());
@@ -99,6 +100,6 @@ void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
 
   auto mappedVal = juce::jmap(static_cast<float> (mPoint.getY()), yMin, yMax, 1.0f, 0.0f);
   auto limitedVal = juce::jlimit(0.0f, 1.0f, mappedVal);
-  audioProcessor.apvts.getParameterAsValue("MIX").setValue(limitedVal);
+  audioProcessor_.apvts.getParameterAsValue("MIX").setValue(limitedVal);
 //  audioProcessor_.setMixValue(juce::jmap((float)pointerPos_.getY(), yMin, yMax, 1.0f, 0.0f));
 }
