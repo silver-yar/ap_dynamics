@@ -15,26 +15,18 @@ APSlider::APSlider(Ap_dynamicsAudioProcessor &p, SliderType sliderType) : audioP
 {
   lookAndFeel_ = std::make_unique<MyLookAndFeel>(sliderType_);
 
-//  auto offset = 72;
-
   switch (sliderType)
   {
     case Invert:
       sliderBarGl_ = std::make_unique<SliderBarGL>("liquidmetal.shader");
-//      openGlBounds_ = Rectangle<int>(1, 10, getWidth() - offset, getHeight() - 20);
       break;
     case Normal:
       sliderBarGl_ = std::make_unique<SliderBarGL>("basic.shader");
-//      openGlBounds_ = Rectangle<int>(1, 10, getWidth() - offset, getHeight() - 20);
     default: break;
   }
 
-  //  ratioSliderBar_  = std::make_unique<SliderBarGL>("basic.shader");
   sliderBarGl_->start();
   addAndMakeVisible(sliderBarGl_.get());
-//  sliderBarGl_->setBounds(openGlBounds_);
-  //  ratioSliderBar_->start();
-  //  addAndMakeVisible(ratioSliderBar_.get());
   slider.setLookAndFeel(lookAndFeel_.get());
   addAndMakeVisible(slider);
 
@@ -43,7 +35,6 @@ APSlider::APSlider(Ap_dynamicsAudioProcessor &p, SliderType sliderType) : audioP
 
 APSlider::~APSlider()
 {
-//  ratioSliderBar_->stop();
   sliderBarGl_->stop();
   slider.setLookAndFeel(nullptr);
   stopTimer();
@@ -86,6 +77,7 @@ void APSlider::timerCallback()
 MyLookAndFeel::MyLookAndFeel(SliderType sliderType)
     : sliderType_(sliderType)
 {
+  initializeAssets();
 }
 
 void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width, int height, float sliderPos,
@@ -99,11 +91,11 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
   ignoreUnused(slider);
 
   lastSliderPos_ = static_cast<int>(sliderPos);
-  sliderWidth_   = width - labelMargin_ + 1;
+  sliderWidth_   = width - APConstants::Gui::SLIDER_LABEL_MARGIN + 1;
   // Background
   g.setColour(APConstants::Colors::DarkGrey);
-  g.fillRoundedRectangle(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width - labelMargin_),
-                         static_cast<float>(height), APSlider::cornerSize);
+  g.fillRoundedRectangle(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width - APConstants::Gui::SLIDER_LABEL_MARGIN),
+                         static_cast<float>(height), APConstants::Gui::CORNER_SIZE);
 }
 
 void MyLookAndFeel::drawLinearSliderBackground(Graphics &g, int x, int y, int width, int height, float sliderPos,
@@ -134,10 +126,10 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label)
 
   switch (sliderType_)
   {
-    case Normal: labelBounds = Rectangle<int>(sliderWidth_, lastSliderPos_, labelMargin_, 20); break;
+    case Normal: labelBounds = Rectangle<int>(sliderWidth_, lastSliderPos_, APConstants::Gui::SLIDER_LABEL_MARGIN, 20); break;
     case Invert:
       labelBounds =
-          Rectangle<int>(sliderWidth_, lastSliderPos_ > 20 ? lastSliderPos_ - 20 : lastSliderPos_, labelMargin_, 20);
+          Rectangle<int>(sliderWidth_, lastSliderPos_ > 20 ? lastSliderPos_ - 20 : lastSliderPos_, APConstants::Gui::SLIDER_LABEL_MARGIN, 20);
       break;
     default: break;
   }
@@ -145,17 +137,31 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label)
   const auto name   = label.getText();
   auto shadowBounds = labelBounds.withX(labelBounds.getX() + 11).withY(labelBounds.getY() - 10).toFloat();
 
-  kernel_.createGaussianBlur(3.2f);
+  kernel_->createGaussianBlur(3.2f);
 
-  shadow_ = juce::Image(juce::Image::PixelFormat::ARGB, label.getWidth(), (int)APConstants::Gui::SHADOW_FONT_HEIGHT, true);
-  juce::Graphics graphics(shadow_);
-  graphics.setColour(APConstants::Colors::SHADOW_COLOR);
-  graphics.setFont(labelFont_.withHeight(20.0f));
-  graphics.drawText(name, 0, 0, shadow_.getWidth(), shadow_.getHeight(), juce::Justification::centred, false);
-  kernel_.applyToImage(shadow_, shadow_, shadow_.getBounds());
-  g.drawImage(shadow_, shadowBounds, juce::RectanglePlacement::fillDestination);
+  if (shadow_ == nullptr)
+  {
+    shadow_ = std::make_unique<juce::Image>(juce::Image::PixelFormat::ARGB, label.getWidth(),
+                                            (int)APConstants::Gui::SHADOW_FONT_HEIGHT, true);
+
+    juce::Graphics graphics(*shadow_);
+    graphics.setColour(APConstants::Colors::SHADOW_COLOR);
+    graphics.setFont(APConstants::Gui::SYS_FONT.withHeight(20.0f));
+    graphics.drawText(name, 0, 0, shadow_->getWidth(), shadow_->getHeight(), juce::Justification::centred, false);
+    kernel_->applyToImage(*shadow_, *shadow_, shadow_->getBounds());
+    DBG("shadow getBounds() x: " << shadow_->getBounds().getX() << ", y: " << shadow_->getBounds().getY() << "width: "
+                                 << shadow_->getBounds().getWidth() << ", height: " << shadow_->getBounds().getHeight());
+    DBG("shadowBounds x: " << shadowBounds.getX() << ", y: " << shadowBounds.getY());
+  }
+  g.drawImage(*shadow_, shadowBounds, juce::RectanglePlacement::fillDestination);
 
   g.setColour(APConstants::Colors::DarkGrey);
-  g.setFont(labelFont_.withHeight(16.0f));
+  g.setFont(APConstants::Gui::SYS_FONT.withHeight(16.0f));
   g.drawFittedText(label.getText().substring(0, 9), labelBounds, juce::Justification::centredRight, 1);
 }
+void MyLookAndFeel::initializeAssets()
+{
+  constexpr auto kernelSize = 16;
+  kernel_ = std::make_unique<juce::ImageConvolutionKernel>(kernelSize);
+}
+

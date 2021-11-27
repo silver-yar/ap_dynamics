@@ -31,8 +31,10 @@ namespace APConstants
     inline constexpr int SLIDER_WIDTH         = 200;
     inline constexpr float FONT_HEIGHT        = 24.0f;
     inline constexpr float SHADOW_FONT_HEIGHT = 28.0f;
-    static const juce::Font SYS_FONT = juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf,
-                                                                                                   BinaryData::VarelaRound_ttfSize));
+    inline constexpr int SLIDER_LABEL_MARGIN  = 70;
+    inline constexpr float CORNER_SIZE        = 10.0f;
+    static const juce::Font SYS_FONT =
+        juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf, BinaryData::VarelaRound_ttfSize));
   }  // namespace Gui
 
   namespace Math
