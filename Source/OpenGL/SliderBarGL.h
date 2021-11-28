@@ -34,7 +34,7 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
   void paint(juce::Graphics&) override;
   void resized() override;
 
-  void setSliderValue(float value)
+  void setSliderValue(const float value)
   {
     if (uniforms_ != nullptr && uniforms_->sliderVal != nullptr)
     {
@@ -42,7 +42,7 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
     }
   }
 
-  void setMeterValue(float value)
+  void setMeterValue(const float value)
   {
     if (uniforms_ != nullptr && uniforms_->vmVal != nullptr)
     {
@@ -50,14 +50,12 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
     }
   }
 
-  int64_t startTime = 0;
-
  private:
   void createShaders();
   // Struct to manage uniforms for the fragment shader
   struct Uniforms
   {
-    Uniforms(juce::OpenGLContext& openGLContext, juce::OpenGLShaderProgram& shaderProgram)
+    explicit Uniforms(juce::OpenGLShaderProgram& shaderProgram)
     {
       resolution  = (createUniform(shaderProgram, "resolution"));
       sliderVal   = (createUniform(shaderProgram, "sliderValue"));
@@ -82,9 +80,12 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
     }
   };
 
+  int64_t startTime_ = 0;
+
   // OpenGL Member Variables
   juce::OpenGLContext openGLContext_;
-  GLuint VBO_, EBO_;
+  GLuint VBO_ = 0;
+  GLuint EBO_ = 0;
 
   juce::Time time_;
 
@@ -102,8 +103,8 @@ class SliderBarGL : public juce::Component, public juce::OpenGLRenderer
   float vmValue_;
   juce::String statusText_;
 
-  const char* vertexShader_;
-  const char* fragmentShader_;
+  const char* vertexShader_ = nullptr;
+  const char* fragmentShader_ = nullptr;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SliderBarGL)
 };

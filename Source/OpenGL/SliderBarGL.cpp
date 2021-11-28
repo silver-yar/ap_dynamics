@@ -13,16 +13,17 @@
 #include <JuceHeader.h>
 #include <juce_opengl/opengl/juce_gl.h>
 
-#include <fstream>
 #include <string>
 #include <utility>
 
+#include "../APDefines.h"
+
 //==============================================================================
-SliderBarGL::SliderBarGL(std::string  filenameNoPath)
+SliderBarGL::SliderBarGL(std::string filenameNoPath)
     : shader_(openGLContext_), filename_(std::move(filenameNoPath)), value_(0.0f), vmValue_(0.0f)
 {
-  auto now  = std::chrono::high_resolution_clock::now();
-  startTime = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
+  const auto now = std::chrono::high_resolution_clock::now();
+  startTime_     = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
   // Sets OpenGL version to 3.2
   openGLContext_.setOpenGLVersionRequired(juce::OpenGLContext::OpenGLVersion::openGL3_2);
   // Attach the OpenGL context to SliderBarGL OpenGLRenderer
@@ -64,10 +65,11 @@ void SliderBarGL::renderOpenGL()
 
   // Setup Viewport
   const auto renderingScale = static_cast<float>(openGLContext_.getRenderingScale());
-  juce::gl::glViewport(0, 0, juce::roundToInt(renderingScale * getWidth()), juce::roundToInt(renderingScale * getHeight()));
+  juce::gl::glViewport(0, 0, juce::roundToInt(renderingScale * static_cast<float>(getWidth())),
+                       juce::roundToInt(renderingScale * static_cast<float>(getHeight())));
 
   // Set background Color
-  juce::OpenGLHelpers::clear(juce::Colours::darkgrey);
+  juce::OpenGLHelpers::clear(APConstants::Colors::DARK_GREY);
 
   // Enable Alpha Blending
   juce::gl::glEnable(juce::gl::GL_BLEND);
@@ -87,32 +89,28 @@ void SliderBarGL::renderOpenGL()
     diffTexture_.bind();
   }
 
-  //    if (uniforms_->specTexture != nullptr)
-  //    {
-  //        specTexture_.bind();
-  //    }
-
   juce::gl::glTexParameteri(juce::gl::GL_TEXTURE_2D, juce::gl::GL_TEXTURE_WRAP_S, juce::gl::GL_REPEAT);
   juce::gl::glTexParameteri(juce::gl::GL_TEXTURE_2D, juce::gl::GL_TEXTURE_WRAP_T, juce::gl::GL_REPEAT);
 
   // Use Shader Program that's been defined
   shader_.use();
 
-  // Setup the Uniforms for use in the Shader
+  // Set up the Uniforms for use in the Shader
 
   if (uniforms_->resolution != nullptr)  // resolution
   {
-    uniforms_->resolution->set((GLfloat)renderingScale * getWidth(), (GLfloat)renderingScale * getHeight());
+    uniforms_->resolution->set(static_cast<float>(renderingScale) * static_cast<float>(getWidth()),
+                               static_cast<float>(renderingScale) * static_cast<float>(getHeight()));
   }
 
   if (uniforms_->sliderVal != nullptr)  // sliderVal
   {
-    uniforms_->sliderVal->set((GLfloat)value_);
+    uniforms_->sliderVal->set(static_cast<float>(value_));
   }
 
   if (uniforms_->vmVal != nullptr)  // vmVal
   {
-    uniforms_->vmVal->set((GLfloat)vmValue_);
+    uniforms_->vmVal->set(static_cast<float>(vmValue_));
   }
 
   if (uniforms_->diffTexture != nullptr)
@@ -127,30 +125,26 @@ void SliderBarGL::renderOpenGL()
 
   if (uniforms_->runTime != nullptr)
   {
-    auto now     = std::chrono::high_resolution_clock::now();
-    auto sysTime = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
-    auto elapsed = static_cast<double>(sysTime - startTime);
-    auto seconds = static_cast<float>(elapsed / 1000000000.0);
-    uniforms_->runTime->set((GLfloat)seconds);
+    const auto now     = std::chrono::high_resolution_clock::now();
+    const auto sysTime = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
+    const auto elapsed = static_cast<double>(sysTime - startTime_);
+    const auto seconds = static_cast<float>(elapsed / 1000000000.0);
+    uniforms_->runTime->set(static_cast<float>(seconds));
   }
 
   // Define Vertices for a Square (the view plane)
-  GLfloat vertices[] = {
+  constexpr GLfloat vertices[] = {
     1.0f,  1.0f,  0.0f, 0.0f,  // Top Right + Tex Coord.
     1.0f,  -1.0f, 1.0f, 0.0f,  // Bottom Right + Tex Coord.
     -1.0f, -1.0f, 1.0f, 1.0f,  // Bottom Left + Tex Coord.
     -1.0f, 1.0f,  0.0f, 1.0f,  // Top Left + Tex Coord.
   };
   // Define Which Vertex Indexes Make the Square
-  GLuint indices[] = {
+  constexpr GLuint indices[] = {
     // Note that we start from 0!
     0, 1, 3,  // First Triangle
     1, 2, 3   // Second Triangle
   };
-
-  // Vertex Array Object stuff for later
-  // openGLContext_.extensions.glGenVertexArrays(1, &VAO);
-  // openGLContext_.extensions.glBindVertexArray(VAO);
 
   // VBO (Vertex Buffer Object) - Bind and Write to Buffer
   juce::OpenGLExtensionFunctions::glBindBuffer(juce::gl::GL_ARRAY_BUFFER, VBO_);
@@ -173,14 +167,12 @@ void SliderBarGL::renderOpenGL()
   juce::OpenGLExtensionFunctions::glEnableVertexAttribArray(1);
 
   // Draw Vertices
-  // glDrawArrays (GL_TRIANGLES, 0, 6); // For just VBO's (Vertex Buffer Objects)
   juce::gl::glDrawElements(juce::gl::GL_TRIANGLES, 6, juce::gl::GL_UNSIGNED_INT,
                            nullptr);  // For EBO's (Element Buffer Objects) (Indices)
 
   // Reset the element buffers so child Components draw correctly
   juce::OpenGLExtensionFunctions::glBindBuffer(juce::gl::GL_ARRAY_BUFFER, 0);
   juce::OpenGLExtensionFunctions::glBindBuffer(juce::gl::GL_ELEMENT_ARRAY_BUFFER, 0);
-  // openGLContext_.extensions.glBindVertexArray(0);
 }
 
 void SliderBarGL::paint(juce::Graphics& g) { ignoreUnused(g); }
@@ -359,7 +351,7 @@ void SliderBarGL::createShaders()
   if (shader_.addShader(vertexShader_, juce::gl::GL_VERTEX_SHADER) &&
       shader_.addShader(fragmentShader_, juce::gl::GL_FRAGMENT_SHADER) && shader_.link())
   {
-    uniforms_ = std::make_unique<Uniforms>(openGLContext_, shader_);
+    uniforms_ = std::make_unique<Uniforms>(shader_);
 
     statusText_ = "GLSL: v" + juce::String(juce::OpenGLShaderProgram::getLanguageVersion(), 2);
   }
