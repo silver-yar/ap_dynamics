@@ -29,14 +29,10 @@ class MyLookAndFeel : public juce::LookAndFeel_V4
 
   void drawLinearSlider(juce::Graphics &, int x, int y, int width, int height, float sliderPos, float minSliderPos,
                         float maxSliderPos, juce::Slider::SliderStyle, juce::Slider &) override;
-  void drawLinearSliderBackground(juce::Graphics &, int x, int y, int width, int height, float sliderPos, float minSliderPos,
-                                  float maxSliderPos, juce::Slider::SliderStyle style, juce::Slider &) override;
   juce::Label *createSliderTextBox(juce::Slider &) override;
   void drawLabel(juce::Graphics &, juce::Label &) override;
 
  private:
-//  juce::ImageConvolutionKernel kernel_{ 16 };
-//  juce::Image shadow_;
   void initializeAssets();
   std::unique_ptr<juce::ImageConvolutionKernel> kernel_;
   std::unique_ptr<juce::Image> shadow_;
@@ -45,7 +41,6 @@ class MyLookAndFeel : public juce::LookAndFeel_V4
 
   int lastSliderPos_ = 0;
   int sliderWidth_   = 0;
-  int labelWidth_ = 0;
 };
 
 class APSlider : public juce::Component, public juce::Timer
@@ -64,6 +59,4 @@ class APSlider : public juce::Component, public juce::Timer
   SliderType sliderType_;
   std::unique_ptr<SliderBarGL> sliderBarGl_;
   std::unique_ptr<MyLookAndFeel> lookAndFeel_;
-
-  juce::Rectangle<int> openGlBounds_;
 };
