@@ -89,7 +89,7 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
   lastSliderPos_ = static_cast<int>(sliderPos);
   sliderWidth_   = width - APConstants::Gui::SLIDER_LABEL_MARGIN + 1;
   // Background
-  g.setColour(APConstants::Colors::DarkGrey);
+  g.setColour(APConstants::Colors::DARK_GREY);
   g.fillRoundedRectangle(static_cast<float>(x), static_cast<float>(y),
                          static_cast<float>(width - APConstants::Gui::SLIDER_LABEL_MARGIN), static_cast<float>(height),
                          APConstants::Gui::CORNER_SIZE);
@@ -130,14 +130,14 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label)
 
     juce::Graphics graphics(*shadow_);
     graphics.setColour(APConstants::Colors::SHADOW_COLOR);
-    graphics.setFont(APConstants::Gui::SYS_FONT.withHeight(20.0f));
+    graphics.setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::LABEL_SHADOW_FONT_HEIGHT));
     graphics.drawText(name, 0, 0, shadow_->getWidth(), shadow_->getHeight(), juce::Justification::centred, false);
     kernel_->applyToImage(*shadow_, *shadow_, shadow_->getBounds());
   }
   g.drawImage(*shadow_, shadowBounds, juce::RectanglePlacement::fillDestination);
 
-  g.setColour(APConstants::Colors::DarkGrey);
-  g.setFont(APConstants::Gui::SYS_FONT.withHeight(16.0f));
+  g.setColour(APConstants::Colors::DARK_GREY);
+  g.setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::LABEL_FONT_HEIGHT));
   g.drawFittedText(label.getText().substring(0, 9), labelBounds, juce::Justification::centredRight, 1);
 }
 void MyLookAndFeel::initializeAssets()

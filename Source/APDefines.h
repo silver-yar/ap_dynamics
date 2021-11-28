@@ -16,8 +16,8 @@ namespace APConstants
 {
   namespace Colors
   {
-    //    extern const juce::Colour DarkGrey;
-    static const juce::Colour DarkGrey          = juce::Colours::darkgrey;
+    //    extern const juce::Colour DARK_GREY;
+    static const juce::Colour DARK_GREY         = juce::Colours::darkgrey;
     static const juce::Colour SHADOW_COLOR      = juce::Colours::black.withAlpha(0.2f);
     static const juce::Colour INNER_GRADIENT_BG = juce::Colour(0xFFFFDC93);
     static const juce::Colour OUTER_GRADIENT_BG = juce::Colour(0xFFFFC446);
@@ -31,6 +31,8 @@ namespace APConstants
     inline constexpr int SLIDER_WIDTH         = 200;
     inline constexpr float FONT_HEIGHT        = 24.0f;
     inline constexpr float SHADOW_FONT_HEIGHT = 28.0f;
+    inline constexpr float LABEL_FONT_HEIGHT = 16.0f;
+    inline constexpr float LABEL_SHADOW_FONT_HEIGHT = 20.0f;
     inline constexpr int SLIDER_LABEL_MARGIN  = 70;
     inline constexpr float CORNER_SIZE        = 10.0f;
     static const juce::Font SYS_FONT =

@@ -27,7 +27,7 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   styleLabel_->setText("style", juce::dontSendNotification);
   styleLabel_->setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::FONT_HEIGHT));
   styleLabel_->setBorderSize(juce::BorderSize<int>(10, 50, 30, 0));
-  styleLabel_->setColour(juce::Label::textColourId, APConstants::Colors::DarkGrey);
+  styleLabel_->setColour(juce::Label::textColourId, APConstants::Colors::DARK_GREY);
   styleLabel_->attachToComponent(&stylePicker_, false);
   addAndMakeVisible(stylePicker_);
 
@@ -160,7 +160,7 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<APSlider>& apS
   label->setJustificationType(juce::Justification::centred);
   label->setText(name.toLowerCase(), juce::dontSendNotification);
   label->setBorderSize(juce::BorderSize<int>(10, 0, 30, 70));
-  label->setColour(juce::Label::textColourId, APConstants::Colors::DarkGrey);
+  label->setColour(juce::Label::textColourId, APConstants::Colors::DARK_GREY);
   label->setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::FONT_HEIGHT));
   label->attachToComponent(apSlider.get(), false);
 
