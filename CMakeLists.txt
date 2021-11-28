@@ -91,7 +91,7 @@ target_compile_definitions(
         JUCE_VST3_CAN_REPLACE_VST2=0
         JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:ap_dynamics,JUCE_PRODUCT_NAME>"
         JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:ap_dynamics,JUCE_VERSION>"
-        )
+)
 
 # If your target needs extra binary assets, you can add them here. The first argument is the name of a new static
 # library target that will include all the binary resources. There is an optional `NAMESPACE` argument that can specify
@@ -102,20 +102,9 @@ target_compile_definitions(
 juce_add_binary_data(
         AudioPluginData
         SOURCES
-        Resources/Antipasto_Med.ttf
         Resources/VarelaRound.ttf
-        Resources/ap_logo_groovees.png
         Resources/blue_noise.png
-        Resources/cantaloupe.png
-        Resources/label.png
-        Resources/logo.png
-        Resources/logo2.png
-        Resources/logo3.png
-        Resources/logo4.png
         Resources/logo_clean.png
-        Resources/organic.png
-        Resources/refl.png
-        Resources/settings.svg
         Resources/shadow.png)
 
 # `target_link_libraries` links libraries and JUCE modules to other libraries or executables. Here, we're linking our
