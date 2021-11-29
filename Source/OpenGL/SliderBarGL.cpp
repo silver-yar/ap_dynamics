@@ -16,7 +16,7 @@
 #include <string>
 #include <utility>
 
-#include "../APDefines.h"
+#include "../../Helpers/APDefines.h"
 
 //==============================================================================
 SliderBarGL::SliderBarGL(std::string filenameNoPath)

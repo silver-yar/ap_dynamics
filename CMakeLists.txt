@@ -71,7 +71,7 @@ target_sources(
         PRIVATE DSP/APCompressor.cpp
         DSP/APOverdrive.cpp
         DSP/APTubeDistortion.cpp
-        Source/APDefines.h
+        Helpers/APDefines.h
         Source/APSlider.cpp
         Source/MixerButton.cpp
         Source/OpenGL/SliderBarGL.cpp
@@ -91,7 +91,7 @@ target_compile_definitions(
         JUCE_VST3_CAN_REPLACE_VST2=0
         JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:ap_dynamics,JUCE_PRODUCT_NAME>"
         JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:ap_dynamics,JUCE_VERSION>"
-)
+        )
 
 # If your target needs extra binary assets, you can add them here. The first argument is the name of a new static
 # library target that will include all the binary resources. There is an optional `NAMESPACE` argument that can specify

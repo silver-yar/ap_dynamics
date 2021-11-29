@@ -8,7 +8,7 @@
 
 #include "PluginProcessor.h"
 
-#include "APDefines.h"
+#include "../Helpers/APDefines.h"
 #include "PluginEditor.h"
 
 //==============================================================================

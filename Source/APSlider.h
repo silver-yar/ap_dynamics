@@ -12,8 +12,8 @@
 
 #include <JuceHeader.h>
 
+#include "../Helpers/APDefines.h"
 #include "./OpenGL/SliderBarGL.h"
-#include "APDefines.h"
 #include "PluginProcessor.h"
 
 enum SliderType

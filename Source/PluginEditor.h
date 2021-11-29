@@ -10,7 +10,7 @@
 
 #include <JuceHeader.h>
 
-#include "APDefines.h"
+#include "../Helpers/APDefines.h"
 #include "APSlider.h"
 #include "MixerButton.h"
 #include "PluginProcessor.h"

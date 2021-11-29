@@ -10,7 +10,7 @@
 
 #include "APSlider.h"
 
-#include "APDefines.h"
+#include "../Helpers/APDefines.h"
 
 APSlider::APSlider(Ap_dynamicsAudioProcessor &p, SliderType sliderType) : audioProcessor(p), sliderType_(sliderType)
 {
