@@ -14,11 +14,12 @@
 #include <juce_core/juce_core.h>
 
 
+
 APCompressor::APCompressor() = default;
 
 APCompressor::~APCompressor() = default;
 
-void APCompressor::process(const float* audioIn, float* audioOut, int numSamplesToRender)
+void APCompressor::process(const float* audioIn, float* audioOut, const int numSamplesToRender)
 {
   for (int i = 0; i < numSamplesToRender; ++i)
   {
@@ -26,20 +27,20 @@ void APCompressor::process(const float* audioIn, float* audioOut, int numSamples
   }
 }
 
-std::pair<float, float> APCompressor::_applyRMSCompression(float sample, float sampleRate, float threshold, float ratio,
-                                  float attack, float release, float kneeWidth,
-                                  float prevGainSmoothed)
+std::pair<float, float> APCompressor::_applyRMSCompression(const float sample, const float sampleRate, const float threshold,
+                                                           const float ratio, const float attack, const float release,
+                                                           const float kneeWidth, const float prevGainSmoothed)
 {
   const auto alphaA = static_cast<float>(exp(-log(9) / (sampleRate * attack)));
   const auto alphaR = static_cast<float>(exp(-log(9) / (sampleRate * release)));
 
-  auto xUni = abs(sample);
-  auto xDb  = juce::Decibels::gainToDecibels(xUni, minusInfinityDb);
-  if (xDb < minusInfinityDb)
-    xDb = minusInfinityDb;
+  const auto xUni = abs(sample);
+  auto xDb        = juce::Decibels::gainToDecibels(xUni, -96.0f);
+  if (xDb < -96.0f)
+    xDb = -96.0f;
 
-  float gainSmooth = 0;
-  float gainSc     = 0;
+  auto gainSmooth = 0.0f;
+  auto gainSc     = 0.0f;
 
   // Static Characteristics
   if (xDb > (threshold + kneeWidth / 2))
@@ -49,7 +50,7 @@ std::pair<float, float> APCompressor::_applyRMSCompression(float sample, float s
   else
     gainSc = xDb;
 
-  const float gainChangeDb = gainSc - xDb;
+  const auto gainChangeDb = gainSc - xDb;
 
   // Smooth gain change (RMS Approximation)
   if (gainChangeDb < prevGainSmoothed)
@@ -65,15 +66,15 @@ std::pair<float, float> APCompressor::_applyRMSCompression(float sample, float s
 
   // Convert back to linear amplitude scalar
   const auto linA = powf(10, gainSmooth / 20);
-  float xOut      = linA * sample;
+  const auto xOut = linA * sample;
 
-  return {xOut, gainSmooth};
+  return { xOut, gainSmooth };
 }
 
-float APCompressor::applyRMSCompression(float sample)
+float APCompressor::applyRMSCompression(const float sample)
 {
-  auto [result, gainSmoothed] = _applyRMSCompression(sample, sampleRate_, threshold_, ratio_,
-                                                     attack_, release_, kneeWidth_, prevGainSmooth_);
+  const auto [result, gainSmoothed] =
+      _applyRMSCompression(sample, sampleRate_, threshold_, ratio_, attack_, release_, kneeWidth_, prevGainSmooth_);
   prevGainSmooth_ = gainSmoothed;
   return result;
 }

@@ -14,20 +14,18 @@
 class APCompressor
 {
  public:
-  static constexpr float minusInfinityDb = -96.0f;
-
   APCompressor();
   ~APCompressor();
 
-  void setSampleRate(float sampleRate) { sampleRate_ = sampleRate; }
-  void updateParameters(float threshold, float ratio)
+  void setSampleRate(const float sampleRate) { sampleRate_ = sampleRate; }
+  void updateParameters(const float threshold, const float ratio)
   {
     threshold_ = threshold;
     ratio_     = ratio;
   }
   void reset()
   {
-    prevGainSmooth_ = 0;
+    prevGainSmooth_ = 0.0f;
   }
 
   void process(const float* audioIn, float* audioOut, int numSamplesToRender);
