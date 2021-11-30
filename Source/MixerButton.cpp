@@ -26,15 +26,18 @@ MixerButton::~MixerButton() = default;
 
 void MixerButton::paint(juce::Graphics& g)
 {
-  constexpr auto cornerRadius = 10;
-  constexpr auto sliderMargin = 70;
+  // TEMPORARY
+  g.setColour(juce::Colours::limegreen);
+
+  constexpr auto cornerRadius  = 10;
+  constexpr auto sliderMargin  = 70;
   constexpr auto lineThickness = 1;
-  constexpr auto maxNumLines = 1;
-  const auto halfWidth      = static_cast<float>(getWidth()) * 0.5f;
-  const auto halfHeight     = static_cast<float>(getHeight()) * 0.5f;
-  const auto thirdHeight    = static_cast<float>(getHeight()) * 0.333333f;
-  const auto sliderWidth    = static_cast<float>(getWidth()) - sliderMargin;
-  auto bounds                = juce::Rectangle<int>(60, 0, static_cast<int>(sliderWidth), getHeight());
+  constexpr auto maxNumLines   = 1;
+  const auto halfWidth         = static_cast<float>(getWidth()) * 0.5f;
+  const auto halfHeight        = static_cast<float>(getHeight()) * 0.5f;
+  const auto thirdHeight       = static_cast<float>(getHeight()) * 0.333333f;
+  const auto sliderWidth       = static_cast<float>(getWidth()) - sliderMargin;
+  auto bounds                  = juce::Rectangle<int>(60, 0, static_cast<int>(sliderWidth), getHeight());
   // Background
   g.setGradientFill(juce::ColourGradient(juce::Colours::grey, halfWidth, halfHeight, juce::Colours::darkgrey, 0, 0, true));
   g.fillRoundedRectangle(bounds.toFloat(), cornerRadius);
@@ -42,26 +45,28 @@ void MixerButton::paint(juce::Graphics& g)
   // Labels
   g.setColour(juce::Colours::snow);
   g.setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::FONT_HEIGHT));
-  g.drawFittedText("dirtier", bounds.removeFromTop(static_cast<int>(thirdHeight)), juce::Justification::centred, maxNumLines);
+  g.drawFittedText("dirtier", bounds.removeFromTop(static_cast<int>(thirdHeight)), juce::Justification::centred,
+                   maxNumLines);
 
-  g.drawLine(sliderMargin, thirdHeight, static_cast<float>(getWidth() - 20), static_cast<float>(getHeight()) / 3.0f, lineThickness);
+  g.drawLine(sliderMargin, thirdHeight, static_cast<float>(getWidth() - 20), static_cast<float>(getHeight()) / 3.0f,
+             lineThickness);
   g.drawFittedText("dirty", bounds.removeFromTop(static_cast<int>(thirdHeight)), juce::Justification::centred, maxNumLines);
   g.drawLine(sliderMargin, thirdHeight * 2, static_cast<float>(getWidth() - 20), thirdHeight * 2, lineThickness);
   g.drawFittedText("clean", bounds, juce::Justification::centred, maxNumLines);
 
   // Selector Bar
-  constexpr auto alphaOne = 0.3f;
-  constexpr auto alphaTwo = 0.7f;
+  constexpr auto alphaOne         = 0.3f;
+  constexpr auto alphaTwo         = 0.7f;
   constexpr auto halfHandleHeight = kHandleHeight / 2;
-  const auto paramRange     = audioProcessor_.apvts.getParameterRange("MIX");
-  const auto param          = audioProcessor_.apvts.getParameter("MIX");
-  const auto mappedParamVal = juce::jmap(param->getValue(), paramRange.start, paramRange.end,
-                                         static_cast<float>(getHeight()) - halfHandleHeight, halfHandleHeight);
-  const auto barBounds      = juce::Rectangle<float>(sliderWidth, kHandleHeight)
+  const auto paramRange           = audioProcessor_.apvts.getParameterRange("MIX");
+  const auto param                = audioProcessor_.apvts.getParameter("MIX");
+  const auto mappedParamVal       = juce::jmap(param->getValue(), paramRange.start, paramRange.end,
+                                               static_cast<float>(getHeight()) - halfHandleHeight, halfHandleHeight);
+  const auto barBounds            = juce::Rectangle<float>(sliderWidth, kHandleHeight)
                              .withCentre(bounds.getCentre().withY(static_cast<int>(mappedParamVal)).toFloat());
-  g.setGradientFill(juce::ColourGradient(juce::Colours::grey.withAlpha(alphaOne), barBounds.getCentreX(), barBounds.getCentreY(),
-                                         juce::Colours::white.withAlpha(alphaTwo), barBounds.getX() - (sliderWidth * 0.3f),
-                                         barBounds.getY() + 2, true));
+  g.setGradientFill(juce::ColourGradient(juce::Colours::grey.withAlpha(alphaOne), barBounds.getCentreX(),
+                                         barBounds.getCentreY(), juce::Colours::white.withAlpha(alphaTwo),
+                                         barBounds.getX() - (sliderWidth * 0.3f), barBounds.getY() + 2, true));
   g.fillRoundedRectangle(barBounds, cornerRadius);
   g.setColour(juce::Colours::white.withAlpha(alphaOne));
   g.drawRoundedRectangle(barBounds, cornerRadius, lineThickness);
@@ -71,8 +76,7 @@ void MixerButton::resized() { }
 
 void MixerButton::mouseDown(const juce::MouseEvent& event)
 {
-  const auto bounds = getLocalBounds();
-
+  auto bounds = juce::Rectangle<int>(60, 0, getWidth() - 70, getHeight());
   if (bounds.contains(event.getMouseDownPosition()))
   {
     mapMouseToValue(event.getMouseDownPosition());
@@ -81,8 +85,7 @@ void MixerButton::mouseDown(const juce::MouseEvent& event)
 
 void MixerButton::mouseDrag(const juce::MouseEvent& event)
 {
-  const auto bounds = getLocalBounds();
-
+  auto bounds = juce::Rectangle<int>(60, 0, getWidth() - 70, getHeight());
   if (bounds.contains(event.getMouseDownPosition()))
   {
     mapMouseToValue(event.getPosition());
@@ -91,8 +94,7 @@ void MixerButton::mouseDrag(const juce::MouseEvent& event)
 
 void MixerButton::mouseUp(const juce::MouseEvent& event)
 {
-  const auto bounds = getLocalBounds();
-
+  auto bounds = juce::Rectangle<int>(60, 0, getWidth() - 70, getHeight());
   if (bounds.contains(event.getMouseDownPosition()))
   {
     mapMouseToValue(event.getPosition());
