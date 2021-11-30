@@ -192,7 +192,7 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     // DSP Processing
     compressor_->process(channelData, channelData, buffer.getNumSamples());
     overdrive_->process(channelData, channelData, buffer.getNumSamples());
-    tubeDistortion_->processDAFX(channelData, bufferMaxVal, 1.0f, -0.2f, 4.0f, channelData, buffer.getNumSamples());
+    tubeDistortion_->process(channelData, bufferMaxVal, 1.0f, -0.2f, 4.0f, channelData, buffer.getNumSamples());
 
     // Makeup
     for (int sample = 0; sample < numSamples; ++sample)

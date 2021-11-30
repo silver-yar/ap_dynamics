@@ -10,51 +10,17 @@
 
 #include "APTubeDistortion.h"
 
-#include <math.h>
-#include <stdlib.h>
-
+#include <cmath>
 #include <vector>
 
 APTubeDistortion::APTubeDistortion() = default;
 
 APTubeDistortion::~APTubeDistortion() = default;
 
-void APTubeDistortion::process(const float* audioIn, float distGain, float Q, float distChar, float* audioOut,
-                               int numSamplesToRender)
+void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, const float distGain, const float Q,
+                               const float distChar, float* audioOut, const int numSamplesToRender) const
 {
-  for (auto i = 0; i < numSamplesToRender; ++i)
-  {
-    const auto& in = audioIn[i];
-    double z       = 0.0;
-    double out     = 0.0;
-    auto q         = in * distGain / abs(in);
-
-    if (Q == 0)
-    {
-      z = q / (1.0 - exp(-distChar * q));
-      if (q == Q)
-      {
-        z = 1.0 / distChar;
-      }
-    }
-    else
-    {
-      z = (q - Q) / (1.0 - exp(-distChar * (q - Q))) + Q / (1.0 - exp(distChar * Q));
-      if (q == Q)
-      {
-        z = 1 / distChar + Q / (1.0 - exp(distChar * Q));
-      }
-    }
-    out = (mix_ * z * abs(in)) / (abs(z) + (1.0 - mix_) * in);
-    out *= abs(in) / abs(out);
-
-    audioOut[i] = in != 0 ? static_cast<float>(out) : static_cast<float>(in);
-  }
-}
-void APTubeDistortion::processDAFX(const float* audioIn, const float maxBufferVal, float distGain, float Q, float distChar,
-                                   float* audioOut, int numSamplesToRender)
-{
-  double maxZ = 0.0;
+  auto maxZ = 0.0;
   std::vector<double> zArray;
 
   // Calculate z
@@ -62,7 +28,7 @@ void APTubeDistortion::processDAFX(const float* audioIn, const float maxBufferVa
   {
     const auto& in = audioIn[i];
     double z       = 0.0;
-    auto q         = in * distGain / maxBufferVal;  // Normalization
+    const auto q   = in * distGain / maxBufferVal;  // Normalization
 
     if (Q == 0)
     {
@@ -81,7 +47,7 @@ void APTubeDistortion::processDAFX(const float* audioIn, const float maxBufferVa
       }
     }
 
-    zArray.push_back(z);
+    zArray.emplace_back(z);
     if (maxZ < z)
       maxZ = z;
   }
@@ -90,9 +56,12 @@ void APTubeDistortion::processDAFX(const float* audioIn, const float maxBufferVa
   for (auto i = 0; i < numSamplesToRender; ++i)
   {
     const auto& in = audioIn[i];
-    double out     = 0.0;
-    out            = mix_ * zArray[i] * (maxBufferVal / maxZ) + (1.0f - mix_) * in;
-    out *= maxBufferVal / maxZ;
+    const auto out = [&]()
+    {
+      auto result        = mix_ * zArray[static_cast<unsigned long>(i)] * (maxBufferVal / maxZ) + (1.0f - mix_) * in;
+      result *= maxBufferVal / maxZ;
+      return result;
+    }();
 
     audioOut[i] = static_cast<float>(out);
   }
