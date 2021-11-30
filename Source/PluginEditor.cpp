@@ -32,10 +32,10 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   addAndMakeVisible(stylePicker_);
 
   // Shadow Setup
-  kernel_->createGaussianBlur(5.6f);
+  kernel_->createGaussianBlur(APConstants::Gui::BLUR_RADIUS_LOGO);
   kernel_->applyToImage(*textShadow_, *textShadow_, textShadow_->getBounds());
   kernel_->clear();
-  kernel_->createGaussianBlur(3.2f);
+  kernel_->createGaussianBlur(APConstants::Gui::BLUR_RADIUS_LABEL);
   setupLabelShadow(*thresholdShadow_, thresholdLabel_->getText());
   setupLabelShadow(*ratioShadow_, ratioLabel_->getText());
   setupLabelShadow(*styleShadow_, styleLabel_->getText());

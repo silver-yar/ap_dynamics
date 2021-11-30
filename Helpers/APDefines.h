@@ -26,16 +26,18 @@ namespace APConstants
 
   namespace Gui
   {
-    inline constexpr int M_HEIGHT             = 500;
-    inline constexpr int M_WIDTH              = 700;
-    inline constexpr int SLIDER_Y             = 290;
-    inline constexpr int SLIDER_WIDTH         = 200;
-    inline constexpr float FONT_HEIGHT        = 24.0f;
-    inline constexpr float SHADOW_FONT_HEIGHT = 28.0f;
-    inline constexpr float LABEL_FONT_HEIGHT = 16.0f;
+    inline constexpr int M_HEIGHT                   = 500;
+    inline constexpr int M_WIDTH                    = 700;
+    inline constexpr int SLIDER_Y                   = 290;
+    inline constexpr int SLIDER_WIDTH               = 200;
+    inline constexpr float FONT_HEIGHT              = 24.0f;
+    inline constexpr float SHADOW_FONT_HEIGHT       = 28.0f;
+    inline constexpr float LABEL_FONT_HEIGHT        = 16.0f;
     inline constexpr float LABEL_SHADOW_FONT_HEIGHT = 20.0f;
-    inline constexpr int SLIDER_LABEL_MARGIN  = 70;
-    inline constexpr float CORNER_SIZE        = 10.0f;
+    inline constexpr int SLIDER_LABEL_MARGIN        = 70;
+    inline constexpr float CORNER_SIZE              = 10.0f;
+    inline constexpr float BLUR_RADIUS_LABEL        = 3.2f;
+    inline constexpr float BLUR_RADIUS_LOGO         = 5.6f;
     static const juce::Font SYS_FONT =
         juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf, BinaryData::VarelaRound_ttfSize));
   }  // namespace Gui
