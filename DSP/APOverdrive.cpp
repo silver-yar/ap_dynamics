@@ -21,10 +21,9 @@ void APOverdrive::process(const float* audioIn, float* audioOut, const int numSa
   for (auto i = 0; i < numSamplesToRender; ++i)
   {
     const auto& sample = audioIn[i];
-    //    auto out           = 0.0f;
-    const auto out = [&]()
+    const auto out     = [&]()
     {
-      auto result = 0.0f;
+      float result = 0.0f;
       if (mix_ >= 0.0f && mix_ <= 0.3f)
       {  // No Clipping
         result = sample;
@@ -63,20 +62,23 @@ float APOverdrive::softClipping(const float sample)
 float APOverdrive::hardClipping(const float sample)
 {
   const auto xUni = abs(sample);
-  auto out        = 0.0f;
-
-  if (xUni <= 1.0f / 3.0f)
+  const auto out  = [&]()
   {
-    out = 2.0f * sample;
-  }
-  else if (xUni > 2.0f / 3.0f)
-  {
-    out = sin(sample);
-  }
-  else
-  {
-    out = sin(sample) * (3.0f - powf(2.0f - 3.0f * xUni, 2.0f)) * 0.33333f;
-  }
+    float result;
+    if (xUni <= 1.0f / 3.0f)
+    {
+      result = 2.0f * sample;
+    }
+    else if (xUni > 2.0f / 3.0f)
+    {
+      result = sin(sample);
+    }
+    else
+    {
+      result = sin(sample) * (3.0f - powf(2.0f - 3.0f * xUni, 2.0f)) * 0.33333f;
+    }
+    return result;
+  }();
 
   return out;
 }
