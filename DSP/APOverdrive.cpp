@@ -16,12 +16,12 @@ APOverdrive::APOverdrive() = default;
 
 APOverdrive::~APOverdrive() = default;
 
-void APOverdrive::process(const float* audioIn, float* audioOut, int numSamplesToRender)
+void APOverdrive::process(const float* audioIn, float* audioOut, const int numSamplesToRender) const
 {
   for (auto i = 0; i < numSamplesToRender; ++i)
   {
     const auto& sample = audioIn[i];
-    float out          = 0;
+    auto out           = 0.0f;
 
     if (mix_ >= 0.0f && mix_ <= 0.3f)
     {  // No Clipping
@@ -51,15 +51,15 @@ void APOverdrive::process(const float* audioIn, float* audioOut, int numSamplesT
   }
 }
 
-float APOverdrive::softClipping(float sample)
+float APOverdrive::softClipping(const float sample)
 {
   const auto alpha = 5.0f;
   return (2.0f / juce::float_Pi) * atan(alpha * sample);
 }
-float APOverdrive::hardClipping(float sample)
+float APOverdrive::hardClipping(const float sample)
 {
-  auto xUni = abs(sample);
-  float out = 0.0f;
+  const auto xUni = abs(sample);
+  auto out        = 0.0f;
 
   if (xUni <= 1.0f / 3.0f)
   {
