@@ -104,21 +104,10 @@ juce::Label *MyLookAndFeel::createSliderTextBox(Slider &slider)
 
 void MyLookAndFeel::drawLabel(Graphics &g, Label &label)
 {
-  Rectangle<int> labelBounds;
+  const auto labelBounds = Rectangle<int>(sliderWidth_, lastSliderPos_ > 20 ? lastSliderPos_ - 20 : lastSliderPos_,
+                                              APConstants::Gui::SLIDER_LABEL_MARGIN, 20);
 
-  switch (sliderType_)
-  {
-    case Normal:
-      labelBounds = Rectangle<int>(sliderWidth_, lastSliderPos_, APConstants::Gui::SLIDER_LABEL_MARGIN, 20);
-      break;
-    case Invert:
-      labelBounds = Rectangle<int>(sliderWidth_, lastSliderPos_ > 20 ? lastSliderPos_ - 20 : lastSliderPos_,
-                                   APConstants::Gui::SLIDER_LABEL_MARGIN, 20);
-      break;
-    default: break;
-  }
-
-  const auto name   = label.getText();
+  const auto name         = label.getText();
   const auto shadowBounds = labelBounds.withX(labelBounds.getX() + 11).withY(labelBounds.getY() - 10).toFloat();
 
   kernel_->createGaussianBlur(3.2f);
