@@ -25,7 +25,7 @@ enum SliderType
 class MyLookAndFeel : public juce::LookAndFeel_V4
 {
  public:
-  explicit MyLookAndFeel(SliderType);
+  MyLookAndFeel();
 
   void drawLinearSlider(juce::Graphics &, int x, int y, int width, int height, float sliderPos, float minSliderPos,
                         float maxSliderPos, juce::Slider::SliderStyle, juce::Slider &) override;
@@ -36,8 +36,6 @@ class MyLookAndFeel : public juce::LookAndFeel_V4
   void initializeAssets();
   std::unique_ptr<juce::ImageConvolutionKernel> kernel_;
   std::unique_ptr<juce::Image> shadow_;
-
-  SliderType sliderType_;
 
   int lastSliderPos_ = 0;
   int sliderWidth_   = 0;

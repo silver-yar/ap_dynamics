@@ -14,7 +14,7 @@
 
 APSlider::APSlider(Ap_dynamicsAudioProcessor &p, SliderType sliderType) : audioProcessor(p), sliderType_(sliderType)
 {
-  lookAndFeel_ = std::make_unique<MyLookAndFeel>(sliderType_);
+  lookAndFeel_ = std::make_unique<MyLookAndFeel>();
 
   switch (sliderType)
   {
@@ -74,7 +74,7 @@ void APSlider::timerCallback()
   resized();
 }
 
-MyLookAndFeel::MyLookAndFeel(SliderType sliderType) : sliderType_(sliderType) { initializeAssets(); }
+MyLookAndFeel::MyLookAndFeel() { initializeAssets(); }
 
 void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width, int height, float sliderPos,
                                      float minSliderPos, float maxSliderPos, const juce::Slider::SliderStyle style,
@@ -110,7 +110,7 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label)
   const auto name         = label.getText();
   const auto shadowBounds = labelBounds.withX(labelBounds.getX() + 11).withY(labelBounds.getY() - 10).toFloat();
 
-  kernel_->createGaussianBlur(3.2f);
+  kernel_->createGaussianBlur(APConstants::Gui::BLUR_RADIUS_LABEL);
 
   if (shadow_ == nullptr)
   {
