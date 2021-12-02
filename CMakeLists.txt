@@ -27,7 +27,7 @@ juce_add_plugin(
         ap_dynamics
         # VERSION ...                               # Set this if the plugin version is different to the project version
         ICON_BIG "Resources/apdicon.png"
-        ICON_SMALL "Resources/apdicon.png"
+        MICROPHONE_PERMISSION_ENABLED FALSE
         "Audio Pirate" # Specify the name of the plugin's author
         IS_SYNTH
         FALSE # Is this a synth or an effect?
@@ -105,7 +105,7 @@ juce_add_binary_data(
         Resources/blue_noise.png
         Resources/logo_clean.png
         Resources/shadow.png
-        Resources/apdicon.png)
+)
 
 # `target_link_libraries` links libraries and JUCE modules to other libraries or executables. Here, we're linking our
 # executable target to the `juce::juce_audio_utils` module. Inter-module dependencies are resolved automatically, so
