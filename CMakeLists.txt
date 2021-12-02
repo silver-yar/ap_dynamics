@@ -26,9 +26,8 @@ add_subdirectory(dependencies)
 juce_add_plugin(
         ap_dynamics
         # VERSION ...                               # Set this if the plugin version is different to the project version
-        # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for
-        # the Standalone ICON_SMALL ...
-        COMPANY_NAME
+        ICON_BIG "Resources/apdicon.png"
+        ICON_SMALL "Resources/apdicon.png"
         "Audio Pirate" # Specify the name of the plugin's author
         IS_SYNTH
         FALSE # Is this a synth or an effect?
@@ -91,7 +90,7 @@ target_compile_definitions(
         JUCE_VST3_CAN_REPLACE_VST2=0
         JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:ap_dynamics,JUCE_PRODUCT_NAME>"
         JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:ap_dynamics,JUCE_VERSION>"
-        )
+)
 
 # If your target needs extra binary assets, you can add them here. The first argument is the name of a new static
 # library target that will include all the binary resources. There is an optional `NAMESPACE` argument that can specify
@@ -105,7 +104,8 @@ juce_add_binary_data(
         Resources/VarelaRound.ttf
         Resources/blue_noise.png
         Resources/logo_clean.png
-        Resources/shadow.png)
+        Resources/shadow.png
+        Resources/apdicon.png)
 
 # `target_link_libraries` links libraries and JUCE modules to other libraries or executables. Here, we're linking our
 # executable target to the `juce::juce_audio_utils` module. Inter-module dependencies are resolved automatically, so
