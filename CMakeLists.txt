@@ -28,7 +28,7 @@ juce_add_plugin(
         # VERSION ...                               # Set this if the plugin version is different to the project version
         ICON_BIG "Resources/apdicon.png"
         MICROPHONE_PERMISSION_ENABLED FALSE
-        "Audio Pirate" # Specify the name of the plugin's author
+        COMPANY_NAME "Audio Pirate" # Specify the name of the plugin's author
         IS_SYNTH
         FALSE # Is this a synth or an effect?
         NEEDS_MIDI_INPUT
@@ -52,7 +52,7 @@ juce_add_plugin(
         VST3
         Standalone # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
         PRODUCT_NAME
-        "APDynamics") # The name of the final executable, which can differ from the target name
+        "AP Dynamics") # The name of the final executable, which can differ from the target name
 
 # `juce_generate_juce_header` will create a JuceHeader.h for a given target, which will be generated into your build
 # tree. This should be included with `#include <JuceHeader.h>`. The include path for this header will be automatically
