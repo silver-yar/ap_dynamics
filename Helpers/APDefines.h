@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "BinaryData.h"
 #include <juce_core/juce_core.h>
 #include <juce_graphics/juce_graphics.h>
 
@@ -38,7 +39,7 @@ namespace APConstants
     inline constexpr float CORNER_SIZE              = 10.0f;
     inline constexpr float BLUR_RADIUS_LABEL        = 3.2f;
     inline constexpr float BLUR_RADIUS_LOGO         = 5.6f;
-    static const juce::Font SYS_FONT =
+    const juce::Font SYS_FONT =
         juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf, BinaryData::VarelaRound_ttfSize));
   }  // namespace Gui
 

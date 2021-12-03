@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.15)
 #SET(MACOSX_DEPLOYMENT_TARGET ${DARWIN_MAJOR_SDK_VERSION}.${DARWIN_MINOR_SDK_VERSION})
 #SET(CMAKE_CXX_FLAGS "--sysroot ${CMAKE_OSX_SYSROOT} ${CMAKE_CXX_FLAGS}")
 #MESSAGE("Setting MACOSX_DEPLOYMENT_TARGET to '${MACOSX_DEPLOYMENT_TARGET}'.")
-
+set(CMAKE_OSX_ARCHITECTURES x86_64 arm64)
 project(ap_dynamics VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -64,7 +64,9 @@ juce_generate_juce_header(ap_dynamics)
 # `target_sources` adds source files to a target. We pass the target that needs the sources as the first argument, then
 # a visibility parameter for the sources which should normally be PRIVATE. Finally, we supply a list of source files
 # that will be built into the target. This is a standard CMake command.
-
+target_include_directories(ap_dynamics PRIVATE
+        Helpers
+        DSP)
 target_sources(
         ap_dynamics
         PRIVATE DSP/APCompressor.cpp

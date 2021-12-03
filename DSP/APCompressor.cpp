@@ -12,6 +12,7 @@
 
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_core/juce_core.h>
+#include "APDefines.h"
 
 
 
@@ -35,9 +36,9 @@ std::pair<float, float> APCompressor::_applyRMSCompression(const float sample, c
   const auto alphaR = static_cast<float>(exp(-log(9) / (sampleRate * release)));
 
   const auto xUni = abs(sample);
-  auto xDb        = juce::Decibels::gainToDecibels(xUni, -96.0f);
-  if (xDb < -96.0f)
-    xDb = -96.0f;
+  auto xDb        = juce::Decibels::gainToDecibels(xUni, APConstants::Math::MINUS_INF_DB);
+  if (xDb < APConstants::Math::MINUS_INF_DB)
+    xDb = APConstants::Math::MINUS_INF_DB;
 
   auto gainSmooth = 0.0f;
   auto gainSc     = 0.0f;
