@@ -98,8 +98,10 @@ void Ap_dynamicsAudioProcessor::changeProgramName(int index, const juce::String&
 //==============================================================================
 void Ap_dynamicsAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-  // Unused Parameters
-  ignoreUnused(samplesPerBlock);
+  if (sampleRate < 0 || samplesPerBlock < 0)
+  {
+    sampleRate = 44100;
+  }
 
   compressor_->setSampleRate(static_cast<float>(sampleRate));
   update();
@@ -231,7 +233,7 @@ void Ap_dynamicsAudioProcessor::setStateInformation(const void* data, int sizeIn
 void Ap_dynamicsAudioProcessor::update()
 {
   mustUpdateProcessing_ = false;
-  const auto mix = apvts.getRawParameterValue("MIX")->load();
+  const auto mix        = apvts.getRawParameterValue("MIX")->load();
 
   compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(), apvts.getRawParameterValue("RAT")->load());
   overdrive_->updateParameters(mix);
