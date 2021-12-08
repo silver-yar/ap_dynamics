@@ -39,7 +39,7 @@ namespace APConstants
     inline constexpr float CORNER_SIZE              = 10.0f;
     inline constexpr float BLUR_RADIUS_LABEL        = 3.2f;
     inline constexpr float BLUR_RADIUS_LOGO         = 5.6f;
-    const juce::Font SYS_FONT =
+    inline const juce::Font SYS_FONT =
         juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::VarelaRound_ttf, BinaryData::VarelaRound_ttfSize));
   }  // namespace Gui
 
@@ -48,3 +48,47 @@ namespace APConstants
     inline constexpr float MINUS_INF_DB = -96.0f;
   }
 }  // namespace APConstants
+
+namespace APParameters
+{
+  inline constexpr auto THRESHOLD_ID = "THR";
+  inline constexpr auto THRESHOLD_NAME = "Threshold";
+  inline constexpr auto THRESHOLD_SUFFIX = "dBFS";
+  inline constexpr auto THRESHOLD_START = -96.0f;
+  inline constexpr auto THRESHOLD_END = 0.0f;
+  inline constexpr auto THRESHOLD_INTERVAL = 0.1f;
+  inline constexpr auto THRESHOLD_DEFAULT = 0.0f;
+
+  inline constexpr auto RATIO_ID = "RAT";
+  inline constexpr auto RATIO_NAME = "Ratio";
+  inline constexpr auto RATIO_SUFFIX = "";
+  inline constexpr auto RATIO_START = 1.0f;
+  inline constexpr auto RATIO_END = 100.0f;
+  inline constexpr auto RATIO_INTERVAL = 0.1f;
+  inline constexpr auto RATIO_SKEW = 0.3f;
+  inline constexpr auto RATIO_DEFAULT = 1.0f;
+  
+  inline constexpr auto MIX_ID = "MIX";
+  inline constexpr auto MIX_NAME = "Global Mix";
+  inline constexpr auto MIX_SUFFIX = "%";
+  inline constexpr auto MIX_START = 0.0f;
+  inline constexpr auto MIX_END = 1.0f;
+  inline constexpr auto MIX_INTERVAL = 0.01f;
+  inline constexpr auto MIX_DEFAULT = 1.0f;
+  
+  inline constexpr auto DISTQ_ID = "DSQ";
+  inline constexpr auto DISTQ_NAME = "Distortion Q";
+  inline constexpr auto DISTQ_SUFFIX = "";
+  inline constexpr auto DISTQ_START = -1.0f;
+  inline constexpr auto DISTQ_END = 1.0f;
+  inline constexpr auto DISTQ_INTERVAL = 0.1f;
+  inline constexpr auto DISTQ_DEFAULT = 0.0f;
+
+  inline constexpr auto MAKEUP_ID = "MUP";
+  inline constexpr auto MAKEUP_NAME = "Makeup";
+  inline constexpr auto MAKEUP_SUFFIX = "dB";
+  inline constexpr auto MAKEUP_START = -30.0f;
+  inline constexpr auto MAKEUP_END = 30.0f;
+  inline constexpr auto MAKEUP_INTERVAL = 0.1f;
+  inline constexpr auto MAKEUP_DEFAULT = 0.0f;
+} // namespace APParameters
