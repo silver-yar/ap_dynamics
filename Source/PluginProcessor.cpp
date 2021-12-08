@@ -33,7 +33,7 @@ Ap_dynamicsAudioProcessor::Ap_dynamicsAudioProcessor()
   apvts.state.addListener(this);
 }
 
-Ap_dynamicsAudioProcessor::~Ap_dynamicsAudioProcessor() { }
+Ap_dynamicsAudioProcessor::~Ap_dynamicsAudioProcessor() = default;
 
 //==============================================================================
 const juce::String Ap_dynamicsAudioProcessor::getName() const { return JucePlugin_Name; }
@@ -262,23 +262,38 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
   const auto valueToTextFunction = [](float val, int len) { return juce::String(val, len); };
   const auto textToValueFunction = [](const juce::String& text) { return text.getFloatValue(); };
 
-  // **Threshold**
+  // Threshold
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
-      "THR", "Threshold", juce::NormalisableRange<float>(-96.0f, 0.0f, 0.1f), 0.0f, "dBFS",
-      juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
-  // **Ratio**
+      APParameters::THRESHOLD_ID, APParameters::THRESHOLD_NAME,
+      juce::NormalisableRange<float>(APParameters::THRESHOLD_START, APParameters::THRESHOLD_END,
+                                     APParameters::THRESHOLD_INTERVAL),
+      APParameters::THRESHOLD_DEFAULT, APParameters::THRESHOLD_SUFFIX, juce::AudioProcessorParameter::genericParameter,
+      valueToTextFunction, textToValueFunction));
+  // Ratio
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
-      "RAT", "Ratio", juce::NormalisableRange<float>(1.0f, 100.0f, 0.1f, 0.3f), 1.0f, "",
-      juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
+      APParameters::RATIO_ID, APParameters::RATIO_NAME,
+      juce::NormalisableRange<float>(APParameters::RATIO_START, APParameters::RATIO_END, APParameters::RATIO_INTERVAL,
+                                     APParameters::RATIO_SKEW),
+      APParameters::RATIO_DEFAULT, APParameters::RATIO_SUFFIX, juce::AudioProcessorParameter::genericParameter,
+      valueToTextFunction, textToValueFunction));
+  // Global Mix
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
-      "MIX", "Global Mix", juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f, "%",
-      juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
+      APParameters::MIX_ID, APParameters::MIX_NAME,
+      juce::NormalisableRange<float>(APParameters::MIX_START, APParameters::MIX_END, APParameters::MIX_INTERVAL),
+      APParameters::MIX_DEFAULT, APParameters::MIX_SUFFIX, juce::AudioProcessorParameter::genericParameter,
+      valueToTextFunction, textToValueFunction));
+  // Distortion Q
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
-      "DSQ", "Distortion Q", juce::NormalisableRange<float>(-1.0f, 1.0f, 0.1f), 0.0f, "",
-      juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
+      APParameters::DISTQ_ID, APParameters::DISTQ_NAME,
+      juce::NormalisableRange<float>(APParameters::DISTQ_START, APParameters::DISTQ_END, APParameters::DISTQ_INTERVAL),
+      APParameters::DISTQ_DEFAULT, APParameters::DISTQ_SUFFIX, juce::AudioProcessorParameter::genericParameter,
+      valueToTextFunction, textToValueFunction));
+  // Makeup
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
-      "MUP", "Makeup", juce::NormalisableRange<float>(-40.0f, 40.0f, 1.0f), 6.0f, "dB",
-      juce::AudioProcessorParameter::genericParameter, valueToTextFunction, textToValueFunction));
+      APParameters::MAKEUP_ID, APParameters::MAKEUP_NAME,
+      juce::NormalisableRange<float>(APParameters::MAKEUP_START, APParameters::MAKEUP_END, APParameters::MAKEUP_INTERVAL),
+      APParameters::MAKEUP_DEFAULT, APParameters::MAKEUP_SUFFIX, juce::AudioProcessorParameter::genericParameter,
+      valueToTextFunction, textToValueFunction));
 
   return { parameters.begin(), parameters.end() };
 }

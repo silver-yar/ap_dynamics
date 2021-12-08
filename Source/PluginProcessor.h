@@ -62,7 +62,8 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   // ValueTree
   juce::AudioProcessorValueTreeState apvts;
 
-  std::atomic<float> meterLocalMaxVal, meterGlobalMaxVal;
+  std::atomic<float> meterLocalMaxVal {0.0f};
+  std::atomic<float> meterGlobalMaxVal {0.0f};
 
   // Updates DSP when user changes parameters
   void update();
@@ -73,7 +74,7 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
 
  private:
   std::atomic<bool> mustUpdateProcessing_{ false }, isActive_{ false }; // TODO: Consider making std::atomic<bool>
-  std::atomic<float> makeupSmoothed_;
+  std::atomic<float> makeupSmoothed_ {0.0f};
 
   std::unique_ptr<APCompressor> compressor_;
   std::unique_ptr<APTubeDistortion> tubeDistortion_;
