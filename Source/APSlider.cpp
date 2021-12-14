@@ -127,7 +127,8 @@ void MyLookAndFeel::drawLabel(Graphics &g, Label &label)
 
   g.setColour(APConstants::Colors::DARK_GREY);
   g.setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::LABEL_FONT_HEIGHT));
-  g.drawFittedText(label.getText().substring(0, 9), labelBounds, juce::Justification::centredRight, 1);
+  const auto slider_value = getLabelText == nullptr ? label.getText() : getLabelText();
+  g.drawFittedText(slider_value, labelBounds, juce::Justification::centredRight, 1);
 }
 void MyLookAndFeel::initializeAssets()
 {

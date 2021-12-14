@@ -31,6 +31,7 @@ class MyLookAndFeel : public juce::LookAndFeel_V4
                         float maxSliderPos, juce::Slider::SliderStyle, juce::Slider &) override;
   juce::Label *createSliderTextBox(juce::Slider &) override;
   void drawLabel(juce::Graphics &, juce::Label &) override;
+  std::function<juce::String()> getLabelText = nullptr;
 
  private:
   void initializeAssets();

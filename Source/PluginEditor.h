@@ -30,7 +30,7 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   void setupLabelShadow(juce::Image& shadow, const juce::String& name);
   void setupSliderShadow(juce::Image& shadow);
   void setupSlider(std::unique_ptr<APSlider>& apSlider, std::unique_ptr<juce::Label>& label, const juce::String& name,
-                   SliderType sliderType, const juce::String& suffix = "s");
+                   SliderType sliderType, const String& suffix = "s");
   void timerCallback() override;
 
  private:

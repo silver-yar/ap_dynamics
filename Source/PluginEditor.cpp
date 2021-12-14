@@ -22,7 +22,32 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   setupSlider(ratioSlider_, ratioLabel_, "Ratio", SliderType::Normal, ": 1");
   ratioAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor_.apvts, "RAT",
                                                                                             ratioSlider_->slider);
-
+  auto thresh_look_and_feel = dynamic_cast<MyLookAndFeel*>(&thresholdSlider_->slider.getLookAndFeel());
+  jassert(thresh_look_and_feel != nullptr);
+  thresh_look_and_feel->getLabelText = [this]()
+  {
+    auto slider_value        = thresholdSlider_->slider.getValue();
+    auto scaled_slider_value = std::round(slider_value * 100.0f);
+    slider_value             = scaled_slider_value / 100.0f;
+    auto label_text = (static_cast<int>(scaled_slider_value) % 100 != 0)
+                          ? juce::String(slider_value) + thresholdSlider_->slider.getTextValueSuffix()
+                          : juce::String(slider_value) + ".0" + thresholdSlider_->slider.getTextValueSuffix();
+    return label_text;
+  };
+  
+  auto ratio_look_and_feel = dynamic_cast<MyLookAndFeel*>(&ratioSlider_->slider.getLookAndFeel());
+  jassert(ratio_look_and_feel != nullptr);
+  ratio_look_and_feel->getLabelText = [this]()
+  {
+    auto slider_value        = ratioSlider_->slider.getValue();
+    auto scaled_slider_value = std::round(slider_value * 100.0f);
+    slider_value             = scaled_slider_value / 100.0f;
+    auto label_text = (static_cast<int>(scaled_slider_value) % 100 != 0)
+                                   ? juce::String(slider_value) + ratioSlider_->slider.getTextValueSuffix()
+                                   : juce::String(slider_value) + ".0" + ratioSlider_->slider.getTextValueSuffix();
+    return label_text;
+  };
+  
   styleLabel_->setJustificationType(juce::Justification::centred);
   styleLabel_->setText("style", juce::dontSendNotification);
   styleLabel_->setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::FONT_HEIGHT));
@@ -146,8 +171,7 @@ void Ap_dynamicsAudioProcessorEditor::setupSliderShadow(juce::Image& shadow)
 }
 
 void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<APSlider>& apSlider, std::unique_ptr<juce::Label>& label,
-                                                  const juce::String& name, const SliderType sliderType,
-                                                  const juce::String& suffix)
+                                                  const juce::String& name, SliderType sliderType, const String& suffix)
 {
   apSlider = std::make_unique<APSlider>(audioProcessor_, sliderType);
   apSlider->slider.setTextBoxIsEditable(false);
