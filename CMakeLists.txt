@@ -46,6 +46,8 @@ juce_add_plugin(
         PLUGIN_CODE
         Apdy # A unique four-character plugin id with exactly one upper-case character
         # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
+        VST3_CATEGORIES
+        Dynamics
         FORMATS
         AU
         AUv3

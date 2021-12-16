@@ -11,7 +11,6 @@
 #include "APTubeDistortion.h"
 
 #include <cmath>
-#include <vector>
 
 APTubeDistortion::APTubeDistortion() = default;
 
@@ -21,48 +20,41 @@ void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, c
                                const float distChar, float* audioOut, const int numSamplesToRender) const
 {
   auto maxZ = 0.0;
-  std::vector<double> zArray;
 
   // Calculate z
   for (auto i = 0; i < numSamplesToRender; ++i)
   {
-    const auto& in = audioIn[i];
-    double z       = 0.0;
-    const auto q   = in * distGain / maxBufferVal;  // Normalization
-
-    if (Q == 0)
+    if (maxBufferVal > 0)
     {
-      z = q / (1.0 - exp(-distChar * q));
-      if (q == Q)
+      const auto& in = audioIn[i];
+      double z       = 0.0;
+      const auto q   = maxBufferVal > 0 ? in * distGain / maxBufferVal : 0;  // Normalization
+
+      if (Q == 0)
       {
-        z = 1.0 / distChar;
+        z = q / (1.0 - exp(-distChar * q));
+        if (q == Q)
+        {
+          z = 1.0 / distChar;
+        }
       }
+      else
+      {
+        z = (q - Q) / (1.0 - exp(-distChar * (q - Q))) + Q / (1.0 - exp(distChar * Q));
+        if (q == Q)
+        {
+          z = 1 / distChar + Q / (1.0 - exp(distChar * Q));
+        }
+      }
+
+      if (maxZ < z)
+        maxZ = z;
+
+      audioOut[i] = static_cast<float>((mix_ * z * (maxBufferVal / maxZ) + (1.0f - mix_) * in) * maxBufferVal / maxZ);
     }
     else
     {
-      z = (q - Q) / (1.0 - exp(-distChar * (q - Q))) + Q / (1.0 - exp(distChar * Q));
-      if (q == Q)
-      {
-        z = 1 / distChar + Q / (1.0 - exp(distChar * Q));
-      }
+      audioOut[i] = 0;
     }
-
-    zArray.emplace_back(z);
-    if (maxZ < z)
-      maxZ = z;
-  }
-
-  // mix_ing
-  for (auto i = 0; i < numSamplesToRender; ++i)
-  {
-    const auto& in = audioIn[i];
-    const auto out = [&]()
-    {
-      auto result        = mix_ * zArray[static_cast<unsigned long>(i)] * (maxBufferVal / maxZ) + (1.0f - mix_) * in;
-      result *= maxBufferVal / maxZ;
-      return result;
-    }();
-
-    audioOut[i] = static_cast<float>(out);
   }
 }
