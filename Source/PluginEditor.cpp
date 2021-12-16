@@ -179,6 +179,7 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<APSlider>& apS
   apSlider->slider.setTextValueSuffix(" " + suffix);
   apSlider->slider.setColour(juce::Slider::trackColourId, juce::Colour(0xFFFFD479));
   apSlider->slider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::snow);
+  apSlider->slider.setTextBoxIsEditable(true);
 
   label = std::make_unique<juce::Label>("", name);
   label->setJustificationType(juce::Justification::centred);
