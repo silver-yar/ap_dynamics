@@ -174,7 +174,6 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<APSlider>& apS
                                                   const juce::String& name, SliderType sliderType, const String& suffix)
 {
   apSlider = std::make_unique<APSlider>(audioProcessor_, sliderType);
-  apSlider->slider.setTextBoxIsEditable(false);
   apSlider->slider.setSliderStyle(juce::Slider::LinearBarVertical);
   apSlider->slider.setTextValueSuffix(" " + suffix);
   apSlider->slider.setColour(juce::Slider::trackColourId, juce::Colour(0xFFFFD479));
