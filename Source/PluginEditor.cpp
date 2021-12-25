@@ -15,6 +15,20 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
     : AudioProcessorEditor(&p), audioProcessor_(p), stylePicker_(p)
 {
   initializeAssets();
+  // Parameters Button
+  parameterButton_->onClick = [this]()
+  {
+    isMenuShown_ = !isMenuShown_;
+    parameterMenu_->setVisible(isMenuShown_);
+  };
+  constexpr auto x_margin    = 20;
+  constexpr auto y_margin    = 10;
+  constexpr auto button_size = 50;
+  parameterButton_->setBounds(APConstants::Gui::M_WIDTH - (button_size + x_margin), x_margin, button_size, button_size);
+  addAndMakeVisible(parameterButton_.get());
+  parameterMenu_->setBounds(x_margin, y_margin, APConstants::Gui::M_WIDTH - (x_margin * 2),
+                            static_cast<int>(APConstants::Gui::M_HEIGHT * 0.5f));
+
   // Slider Setup
   setupSlider(thresholdSlider_, thresholdLabel_, "Threshold", SliderType::Invert, "dB");
   thresholdAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor_.apvts, "THR",
@@ -29,12 +43,12 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
     auto slider_value        = thresholdSlider_->slider.getValue();
     auto scaled_slider_value = std::round(slider_value * 100.0f);
     slider_value             = scaled_slider_value / 100.0f;
-    auto label_text = (static_cast<int>(scaled_slider_value) % 100 != 0)
-                          ? juce::String(slider_value) + thresholdSlider_->slider.getTextValueSuffix()
-                          : juce::String(slider_value) + ".0" + thresholdSlider_->slider.getTextValueSuffix();
+    auto label_text          = (static_cast<int>(scaled_slider_value) % 100 != 0)
+                                   ? juce::String(slider_value) + thresholdSlider_->slider.getTextValueSuffix()
+                                   : juce::String(slider_value) + ".0" + thresholdSlider_->slider.getTextValueSuffix();
     return label_text;
   };
-  
+
   auto ratio_look_and_feel = dynamic_cast<MyLookAndFeel*>(&ratioSlider_->slider.getLookAndFeel());
   jassert(ratio_look_and_feel != nullptr);
   ratio_look_and_feel->getLabelText = [this]()
@@ -42,12 +56,12 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
     auto slider_value        = ratioSlider_->slider.getValue();
     auto scaled_slider_value = std::round(slider_value * 100.0f);
     slider_value             = scaled_slider_value / 100.0f;
-    auto label_text = (static_cast<int>(scaled_slider_value) % 100 != 0)
+    auto label_text          = (static_cast<int>(scaled_slider_value) % 100 != 0)
                                    ? juce::String(slider_value) + ratioSlider_->slider.getTextValueSuffix()
                                    : juce::String(slider_value) + ".0" + ratioSlider_->slider.getTextValueSuffix();
     return label_text;
   };
-  
+
   styleLabel_->setJustificationType(juce::Justification::centred);
   styleLabel_->setText("style", juce::dontSendNotification);
   styleLabel_->setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::FONT_HEIGHT));
@@ -71,6 +85,8 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   thresholdBounds_ = juce::Rectangle<int>(40, APConstants::Gui::SLIDER_Y, APConstants::Gui::SLIDER_WIDTH, sliderHeight_);
   ratioBounds_     = juce::Rectangle<int>(280, APConstants::Gui::SLIDER_Y, APConstants::Gui::SLIDER_WIDTH, sliderHeight_);
   pickerBounds_    = juce::Rectangle<int>(470, APConstants::Gui::SLIDER_Y, APConstants::Gui::SLIDER_WIDTH, sliderHeight_);
+
+  addChildComponent(parameterMenu_.get());
 
   setSize(APConstants::Gui::M_WIDTH, APConstants::Gui::M_HEIGHT);
   setResizable(false, false);
@@ -194,6 +210,16 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<APSlider>& apS
 void Ap_dynamicsAudioProcessorEditor::timerCallback() { repaint(); }
 void Ap_dynamicsAudioProcessorEditor::initializeAssets()
 {
+  pButtonDef_ = std::make_unique<juce::DrawableImage>(
+      juce::ImageCache::getFromMemory(BinaryData::tune_black_png, BinaryData::tune_black_pngSize));
+  pButtonDef_->setOverlayColour(APConstants::Colors::DARK_GREY);
+  pButtonDef_->setAlpha(0.0f);
+  pButtonOver_ = std::make_unique<juce::DrawableImage>(
+      juce::ImageCache::getFromMemory(BinaryData::tune_white_png, BinaryData::tune_white_pngSize));
+  parameterButton_ = std::make_unique<juce::DrawableButton>("Parameters", juce::DrawableButton::ButtonStyle::ImageFitted);
+  parameterButton_->setImages(pButtonDef_.get(), pButtonOver_.get());
+  parameterMenu_ = std::make_unique<APParameterMenu>();
+
   bgText_ = std::make_unique<juce::Image>(
       juce::ImageCache::getFromMemory(BinaryData::logo_clean_png, BinaryData::logo_clean_pngSize));
   textShadow_ =

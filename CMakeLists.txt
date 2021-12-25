@@ -75,6 +75,7 @@ target_sources(
         DSP/APOverdrive.cpp
         DSP/APTubeDistortion.cpp
         Helpers/APDefines.h
+        Source/APParameterMenu.cpp
         Source/APSlider.cpp
         Source/MixerButton.cpp
         Source/OpenGL/SliderBarGL.cpp
@@ -109,6 +110,9 @@ juce_add_binary_data(
         Resources/blue_noise.png
         Resources/logo_clean.png
         Resources/shadow.png
+        Resources/tune_black.png
+        Resources/tune_white.png
+        Resources/close_white.png
 )
 
 # `target_link_libraries` links libraries and JUCE modules to other libraries or executables. Here, we're linking our
