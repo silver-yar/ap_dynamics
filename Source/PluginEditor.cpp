@@ -218,7 +218,7 @@ void Ap_dynamicsAudioProcessorEditor::initializeAssets()
       juce::ImageCache::getFromMemory(BinaryData::tune_white_png, BinaryData::tune_white_pngSize));
   parameterButton_ = std::make_unique<juce::DrawableButton>("Parameters", juce::DrawableButton::ButtonStyle::ImageFitted);
   parameterButton_->setImages(pButtonDef_.get(), pButtonOver_.get());
-  parameterMenu_ = std::make_unique<APParameterMenu>();
+  parameterMenu_ = std::make_unique<APParameterMenu>(audioProcessor_, audioProcessor_.apvts);
 
   bgText_ = std::make_unique<juce::Image>(
       juce::ImageCache::getFromMemory(BinaryData::logo_clean_png, BinaryData::logo_clean_pngSize));
