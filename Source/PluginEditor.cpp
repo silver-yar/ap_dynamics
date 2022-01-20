@@ -26,6 +26,7 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   constexpr auto button_size = 50;
   parameterButton_->setBounds(APConstants::Gui::M_WIDTH - (button_size + x_margin), x_margin, button_size, button_size);
   addAndMakeVisible(parameterButton_.get());
+  parameterMenu_->setMenuWidth(APConstants::Gui::MENU_WIDTH);
   parameterMenu_->setBounds(x_margin, y_margin, APConstants::Gui::M_WIDTH - (x_margin * 2),
                             static_cast<int>(APConstants::Gui::M_HEIGHT * 0.5f));
 

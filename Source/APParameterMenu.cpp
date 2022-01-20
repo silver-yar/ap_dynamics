@@ -3,20 +3,16 @@
 //
 
 #include "APParameterMenu.h"
+#include "../Helpers/APDefines.h"
 
 #include "BinaryData.h"
 
-ParameterGrid::ParameterGrid(juce::AudioProcessor& p, juce::AudioProcessorValueTreeState& s) : audioProcessor_(p), apvts_(s)
+void APParameterMenu::ParameterGrid::paint(juce::Graphics& g)
 {
-  initializeAssets();
+  juce::ignoreUnused(g);
+  setSize(width, 1000);
 }
-ParameterGrid::~ParameterGrid() { }
-void ParameterGrid::paint(juce::Graphics& g)
-{
-  g.setColour(juce::Colours::limegreen);
-  g.fillAll();
-}
-void ParameterGrid::resized()
+void APParameterMenu::ParameterGrid::resized()
 {
   using Fr    = juce::Grid::Fr;
   using Track = juce::Grid::TrackInfo;
@@ -33,7 +29,7 @@ void ParameterGrid::resized()
 
   grid.performLayout(getLocalBounds());
 }
-void ParameterGrid::initializeAssets()
+void APParameterMenu::ParameterGrid::initializeAssets()
 {
   auto all_parameters = audioProcessor_.getParameters();
   sliders_.reserve(static_cast<unsigned long>(all_parameters.size() - 2));
@@ -47,6 +43,7 @@ void ParameterGrid::initializeAssets()
                   new_slider.sliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
                       apvts_, cast_param->getParameterID(), *new_slider.slider);
                   new_slider.label = std::make_unique<juce::Label>(cast_param->name, cast_param->name);
+                  new_slider.label->setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::FONT_HEIGHT));
                   addAndMakeVisible(new_slider.label.get());
                   addAndMakeVisible(new_slider.slider.get());
 
@@ -54,23 +51,39 @@ void ParameterGrid::initializeAssets()
                 });
 }
 
+
 APParameterMenu::APParameterMenu(juce::AudioProcessor& p, juce::AudioProcessorValueTreeState& s)
     : audioProcessor_(p), apvts_(s)
 {
+
   initializeAssets();
   closeButton_->onClick = [this]() { setVisible(false); };
   closeButton_->setBounds(5, 5, 20, 20);
-  addAndMakeVisible(closeButton_.get());
 
-  addAndMakeVisible(parameterGrid_.get());
+  setViewedComponent(parameterGrid_.get());
+  setViewPositionProportionately(1.0, 1.0);
+  addAndMakeVisible(closeButton_.get());
 }
 
 APParameterMenu::~APParameterMenu() { }
 
 void APParameterMenu::paint(juce::Graphics& g)
 {
-  g.setColour(juce::Colours::black);
-  g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.0f);
+  if (backgroundImage_)
+  {
+    g.drawImage(*backgroundImage_, getLocalBounds().toFloat(), juce::RectanglePlacement::fillDestination);
+  }
+  else
+  {
+    constexpr auto bg_alpha = 0.6f;
+    g.setColour(juce::Colours::black.withAlpha(bg_alpha));
+    g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.0f);
+  }
+}
+
+void APParameterMenu::setBackgroundImage(const Image& backgroundImage)
+{
+  backgroundImage_ = std::make_unique<juce::Image> (backgroundImage);
 }
 
 void APParameterMenu::initializeAssets()
@@ -85,4 +98,7 @@ void APParameterMenu::initializeAssets()
   parameterGrid_ = std::make_unique<ParameterGrid>(audioProcessor_, apvts_);
 }
 
-void APParameterMenu::resized() { parameterGrid_->setBounds(getLocalBounds().reduced(10)); }
+void APParameterMenu::resized()
+{
+  parameterGrid_->setBounds(getLocalBounds().reduced(50));
+}
