@@ -7,13 +7,18 @@
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "PluginProcessor.h"
 
-st
 
 class ParameterGrid : public juce::Component
 {
  public:
   ParameterGrid(juce::AudioProcessor&, juce::AudioProcessorValueTreeState&);
   ~ParameterGrid();
+
+  struct SliderObject {
+    std::unique_ptr<juce::Slider> slider = nullptr;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sliderAttachment = nullptr;
+    std::unique_ptr<juce::Label> label = nullptr;
+  };
 
   void paint(juce::Graphics& g) override;
   void resized() override;
@@ -23,8 +28,7 @@ class ParameterGrid : public juce::Component
   juce::AudioProcessor& audioProcessor_;
   juce::AudioProcessorValueTreeState& apvts_;
 
-  std::vector<std::pair<std::unique_ptr<juce::Slider>,
-                        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>>> sliders_;
+  std::vector<SliderObject> sliders_;
 };
 
 class APParameterMenu : public juce::Component

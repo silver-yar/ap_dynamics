@@ -21,27 +21,36 @@ void ParameterGrid::resized()
   using Fr    = juce::Grid::Fr;
   using Track = juce::Grid::TrackInfo;
   juce::Grid grid;
-  grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(1)) };
-  grid.templateRows    = { Track(Fr(1)), Track(Fr(1)), Track(Fr(1)) };
-  grid.items.resize(static_cast<int>(sliders_.size()));
-  std::transform(sliders_.begin(), sliders_.end(), grid.items.begin(),
-                 [](auto& slider) { return juce::GridItem(*slider.first); });
+
+  grid.templateColumns = { Track(Fr(1)), Track(Fr(2)) };
+//  grid.templateRows    = { Track(Fr(1)), Track(Fr(1)), Track(Fr(1)) };
+  grid.autoRows = Track (Fr(1));
+  for (const auto& slider : sliders_)
+  {
+     grid.items.add(GridItem(*slider.label));
+     grid.items.add(GridItem(*slider.slider));
+  }
+
   grid.performLayout(getLocalBounds());
 }
 void ParameterGrid::initializeAssets()
 {
   auto all_parameters = audioProcessor_.getParameters();
-
+  sliders_.reserve(static_cast<unsigned long>(all_parameters.size() - 2));
   std::for_each(all_parameters.begin() + 2, all_parameters.end(),
                 [this](auto parameter)
                 {
+                   SliderObject new_slider;
                   const auto* cast_param = dynamic_cast<const juce::RangedAudioParameter*>(parameter);
-                  auto slider =
+                 new_slider.slider =
                       std::make_unique<juce::Slider>(juce::Slider::SliderStyle::LinearBar, juce::Slider::TextBoxAbove);
-                  auto attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-                      apvts_, cast_param->getParameterID(), *slider);
-                  addAndMakeVisible(slider.get());
-                  sliders_.emplace_back(std::move(slider), std::move(attachment));
+                  new_slider.sliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+                      apvts_, cast_param->getParameterID(), *new_slider.slider);
+                  new_slider.label = std::make_unique<juce::Label>(cast_param->name, cast_param->name);
+                  addAndMakeVisible(new_slider.label.get());
+                  addAndMakeVisible(new_slider.slider.get());
+
+                sliders_.emplace_back(std::move(new_slider));
                 });
 }
 
