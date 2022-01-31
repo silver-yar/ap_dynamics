@@ -595,7 +595,7 @@ void SliderBarGL::createShaders()
 
         float warp(vec2 p) {
           vec2 v = vec2(fbm1(p), fbm1(p+0.7*vec2(1.0, 1.0)));
-          float stressFactor = sliderValue + 0.01f;
+          float stressFactor = (sliderValue * 0.9f) + 0.1f;
 
           rot(v, 1.0+runTime*stressFactor);
 

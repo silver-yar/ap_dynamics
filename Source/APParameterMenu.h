@@ -18,6 +18,11 @@ class APParameterMenu : public juce::Viewport
   void setMenuWidth(int w) { parameterGrid_->width = w; }
   void setBackgroundImage(const juce::Image& backgroundImage);
   void initializeAssets();
+  void setParameterFilter(const std::function<bool(juce::AudioProcessorParameter*)>& newFilter) {
+    if (newFilter == nullptr)
+      return;
+    parameterGrid_->parameterFilter = newFilter;
+  }
 
   class ParameterGrid : public juce::Component
   {
@@ -39,6 +44,8 @@ class APParameterMenu : public juce::Viewport
     void resized() override;
     void initializeAssets();
 
+
+    std::function<bool(juce::AudioProcessorParameter* parameter)> parameterFilter = [](auto*) { return true; };
     int width = 0;
    private:
     juce::AudioProcessor& audioProcessor_;
@@ -46,6 +53,7 @@ class APParameterMenu : public juce::Viewport
 
     std::vector<SliderObject> sliders_;
   };
+
 
  private:
   juce::AudioProcessor& audioProcessor_;
