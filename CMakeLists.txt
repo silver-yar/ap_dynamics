@@ -114,6 +114,7 @@ juce_add_binary_data(
         Resources/tune_white.png
         Resources/close_white.png
         Resources/glass.jpeg
+        Resources/apdlogo.png
 )
 
 # `target_link_libraries` links libraries and JUCE modules to other libraries or executables. Here, we're linking our

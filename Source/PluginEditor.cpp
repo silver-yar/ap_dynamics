@@ -116,9 +116,9 @@ void Ap_dynamicsAudioProcessorEditor::paint(juce::Graphics& g)
 
   // Draw Logo Shadow
   g.drawImage(*textShadow_, textBounds.withY(textBounds.getY() - 10).expanded(shadowDeltaXY_ * 1.5f) + offset_,
-              juce::RectanglePlacement::fillDestination);
-
-  g.drawImage(*bgText_, textBounds, juce::RectanglePlacement::fillDestination);
+              juce::RectanglePlacement::centred);
+  // Draw Logo
+  g.drawImage(*bgText_, textBounds, juce::RectanglePlacement::centred);
 
   // Draw Label Shadows
   constexpr auto shadowHeight = static_cast<float>(APConstants::Gui::SLIDER_Y - 68);
@@ -222,7 +222,7 @@ void Ap_dynamicsAudioProcessorEditor::initializeAssets()
   parameterMenu_ = std::make_unique<APParameterMenu>(audioProcessor_, audioProcessor_.apvts);
 
   bgText_ = std::make_unique<juce::Image>(
-      juce::ImageCache::getFromMemory(BinaryData::logo_clean_png, BinaryData::logo_clean_pngSize));
+      juce::ImageCache::getFromMemory(BinaryData::apdlogo_png, BinaryData::apdlogo_pngSize));
   textShadow_ =
       std::make_unique<juce::Image>(juce::ImageCache::getFromMemory(BinaryData::shadow_png, BinaryData::shadow_pngSize));
   styleLabel_      = std::make_unique<juce::Label>("", "style");

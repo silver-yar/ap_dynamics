@@ -406,7 +406,7 @@ void SliderBarGL::createShaders()
           //lights colors
           // color read b,g,r for some reason?
           vec3 baseCol1 = vec3(181. / 255., 181. / 255., 181. / 255.);
-          vec3 baseCol2 = vec3(121. / 255., 212. / 255., 255. / 255.);
+          vec3 baseCol2 = vec3(178. / 255., 230. / 255., 255. / 255.);
 
           float oh = height(p + ll1*0.05*normalize(ld1.xz));
           const float level0 = 0.0;
@@ -650,7 +650,7 @@ void SliderBarGL::createShaders()
           //lights colors
           // color read b,g,r for some reason?
           vec3 baseCol1 = vec3(181. / 255., 181. / 255., 181. / 255.);
-          vec3 baseCol2 = vec3(121. / 255., 212. / 255., 255. / 255.);
+          vec3 baseCol2 = vec3(178. / 255., 230. / 255., 255. / 255.);
 
           float oh = height(p + ll1*0.05*normalize(ld1.xz));
           const float level0 = 0.0;
