@@ -23,8 +23,10 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   };
   constexpr auto x_margin    = 20;
   constexpr auto y_margin    = 10;
-  constexpr auto button_size = 50;
-  parameterButton_->setBounds(APConstants::Gui::M_WIDTH - (button_size + x_margin), x_margin, button_size, button_size);
+  constexpr auto button_size = 60;
+  pMenuBounds_ = juce::Rectangle<int>(APConstants::Gui::M_WIDTH - (button_size + x_margin), y_margin + 20, button_size, button_size);
+
+  parameterButton_->setBounds(pMenuBounds_);
   addAndMakeVisible(parameterButton_.get());
   parameterMenu_->setMenuWidth(APConstants::Gui::MENU_WIDTH);
   parameterMenu_->setBounds(x_margin, y_margin, APConstants::Gui::M_WIDTH - (x_margin * 2),
@@ -105,7 +107,7 @@ void Ap_dynamicsAudioProcessorEditor::paint(juce::Graphics& g)
   g.fillAll();
 
   // Logo
-  constexpr int textDeltaX = 80;
+  constexpr int textDeltaX = 120;
   constexpr int textDeltaY = 50;
   const int textHeight     = static_cast<int>(static_cast<float>(getHeight()) * 0.45f);
   const auto textBounds    = getLocalBounds()
@@ -113,6 +115,8 @@ void Ap_dynamicsAudioProcessorEditor::paint(juce::Graphics& g)
                               .reduced(textDeltaX, textDeltaY)
                               .withBottomY(APConstants::Gui::SLIDER_Y - 100)
                               .toFloat();
+
+  g.drawImage(*pButtonShadow_, pMenuBounds_.withY(18).toFloat(), juce::RectanglePlacement::centred);
 
   // Draw Logo Shadow
   g.drawImage(*textShadow_, textBounds.withY(textBounds.getY() - 10).expanded(shadowDeltaXY_ * 1.5f) + offset_,
@@ -213,13 +217,14 @@ void Ap_dynamicsAudioProcessorEditor::initializeAssets()
 {
   pButtonDef_ = std::make_unique<juce::DrawableImage>(
       juce::ImageCache::getFromMemory(BinaryData::tune_black_png, BinaryData::tune_black_pngSize));
-  pButtonDef_->setOverlayColour(APConstants::Colors::DARK_GREY);
+//  pButtonDef_->setOverlayColour(APConstants::Colors::DARK_GREY);
   pButtonDef_->setAlpha(0.0f);
   pButtonOver_ = std::make_unique<juce::DrawableImage>(
       juce::ImageCache::getFromMemory(BinaryData::tune_white_png, BinaryData::tune_white_pngSize));
   parameterButton_ = std::make_unique<juce::DrawableButton>("Parameters", juce::DrawableButton::ButtonStyle::ImageFitted);
   parameterButton_->setImages(pButtonDef_.get(), pButtonOver_.get());
   parameterMenu_ = std::make_unique<APParameterMenu>(audioProcessor_, audioProcessor_.apvts);
+  pButtonShadow_ = std::make_unique<juce::Image>(juce::ImageCache::getFromMemory(BinaryData::tune_shadow_png, BinaryData::tune_shadow_pngSize));
 
   bgText_ = std::make_unique<juce::Image>(
       juce::ImageCache::getFromMemory(BinaryData::apdlogo_png, BinaryData::apdlogo_pngSize));

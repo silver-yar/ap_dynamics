@@ -39,16 +39,21 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
 
   Ap_dynamicsAudioProcessor& audioProcessor_;
 
+  // Parameter Menu
   std::unique_ptr<juce::DrawableImage> pButtonDef_, pButtonOver_;
   std::unique_ptr<juce::DrawableButton> parameterButton_;
   std::unique_ptr<APParameterMenu> parameterMenu_;
 
   std::unique_ptr<juce::ImageConvolutionKernel> kernel_;
+  std::unique_ptr<juce::Image> bgText_;
+
+  // Shadows
+  std::unique_ptr<juce::Image> pButtonShadow_;
   std::unique_ptr<juce::Image> thresholdShadow_, ratioShadow_, styleShadow_;
   std::unique_ptr<juce::Image> tSliderShadow_, rSliderShadow_, sSliderShadow_;
-  std::unique_ptr<juce::Image> bgText_;
   std::unique_ptr<juce::Image> textShadow_;
 
+  // Parameter Components
   MixerButton stylePicker_;
   std::unique_ptr<APSlider> thresholdSlider_, ratioSlider_;
   std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> thresholdAttachment_,
@@ -59,7 +64,7 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   const float shadowDeltaXY_      = 8.0f;
   const int sliderHeight_ = 185;
   bool isMenuShown_ = false;
-  juce::Rectangle<int> thresholdBounds_, ratioBounds_, pickerBounds_;
+  juce::Rectangle<int> thresholdBounds_, ratioBounds_, pickerBounds_, pMenuBounds_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Ap_dynamicsAudioProcessorEditor)
 };
