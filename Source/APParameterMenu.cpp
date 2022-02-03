@@ -14,10 +14,8 @@ void APParameterMenu::ParameterGrid::resized()
   using Track = juce::Grid::TrackInfo;
   juce::Grid grid;
 
-
-
+  grid.justifyContent = juce::Grid::JustifyContent::center;
   grid.templateColumns = { Track(Fr(1)), Track(Fr(2)) };
-  //  grid.templateRows    = { Track(Fr(1)), Track(Fr(1)), Track(Fr(1)) };
   grid.autoRows = Track(Fr(1));
   for (const auto& slider : sliders_)
   {
@@ -25,7 +23,7 @@ void APParameterMenu::ParameterGrid::resized()
     grid.items.add(GridItem(*slider.slider));
   }
 
-  grid.performLayout(getLocalBounds());
+  grid.performLayout(getLocalBounds().reduced(20));
 }
 void APParameterMenu::ParameterGrid::initializeAssets()
 {
@@ -55,10 +53,11 @@ void APParameterMenu::ParameterGrid::initializeAssets()
                   const auto* cast_param = dynamic_cast<const juce::RangedAudioParameter*>(parameter);
                   new_slider.slider =
                       std::make_unique<juce::Slider>(juce::Slider::SliderStyle::LinearBar, juce::Slider::TextBoxAbove);
+                  new_slider.slider->setTextValueSuffix(" " + cast_param->getLabel());
                   new_slider.sliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
                       apvts_, cast_param->getParameterID(), *new_slider.slider);
                   new_slider.label = std::make_unique<juce::Label>(cast_param->name, cast_param->name);
-                  new_slider.label->setFont(APConstants::Gui::SYS_FONT.withHeight(APConstants::Gui::FONT_HEIGHT));
+                  new_slider.label->setFont(APConstants::Gui::SYS_FONT);
                   addAndMakeVisible(new_slider.label.get());
                   addAndMakeVisible(new_slider.slider.get());
 
@@ -92,6 +91,9 @@ void APParameterMenu::paint(juce::Graphics& g)
     g.setColour(juce::Colours::black.withAlpha(bg_alpha));
     g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.0f);
   }
+
+//  g.setColour(juce::Colours::limegreen);
+//  g.fillRect(getLocalBounds().reduced(20));
 }
 
 void APParameterMenu::setBackgroundImage(const Image& backgroundImage)
@@ -118,8 +120,8 @@ void APParameterMenu::resized() {
   constexpr float slider_height_scalar = 1.0f / num_vis_sliders;
   auto slider_height                   = static_cast<int>(static_cast<float>(getLocalBounds().getHeight()) * slider_height_scalar);
 
-  const int sum = static_cast<int>(std::count_if(all_parameters.begin(), all_parameters.end(),parameterGrid_->parameterFilter));
+  const int num_sliders = static_cast<int>(std::count_if(all_parameters.begin(), all_parameters.end(),parameterGrid_->parameterFilter));
 
-  parameterGrid_->setBounds(getLocalBounds().withHeight(sum * slider_height));
+  parameterGrid_->setBounds(getLocalBounds().withHeight(num_sliders * slider_height));
 
 }

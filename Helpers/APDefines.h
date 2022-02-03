@@ -63,7 +63,7 @@ namespace APParameters
 
   inline constexpr auto RATIO_ID       = "RAT";
   inline constexpr auto RATIO_NAME     = "Ratio";
-  inline constexpr auto RATIO_SUFFIX   = "";
+  inline constexpr auto RATIO_SUFFIX   = ": 1";
   inline constexpr auto RATIO_START    = 1.0f;
   inline constexpr auto RATIO_END      = 100.0f;
   inline constexpr auto RATIO_INTERVAL = 0.1f;
@@ -72,7 +72,7 @@ namespace APParameters
 
   inline constexpr auto MIX_ID       = "MIX";
   inline constexpr auto MIX_NAME     = "Global Mix";
-  inline constexpr auto MIX_SUFFIX   = "%";
+  inline constexpr auto MIX_SUFFIX   = "";
   inline constexpr auto MIX_START    = 0.0f;
   inline constexpr auto MIX_END      = 1.0f;
   inline constexpr auto MIX_INTERVAL = 0.01f;
