@@ -15,16 +15,15 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
     : AudioProcessorEditor(&p), audioProcessor_(p), stylePicker_(p)
 {
   initializeAssets();
+  // Click Layer
+
   // Parameters Button
-  parameterButton_->onClick = [this]()
-  {
-    isMenuShown_ = !isMenuShown_;
-    parameterMenu_->setVisible(isMenuShown_);
-  };
+  parameterButton_->onClick  = [this]() { clickLayer_->setVisible(true); };
   constexpr auto x_margin    = 20;
   constexpr auto y_margin    = 10;
   constexpr auto button_size = 60;
-  pMenuBounds_ = juce::Rectangle<int>(APConstants::Gui::M_WIDTH - (button_size + x_margin), y_margin + 20, button_size, button_size);
+  pMenuBounds_ =
+      juce::Rectangle<int>(APConstants::Gui::M_WIDTH - (button_size + x_margin), y_margin + 20, button_size, button_size);
 
   parameterButton_->setBounds(pMenuBounds_);
   addAndMakeVisible(parameterButton_.get());
@@ -89,7 +88,10 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   ratioBounds_     = juce::Rectangle<int>(280, APConstants::Gui::SLIDER_Y, APConstants::Gui::SLIDER_WIDTH, sliderHeight_);
   pickerBounds_    = juce::Rectangle<int>(470, APConstants::Gui::SLIDER_Y, APConstants::Gui::SLIDER_WIDTH, sliderHeight_);
 
-  addChildComponent(parameterMenu_.get());
+  // Click Layer Bounds
+  clickLayer_->setBounds(0, 0, APConstants::Gui::M_WIDTH, APConstants::Gui::M_HEIGHT);
+  addChildComponent(clickLayer_.get());
+  clickLayer_->addAndMakeVisible(parameterMenu_.get());
 
   setSize(APConstants::Gui::M_WIDTH, APConstants::Gui::M_HEIGHT);
   setResizable(false, false);
@@ -164,6 +166,11 @@ void Ap_dynamicsAudioProcessorEditor::resized()
   ratioSlider_->setBounds(ratioBounds_);
 
   stylePicker_.setBounds(pickerBounds_);
+
+  //  if (parameterMenu_->isVisible())
+  //  {
+  //
+  //  }
 }
 
 void Ap_dynamicsAudioProcessorEditor::setupLabelShadow(juce::Image& shadow, const juce::String& name)
@@ -215,19 +222,21 @@ void Ap_dynamicsAudioProcessorEditor::setupSlider(std::unique_ptr<APSlider>& apS
 void Ap_dynamicsAudioProcessorEditor::timerCallback() { repaint(); }
 void Ap_dynamicsAudioProcessorEditor::initializeAssets()
 {
+  clickLayer_ = std::make_unique<ClickLayer>();
   pButtonDef_ = std::make_unique<juce::DrawableImage>(
       juce::ImageCache::getFromMemory(BinaryData::tune_black_png, BinaryData::tune_black_pngSize));
-//  pButtonDef_->setOverlayColour(APConstants::Colors::DARK_GREY);
+  //  pButtonDef_->setOverlayColour(APConstants::Colors::DARK_GREY);
   pButtonDef_->setAlpha(0.0f);
   pButtonOver_ = std::make_unique<juce::DrawableImage>(
       juce::ImageCache::getFromMemory(BinaryData::tune_white_png, BinaryData::tune_white_pngSize));
   parameterButton_ = std::make_unique<juce::DrawableButton>("Parameters", juce::DrawableButton::ButtonStyle::ImageFitted);
   parameterButton_->setImages(pButtonDef_.get(), pButtonOver_.get());
   parameterMenu_ = std::make_unique<APParameterMenu>(audioProcessor_, audioProcessor_.apvts);
-  pButtonShadow_ = std::make_unique<juce::Image>(juce::ImageCache::getFromMemory(BinaryData::tune_shadow_png, BinaryData::tune_shadow_pngSize));
+  pButtonShadow_ = std::make_unique<juce::Image>(
+      juce::ImageCache::getFromMemory(BinaryData::tune_shadow_png, BinaryData::tune_shadow_pngSize));
 
-  bgText_ = std::make_unique<juce::Image>(
-      juce::ImageCache::getFromMemory(BinaryData::apdlogo_png, BinaryData::apdlogo_pngSize));
+  bgText_ =
+      std::make_unique<juce::Image>(juce::ImageCache::getFromMemory(BinaryData::apdlogo_png, BinaryData::apdlogo_pngSize));
   textShadow_ =
       std::make_unique<juce::Image>(juce::ImageCache::getFromMemory(BinaryData::shadow_png, BinaryData::shadow_pngSize));
   styleLabel_      = std::make_unique<juce::Label>("", "style");
@@ -239,3 +248,4 @@ void Ap_dynamicsAudioProcessorEditor::initializeAssets()
   rSliderShadow_   = std::make_unique<juce::Image>();
   sSliderShadow_   = std::make_unique<juce::Image>();
 }
+void Ap_dynamicsAudioProcessorEditor::mouseDown(const MouseEvent& event) { DBG(rand()); }

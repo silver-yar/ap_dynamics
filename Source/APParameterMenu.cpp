@@ -14,9 +14,9 @@ void APParameterMenu::ParameterGrid::resized()
   using Track = juce::Grid::TrackInfo;
   juce::Grid grid;
 
-  grid.justifyContent = juce::Grid::JustifyContent::center;
+  grid.justifyContent  = juce::Grid::JustifyContent::center;
   grid.templateColumns = { Track(Fr(1)), Track(Fr(2)) };
-  grid.autoRows = Track(Fr(1));
+  grid.autoRows        = Track(Fr(1));
   for (const auto& slider : sliders_)
   {
     grid.items.add(GridItem(*slider.label));
@@ -45,10 +45,7 @@ void APParameterMenu::ParameterGrid::initializeAssets()
   std::for_each(all_parameters.begin(), all_parameters.end(),
                 [this](auto parameter)
                 {
-                  if (parameterFilter(parameter))
-                  {
-
-                  }
+                  if (parameterFilter(parameter)) { }
                   SliderObject new_slider;
                   const auto* cast_param = dynamic_cast<const juce::RangedAudioParameter*>(parameter);
                   new_slider.slider =
@@ -69,7 +66,7 @@ APParameterMenu::APParameterMenu(juce::AudioProcessor& p, juce::AudioProcessorVa
     : audioProcessor_(p), apvts_(s)
 {
   initializeAssets();
-  closeButton_->onClick = [this]() { setVisible(false); };
+  closeButton_->onClick = [this]() { closeButton_->getParentComponent()->getParentComponent()->setVisible(false); };
   closeButton_->setBounds(5, 5, 20, 20);
 
   setViewedComponent(parameterGrid_.get());
@@ -92,8 +89,8 @@ void APParameterMenu::paint(juce::Graphics& g)
     g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.0f);
   }
 
-//  g.setColour(juce::Colours::limegreen);
-//  g.fillRect(getLocalBounds().reduced(20));
+  //  g.setColour(juce::Colours::limegreen);
+  //  g.fillRect(getLocalBounds().reduced(20));
 }
 
 void APParameterMenu::setBackgroundImage(const Image& backgroundImage)
@@ -113,15 +110,16 @@ void APParameterMenu::initializeAssets()
   parameterGrid_ = std::make_unique<ParameterGrid>(audioProcessor_, apvts_);
 }
 
-void APParameterMenu::resized() {
+void APParameterMenu::resized()
+{
   jassert(parameterGrid_->parameterFilter != nullptr);
-  auto all_parameters = audioProcessor_.getParameters();
+  auto all_parameters                  = audioProcessor_.getParameters();
   constexpr float num_vis_sliders      = 3.5f;
   constexpr float slider_height_scalar = 1.0f / num_vis_sliders;
-  auto slider_height                   = static_cast<int>(static_cast<float>(getLocalBounds().getHeight()) * slider_height_scalar);
+  auto slider_height = static_cast<int>(static_cast<float>(getLocalBounds().getHeight()) * slider_height_scalar);
 
-  const int num_sliders = static_cast<int>(std::count_if(all_parameters.begin(), all_parameters.end(),parameterGrid_->parameterFilter));
+  const int num_sliders =
+      static_cast<int>(std::count_if(all_parameters.begin(), all_parameters.end(), parameterGrid_->parameterFilter));
 
   parameterGrid_->setBounds(getLocalBounds().withHeight(num_sliders * slider_height));
-
 }

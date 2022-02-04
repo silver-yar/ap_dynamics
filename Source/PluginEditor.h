@@ -33,11 +33,26 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   void setupSlider(std::unique_ptr<APSlider>& apSlider, std::unique_ptr<juce::Label>& label, const juce::String& name,
                    SliderType sliderType, const String& suffix = "s");
   void timerCallback() override;
+  void mouseDown(const juce::MouseEvent&) override;
 
  private:
   void initializeAssets();
 
   Ap_dynamicsAudioProcessor& audioProcessor_;
+
+  // Click Layer
+  struct ClickLayer : public juce::Component
+  {
+    ClickLayer() = default;
+    ~ClickLayer() override = default;
+
+    void mouseDown(const juce::MouseEvent& event) override
+    {
+      if (getLocalBounds().contains(event.getMouseDownPosition()))
+        setVisible(false);
+    }
+  };
+  std::unique_ptr<ClickLayer> clickLayer_;
 
   // Parameter Menu
   std::unique_ptr<juce::DrawableImage> pButtonDef_, pButtonOver_;
