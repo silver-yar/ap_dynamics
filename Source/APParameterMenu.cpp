@@ -27,20 +27,6 @@ void APParameterMenu::ParameterGrid::resized()
 }
 void APParameterMenu::ParameterGrid::initializeAssets()
 {
-  const auto predicate = [](juce::AudioParameterFloat* param) -> bool
-  {
-    const std::vector<juce::String> idsToKeep{ "gain", "distortion", /* bass */ };
-
-    const auto* cast_param = dynamic_cast<const juce::RangedAudioParameter*>(param);
-    if (cast_param != nullptr)
-    {
-      const auto id = cast_param->getParameterID();
-
-      return std::any_of(idsToKeep.begin(), idsToKeep.end(), [&id](const auto& idToKeep) { return id == idToKeep; });
-    }
-
-    return false;
-  };
   auto all_parameters = audioProcessor_.getParameters();
   std::for_each(all_parameters.begin(), all_parameters.end(),
                 [this](auto parameter)
@@ -88,14 +74,6 @@ void APParameterMenu::paint(juce::Graphics& g)
     g.setColour(juce::Colours::black.withAlpha(bg_alpha));
     g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.0f);
   }
-
-  //  g.setColour(juce::Colours::limegreen);
-  //  g.fillRect(getLocalBounds().reduced(20));
-}
-
-void APParameterMenu::setBackgroundImage(const Image& backgroundImage)
-{
-  backgroundImage_ = std::make_unique<juce::Image>(backgroundImage);
 }
 
 void APParameterMenu::initializeAssets()

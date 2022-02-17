@@ -16,7 +16,6 @@ class APParameterMenu : public juce::Viewport
   void paint(juce::Graphics& g) override;
   void resized() override;
   void setMenuWidth(int w) { parameterGrid_->width = w; }
-  void setBackgroundImage(const juce::Image& backgroundImage);
   void initializeAssets();
   void setParameterFilter(const std::function<bool(juce::AudioProcessorParameter*)>& newFilter) {
     if (newFilter == nullptr)

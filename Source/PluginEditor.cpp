@@ -248,4 +248,3 @@ void Ap_dynamicsAudioProcessorEditor::initializeAssets()
   rSliderShadow_   = std::make_unique<juce::Image>();
   sSliderShadow_   = std::make_unique<juce::Image>();
 }
-void Ap_dynamicsAudioProcessorEditor::mouseDown(const MouseEvent& event) { DBG(rand()); }

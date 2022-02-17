@@ -33,7 +33,6 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   void setupSlider(std::unique_ptr<APSlider>& apSlider, std::unique_ptr<juce::Label>& label, const juce::String& name,
                    SliderType sliderType, const String& suffix = "s");
   void timerCallback() override;
-  void mouseDown(const juce::MouseEvent&) override;
 
  private:
   void initializeAssets();
@@ -78,7 +77,6 @@ class Ap_dynamicsAudioProcessorEditor : public juce::AudioProcessorEditor, publi
   const juce::Point<float> offset_{ 0.0f, -16.0f };
   const float shadowDeltaXY_      = 8.0f;
   const int sliderHeight_ = 185;
-  bool isMenuShown_ = false;
   juce::Rectangle<int> thresholdBounds_, ratioBounds_, pickerBounds_, pMenuBounds_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Ap_dynamicsAudioProcessorEditor)
