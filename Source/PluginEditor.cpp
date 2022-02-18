@@ -21,9 +21,8 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   parameterButton_->onClick  = [this]() { clickLayer_->setVisible(true); };
   constexpr auto x_margin    = 20;
   constexpr auto y_margin    = 10;
-  constexpr auto button_size = 60;
   pMenuBounds_ =
-      juce::Rectangle<int>(APConstants::Gui::M_WIDTH - (button_size + x_margin), y_margin + 20, button_size, button_size);
+      juce::Rectangle<int>(APConstants::Gui::M_WIDTH - (APConstants::Gui::MENU_BUTTON_SIZE + x_margin), y_margin + 20, APConstants::Gui::MENU_BUTTON_SIZE, APConstants::Gui::MENU_BUTTON_SIZE);
 
   parameterButton_->setBounds(pMenuBounds_);
   addAndMakeVisible(parameterButton_.get());

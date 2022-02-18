@@ -33,6 +33,7 @@ namespace APConstants
     inline constexpr int MENU_WIDTH                 = 630;
     inline constexpr int SLIDER_Y                   = 290;
     inline constexpr int SLIDER_WIDTH               = 200;
+    inline constexpr int MENU_BUTTON_SIZE = 50;
     inline constexpr float FONT_HEIGHT              = 24.0f;
     inline constexpr float SHADOW_FONT_HEIGHT       = 28.0f;
     inline constexpr float LABEL_FONT_HEIGHT        = 16.0f;
