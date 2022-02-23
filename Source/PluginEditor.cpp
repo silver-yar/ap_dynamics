@@ -18,16 +18,15 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   // Click Layer
 
   // Parameters Button
-  parameterButton_->onClick  = [this]() { clickLayer_->setVisible(true); };
-  constexpr auto x_margin    = 20;
-  constexpr auto y_margin    = 10;
-  pMenuBounds_ =
-      juce::Rectangle<int>(APConstants::Gui::M_WIDTH - (APConstants::Gui::MENU_BUTTON_SIZE + x_margin), y_margin + 20, APConstants::Gui::MENU_BUTTON_SIZE, APConstants::Gui::MENU_BUTTON_SIZE);
+  parameterButton_->onClick = [this]() { clickLayer_->setVisible(true); };
+  constexpr auto x_margin   = 20;
+  constexpr auto y_margin   = 10;
+  pMenuBounds_ = juce::Rectangle<int>(APConstants::Gui::M_WIDTH - (APConstants::Gui::MENU_BUTTON_SIZE + x_margin),
+                                      y_margin + 20, APConstants::Gui::MENU_BUTTON_SIZE, APConstants::Gui::MENU_BUTTON_SIZE);
 
   parameterButton_->setBounds(pMenuBounds_);
   addAndMakeVisible(parameterButton_.get());
   parameterMenu_->setMenuWidth(APConstants::Gui::MENU_WIDTH);
-
 
   // Slider Setup
   setupSlider(thresholdSlider_, thresholdLabel_, "Threshold", SliderType::Invert, "dB");
@@ -165,8 +164,8 @@ void Ap_dynamicsAudioProcessorEditor::resized()
 
   stylePicker_.setBounds(pickerBounds_);
 
-  constexpr auto x_margin    = 20;
-  constexpr auto y_margin    = 10;
+  constexpr auto x_margin = 20;
+  constexpr auto y_margin = 10;
   parameterMenu_->setBounds(x_margin, y_margin, APConstants::Gui::M_WIDTH - (x_margin * 2),
                             static_cast<int>(APConstants::Gui::M_HEIGHT * 0.5f));
 
@@ -228,13 +227,14 @@ void Ap_dynamicsAudioProcessorEditor::initializeAssets()
   clickLayer_ = std::make_unique<ClickLayer>();
   pButtonDef_ = std::make_unique<juce::DrawableImage>(
       juce::ImageCache::getFromMemory(BinaryData::tune_black_png, BinaryData::tune_black_pngSize));
-  //  pButtonDef_->setOverlayColour(APConstants::Colors::DARK_GREY);
   pButtonDef_->setAlpha(0.0f);
   pButtonOver_ = std::make_unique<juce::DrawableImage>(
       juce::ImageCache::getFromMemory(BinaryData::tune_white_png, BinaryData::tune_white_pngSize));
   parameterButton_ = std::make_unique<juce::DrawableButton>("Parameters", juce::DrawableButton::ButtonStyle::ImageFitted);
   parameterButton_->setImages(pButtonDef_.get(), pButtonOver_.get());
   parameterMenu_ = std::make_unique<APParameterMenu>(audioProcessor_, audioProcessor_.apvts);
+  parameterMenu_->getVerticalScrollBar().setColour(juce::ScrollBar::thumbColourId, juce::Colours::lightgrey);
+  parameterMenu_->getVerticalScrollBar().setColour(juce::ScrollBar::trackColourId, juce::Colours::darkgrey);
   pButtonShadow_ = std::make_unique<juce::Image>(
       juce::ImageCache::getFromMemory(BinaryData::tune_shadow_png, BinaryData::tune_shadow_pngSize));
 

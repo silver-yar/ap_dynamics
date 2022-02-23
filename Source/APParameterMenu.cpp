@@ -41,6 +41,7 @@ void APParameterMenu::ParameterGrid::initializeAssets()
                       std::make_unique<juce::Slider>(juce::Slider::SliderStyle::LinearBar, juce::Slider::TextBoxAbove);
                   new_slider.slider->setTextValueSuffix(" " + cast_param->getLabel());
                   new_slider.slider->setLookAndFeel(menuLookAndFeel_.get());
+                  new_slider.slider->setColour(juce::Slider::trackColourId, APConstants::Colors::DARK_GREY);
                   new_slider.sliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
                       apvts_, cast_param->getParameterID(), *new_slider.slider);
                   new_slider.label = std::make_unique<juce::Label>(cast_param->name, cast_param->name);
