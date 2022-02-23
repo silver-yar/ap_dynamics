@@ -7,6 +7,13 @@
 #include "../Helpers/APDefines.h"
 #include "BinaryData.h"
 
+juce::Label* MenuLookAndFeel::createSliderTextBox(Slider& slider)
+{
+  auto *l = juce::LookAndFeel_V4::createSliderTextBox(slider);
+  l->setFont(APConstants::Gui::SYS_FONT);
+
+  return l;
+}
 void APParameterMenu::ParameterGrid::paint(juce::Graphics& g) { juce::ignoreUnused(g); }
 void APParameterMenu::ParameterGrid::resized()
 {
@@ -27,6 +34,8 @@ void APParameterMenu::ParameterGrid::resized()
 }
 void APParameterMenu::ParameterGrid::initializeAssets()
 {
+  menuLookAndFeel_ = std::make_unique<MenuLookAndFeel>();
+
   auto all_parameters = audioProcessor_.getParameters();
   std::for_each(all_parameters.begin(), all_parameters.end(),
                 [this](auto parameter)
@@ -37,6 +46,7 @@ void APParameterMenu::ParameterGrid::initializeAssets()
                   new_slider.slider =
                       std::make_unique<juce::Slider>(juce::Slider::SliderStyle::LinearBar, juce::Slider::TextBoxAbove);
                   new_slider.slider->setTextValueSuffix(" " + cast_param->getLabel());
+                  new_slider.slider->setLookAndFeel(menuLookAndFeel_.get());
                   new_slider.sliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
                       apvts_, cast_param->getParameterID(), *new_slider.slider);
                   new_slider.label = std::make_unique<juce::Label>(cast_param->name, cast_param->name);
@@ -90,6 +100,7 @@ void APParameterMenu::initializeAssets()
 
 void APParameterMenu::resized()
 {
+  Viewport::resized();
   jassert(parameterGrid_->parameterFilter != nullptr);
   auto all_parameters                  = audioProcessor_.getParameters();
   constexpr float num_vis_sliders      = 3.5f;
@@ -99,5 +110,7 @@ void APParameterMenu::resized()
   const int num_sliders =
       static_cast<int>(std::count_if(all_parameters.begin(), all_parameters.end(), parameterGrid_->parameterFilter));
 
-  parameterGrid_->setBounds(getLocalBounds().withHeight(num_sliders * slider_height));
+  const auto menu_height = num_sliders * slider_height;
+  parameterGrid_->setBounds(0,0,getWidth() - getScrollBarThickness(),menu_height);
 }
+

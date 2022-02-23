@@ -27,8 +27,7 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   parameterButton_->setBounds(pMenuBounds_);
   addAndMakeVisible(parameterButton_.get());
   parameterMenu_->setMenuWidth(APConstants::Gui::MENU_WIDTH);
-  parameterMenu_->setBounds(x_margin, y_margin, APConstants::Gui::M_WIDTH - (x_margin * 2),
-                            static_cast<int>(APConstants::Gui::M_HEIGHT * 0.5f));
+
 
   // Slider Setup
   setupSlider(thresholdSlider_, thresholdLabel_, "Threshold", SliderType::Invert, "dB");
@@ -165,6 +164,11 @@ void Ap_dynamicsAudioProcessorEditor::resized()
   ratioSlider_->setBounds(ratioBounds_);
 
   stylePicker_.setBounds(pickerBounds_);
+
+  constexpr auto x_margin    = 20;
+  constexpr auto y_margin    = 10;
+  parameterMenu_->setBounds(x_margin, y_margin, APConstants::Gui::M_WIDTH - (x_margin * 2),
+                            static_cast<int>(APConstants::Gui::M_HEIGHT * 0.5f));
 
   //  if (parameterMenu_->isVisible())
   //  {
