@@ -6,11 +6,7 @@
 #include "PluginProcessor.h"
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_gui_basics/juce_gui_basics.h"
-
-class MenuLookAndFeel : public juce::LookAndFeel_V4
-{
-  juce::Label* createSliderTextBox(juce::Slider&) override;
-};
+#include "APLookAndFeel.h"
 
 class APParameterMenu : public juce::Viewport
 {

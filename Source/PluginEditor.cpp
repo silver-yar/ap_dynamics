@@ -36,7 +36,7 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
   setupSlider(ratioSlider_, ratioLabel_, "Ratio", SliderType::Normal, ": 1");
   ratioAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor_.apvts, "RAT",
                                                                                             ratioSlider_->slider);
-  auto thresh_look_and_feel = dynamic_cast<MyLookAndFeel*>(&thresholdSlider_->slider.getLookAndFeel());
+  auto thresh_look_and_feel = dynamic_cast<MainSliderLookAndFeel*>(&thresholdSlider_->slider.getLookAndFeel());
   jassert(thresh_look_and_feel != nullptr);
   thresh_look_and_feel->getLabelText = [this]()
   {
@@ -49,7 +49,7 @@ Ap_dynamicsAudioProcessorEditor::Ap_dynamicsAudioProcessorEditor(Ap_dynamicsAudi
     return label_text;
   };
 
-  auto ratio_look_and_feel = dynamic_cast<MyLookAndFeel*>(&ratioSlider_->slider.getLookAndFeel());
+  auto ratio_look_and_feel = dynamic_cast<MainSliderLookAndFeel*>(&ratioSlider_->slider.getLookAndFeel());
   jassert(ratio_look_and_feel != nullptr);
   ratio_look_and_feel->getLabelText = [this]()
   {

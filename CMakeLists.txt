@@ -80,7 +80,8 @@ target_sources(
         Source/MixerButton.cpp
         Source/OpenGL/SliderBarGL.cpp
         Source/PluginEditor.cpp
-        Source/PluginProcessor.cpp)
+        Source/PluginProcessor.cpp
+        Source/APLookAndFeel.cpp)
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer project, these might be
 # passed in the 'Preprocessor Definitions' field. JUCE modules also make use of compile definitions to switch certain
 # features on/off, so if there's a particular feature you need that's not on by default, check the module header for the

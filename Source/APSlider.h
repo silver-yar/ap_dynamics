@@ -15,31 +15,12 @@
 #include "../Helpers/APDefines.h"
 #include "./OpenGL/SliderBarGL.h"
 #include "PluginProcessor.h"
+#include "APLookAndFeel.h"
 
 enum SliderType
 {
   Normal = 1,
   Invert = 2
-};
-
-class MyLookAndFeel : public juce::LookAndFeel_V4
-{
- public:
-  MyLookAndFeel();
-
-  void drawLinearSlider(juce::Graphics &, int x, int y, int width, int height, float sliderPos, float minSliderPos,
-                        float maxSliderPos, juce::Slider::SliderStyle, juce::Slider &) override;
-  juce::Label *createSliderTextBox(juce::Slider &) override;
-  void drawLabel(juce::Graphics &, juce::Label &) override;
-  std::function<juce::String()> getLabelText = nullptr;
-
- private:
-  void initializeAssets();
-  std::unique_ptr<juce::ImageConvolutionKernel> kernel_;
-  std::unique_ptr<juce::Image> shadow_;
-
-  int lastSliderPos_ = 0;
-  int sliderWidth_   = 0;
 };
 
 class APSlider : public juce::Component, public juce::Timer
@@ -57,5 +38,5 @@ class APSlider : public juce::Component, public juce::Timer
   Ap_dynamicsAudioProcessor &audioProcessor;
   SliderType sliderType_;
   std::unique_ptr<SliderBarGL> sliderBarGl_;
-  std::unique_ptr<MyLookAndFeel> lookAndFeel_;
+  std::unique_ptr<MainSliderLookAndFeel> lookAndFeel_;
 };

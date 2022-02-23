@@ -7,13 +7,7 @@
 #include "../Helpers/APDefines.h"
 #include "BinaryData.h"
 
-juce::Label* MenuLookAndFeel::createSliderTextBox(Slider& slider)
-{
-  auto *l = juce::LookAndFeel_V4::createSliderTextBox(slider);
-  l->setFont(APConstants::Gui::SYS_FONT);
 
-  return l;
-}
 void APParameterMenu::ParameterGrid::paint(juce::Graphics& g) { juce::ignoreUnused(g); }
 void APParameterMenu::ParameterGrid::resized()
 {
