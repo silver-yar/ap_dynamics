@@ -10,6 +10,6 @@ add_subdirectory(catch2)
 FetchContent_Declare(
         juce
         GIT_REPOSITORY "https://github.com/juce-framework/JUCE.git"
-        GIT_TAG 6.1.3
+        GIT_TAG 6.1.6
 )
 add_subdirectory(juce)
