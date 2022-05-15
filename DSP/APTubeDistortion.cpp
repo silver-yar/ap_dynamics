@@ -24,11 +24,9 @@ void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, c
   // Calculate z
   for (auto i = 0; i < numSamplesToRender; ++i)
   {
-    if (maxBufferVal > 0)
-    {
       const auto& in = audioIn[i];
       double z       = 0.0;
-      const auto q   = maxBufferVal > 0 ? in * distGain / maxBufferVal : 0;  // Normalization
+      const auto q   = maxBufferVal > 0 ? in * distGain / maxBufferVal : 0;  // Normalization 0.0f - 1.0f
 
       if (Q == 0)
       {
@@ -51,10 +49,5 @@ void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, c
         maxZ = z;
 
       audioOut[i] = static_cast<float>((mix_ * z * (maxBufferVal / maxZ) + (1.0f - mix_) * in) * maxBufferVal / maxZ);
-    }
-    else
-    {
-      audioOut[i] = 0;
-    }
   }
 }

@@ -21,8 +21,8 @@ class APTubeDistortion
   // Based off DAFX 2nd edition pg. 123
   void process(const float* audioIn, float maxBufferVal,
                    float distGain,  // distortion amount
-                   float Q,         // work point
-                   float distChar,  // distortion character
+                   float Q,         // work point, more negative = more linear
+                   float distChar,  // distortion character, higher = harder, >0
                    float* audioOut, int numSamplesToRender) const;
 
  private:

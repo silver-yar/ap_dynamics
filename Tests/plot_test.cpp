@@ -64,8 +64,7 @@ void processSamplesWithDistortion(juce::AudioBuffer<float>& buffer, APTubeDistor
 
     DBG("bufferMaxVal: " << bufferMaxVal );
 
-    APTubeDistortion::process(channelData, bufferMaxVal, 1.0f, -0.4, 8.0f, 1.0f, channelData, numSamples);
-
+    distortion.process(channelData, bufferMaxVal, 1.0f, -0.4, 8.0f, channelData, numSamples);
 
 //    APTubeDistortion::process(channelData, 3.0f, -0.2f, 8.0f, 0.8f, channelData, buffer.getNumSamples());
   }
@@ -81,7 +80,7 @@ void processSamplesWithOverdrive(juce::AudioBuffer<float>& buffer, APOverdrive& 
   for (int channel = 0; channel < numChannels; ++channel)
   {
     auto* channelData = buffer.getWritePointer(channel);
-    APOverdrive::process(channelData, 0.5f, channelData, buffer.getNumSamples());
+//    APOverdrive::process(channelData, 0.5f, channelData, buffer.getNumSamples());
   }
 }
 

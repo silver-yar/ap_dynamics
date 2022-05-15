@@ -15,6 +15,7 @@
 #include "MixerButton.h"
 #include "PluginProcessor.h"
 #include "APParameterMenu.h"
+#include <string_view>
 
 //==============================================================================
 
