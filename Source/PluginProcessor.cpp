@@ -209,7 +209,7 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     //    compressor_->process(channelData, channelData, buffer.getNumSamples()); // comp -> ok
     //    overdrive_->process(channelData, channelData, buffer.getNumSamples());
 
-//    tubeDistortion_->process(channelData, bufferMaxVal, 1.0f, -0.2f, 8.0f, channelData, buffer.getNumSamples());
+    tubeDistortion_->process(channelData, bufferMaxVal, 1.0f, -0.2f, 8.0f, channelData, buffer.getNumSamples());
 
     // Makeup
     //    for (int sample = 0; sample < numSamples; ++sample)

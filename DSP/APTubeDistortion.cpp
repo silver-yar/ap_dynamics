@@ -37,7 +37,8 @@ void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, c
     else
     {
       double z     = 0.0;
-      const auto q = in * distGain / maxBufferVal;  // Normalization 0.0f - 1.0f
+      const auto q = in * distGain / maxBufferVal;
+//      const auto q = juce::jmap(in, -10.0f, 10.0f, 0.0f, 1.0f) * distGain;
 
       if (Q == 0)
       {
@@ -50,6 +51,7 @@ void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, c
       else
       {
         z = (q - Q) / (1.0 - exp(-distChar * (q - Q))) + Q / (1.0 - exp(distChar * Q));
+//        jassert(static_cast<bool>(z));
         if (q == Q)
         {
           z = 1 / distChar + Q / (1.0 - exp(distChar * Q));
@@ -59,13 +61,15 @@ void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, c
       if (maxZ < z)
         maxZ = z;
 
-      auto out = static_cast<float>(z * maxBufferVal / maxZ );
+//      auto out = static_cast<float>(z * maxBufferVal / maxZ );
+//      jassert(static_cast<bool>(out));
+      auto out = static_cast<float>(z);
 
       if (maxOut < out)
         maxOut = out;
 
-      out = out * maxBufferVal / maxOut;
-      // HP Filter
+//      out = out * maxBufferVal / maxOut;
+//      jassert(static_cast<bool>(out));
 
       audioOut[i] = out;
     }

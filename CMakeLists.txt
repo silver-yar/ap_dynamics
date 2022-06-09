@@ -161,6 +161,7 @@ list(
 add_executable(plot-test ${FILES_plot})
 target_link_libraries(plot-test
         PRIVATE
+        AudioPluginData
         juce::juce_core
         juce::juce_graphics
         juce::juce_audio_basics
