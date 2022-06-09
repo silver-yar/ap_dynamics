@@ -77,7 +77,7 @@ namespace APParameters
   inline constexpr auto MIX_START    = 0.0f;
   inline constexpr auto MIX_END      = 1.0f;
   inline constexpr auto MIX_INTERVAL = 0.01f;
-  inline constexpr auto MIX_DEFAULT  = 1.0f;
+  inline constexpr auto MIX_DEFAULT  = 0.0f;
 
   inline constexpr auto DISTQ_ID       = "DSQ";
   inline constexpr auto DISTQ_NAME     = "Distortion Q";

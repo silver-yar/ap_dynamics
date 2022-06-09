@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "juce_dsp/juce_dsp.h"
 
 #include "../DSP/APCompressor.h"
 #include "../DSP/APOverdrive.h"
@@ -75,6 +76,9 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
  private:
   std::atomic<bool> mustUpdateProcessing_{ false }, isActive_{ false }; // TODO: Consider making std::atomic<bool>
   std::atomic<float> makeupSmoothed_ {0.0f};
+
+  using Filter = juce::dsp::ProcessorDuplicator<dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>;
+  std::unique_ptr<Filter> postHighPass_;
 
   std::unique_ptr<APCompressor> compressor_;
   std::unique_ptr<APTubeDistortion> tubeDistortion_;

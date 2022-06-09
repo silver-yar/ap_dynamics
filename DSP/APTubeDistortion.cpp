@@ -12,21 +12,32 @@
 
 #include <cmath>
 
-APTubeDistortion::APTubeDistortion() = default;
+APTubeDistortion::APTubeDistortion() {
+//  postHighPass_ = std::make_unique<juce::dsp::IIR::Filter<float>>();
+}
 
 APTubeDistortion::~APTubeDistortion() = default;
 
 void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, const float distGain, const float Q,
                                const float distChar, float* audioOut, const int numSamplesToRender) const
 {
+//  postHighPass_->snapToZero();
   auto maxZ = 0.0;
+  auto maxOut = 0.0f;
 
   // Calculate z
   for (auto i = 0; i < numSamplesToRender; ++i)
   {
-      const auto& in = audioIn[i];
-      double z       = 0.0;
-      const auto q   = maxBufferVal > 0 ? in * distGain / maxBufferVal : 0;  // Normalization 0.0f - 1.0f
+    const auto& in = audioIn[i];
+
+    if (in == 0.0f || maxBufferVal == 0.0f)
+    {
+      audioOut[i] = in;
+    }
+    else
+    {
+      double z     = 0.0;
+      const auto q = in * distGain / maxBufferVal;  // Normalization 0.0f - 1.0f
 
       if (Q == 0)
       {
@@ -48,6 +59,15 @@ void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, c
       if (maxZ < z)
         maxZ = z;
 
-      audioOut[i] = static_cast<float>((mix_ * z * (maxBufferVal / maxZ) + (1.0f - mix_) * in) * maxBufferVal / maxZ);
+      auto out = static_cast<float>(z * maxBufferVal / maxZ );
+
+      if (maxOut < out)
+        maxOut = out;
+
+      out = out * maxBufferVal / maxOut;
+      // HP Filter
+
+      audioOut[i] = out;
+    }
   }
 }

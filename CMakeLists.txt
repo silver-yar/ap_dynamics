@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.15)
 #SET(MACOSX_DEPLOYMENT_TARGET ${DARWIN_MAJOR_SDK_VERSION}.${DARWIN_MINOR_SDK_VERSION})
 #SET(CMAKE_CXX_FLAGS "--sysroot ${CMAKE_OSX_SYSROOT} ${CMAKE_CXX_FLAGS}")
 #MESSAGE("Setting MACOSX_DEPLOYMENT_TARGET to '${MACOSX_DEPLOYMENT_TARGET}'.")
-project(ap_dynamics VERSION 0.0.1)
+project(ap_dynamics VERSION 0.0.2)
 set(CMAKE_OSX_ARCHITECTURES x86_64 arm64)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -127,7 +127,7 @@ juce_add_binary_data(
 target_link_libraries(
         ap_dynamics
         PRIVATE AudioPluginData # If we'd created a binary data target, we'd link to it here
-        juce::juce_audio_utils juce::juce_opengl
+        juce::juce_audio_utils juce::juce_opengl juce::juce_dsp
         PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_lto_flags juce::juce_recommended_warning_flags)
 
 add_library(project_warnings INTERFACE)
