@@ -23,7 +23,7 @@ class APTubeDistortion
 //    *postHighPass_->coefficients = *juce::dsp::IIR::Coefficients<float>::makeLowPass(spec.sampleRate, 20000);
   };
   // Based off DAFX 2nd edition pg. 123
-  void process(const float* audioIn, float maxBufferVal,
+  void process(const float* audioIn, float minBufferVal, float maxBufferVal,
                    float distGain,  // distortion amount
                    float Q,         // work point, more negative = more linear
                    float distChar,  // distortion character, higher = harder, >0

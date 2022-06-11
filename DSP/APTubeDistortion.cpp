@@ -18,13 +18,10 @@ APTubeDistortion::APTubeDistortion() {
 
 APTubeDistortion::~APTubeDistortion() = default;
 
-void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, const float distGain, const float Q,
+void APTubeDistortion::process(const float* audioIn, const float minBufferVal, const float maxBufferVal, const float distGain, const float Q,
                                const float distChar, float* audioOut, const int numSamplesToRender) const
 {
 //  postHighPass_->snapToZero();
-  auto maxZ = 0.0;
-  auto maxOut = 0.0f;
-
   // Calculate z
   for (auto i = 0; i < numSamplesToRender; ++i)
   {
@@ -38,7 +35,6 @@ void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, c
     {
       double z     = 0.0;
       const auto q = in * distGain / maxBufferVal;
-//      const auto q = juce::jmap(in, -10.0f, 10.0f, 0.0f, 1.0f) * distGain;
 
       if (Q == 0)
       {
@@ -58,20 +54,7 @@ void APTubeDistortion::process(const float* audioIn, const float maxBufferVal, c
         }
       }
 
-      if (maxZ < z)
-        maxZ = z;
-
-//      auto out = static_cast<float>(z * maxBufferVal / maxZ );
-//      jassert(static_cast<bool>(out));
-      auto out = static_cast<float>(z);
-
-      if (maxOut < out)
-        maxOut = out;
-
-//      out = out * maxBufferVal / maxOut;
-//      jassert(static_cast<bool>(out));
-
-      audioOut[i] = out;
+      audioOut[i] = juce::jlimit(minBufferVal, maxBufferVal, static_cast<float>(z));
     }
   }
 }

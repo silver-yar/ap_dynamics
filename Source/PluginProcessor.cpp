@@ -29,7 +29,8 @@ Ap_dynamicsAudioProcessor::Ap_dynamicsAudioProcessor()
   compressor_     = std::make_unique<APCompressor>();
   tubeDistortion_ = std::make_unique<APTubeDistortion>();
   overdrive_      = std::make_unique<APOverdrive>();
-  postHighPass_ = std::make_unique<Filter>();
+  postHighPass_   = std::make_unique<Filter>();
+  postLowPass_    = std::make_unique<Filter>();
 
   apvts.state.addListener(this);
 }
@@ -107,12 +108,17 @@ void Ap_dynamicsAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
   auto channels = static_cast<uint32>(jmin(getMainBusNumInputChannels(), getMainBusNumOutputChannels()));
   dsp::ProcessSpec spec{ sampleRate, static_cast<uint32>(samplesPerBlock), channels };
 
-//  tubeDistortion_->prepare(spec);
+  //  tubeDistortion_->prepare(spec);
 
   postHighPass_->prepare(spec);
+  postLowPass_->prepare(spec);
 
-//  *postHighPass_->state = dsp::IIR::Coefficients<float> (1.0f, -2.0f, 1.0f, 1.0f, -2.0f * 0.98f, powf(0.98f, 2.0f));
-  *postHighPass_->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 20.0f);
+  auto rh = 0.98f;
+  auto r1 = 0.8f;
+
+  *postHighPass_->state = dsp::IIR::Coefficients<float>(1.0f, -2.0f, 1.0f, 1.0f, -2.0f * rh, powf(rh, 2.0f));
+  *postLowPass_->state  = dsp::IIR::Coefficients<float>(1.0f - r1, 0.0f, 0.0f, 1.0f, -r1, 0.0f);
+  //  *postHighPass_->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 20.0f);
 
   compressor_->setSampleRate(static_cast<float>(sampleRate));
   update();
@@ -161,8 +167,8 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     update();
 
   juce::ScopedNoDenormals noDenormals;
-  juce::dsp::AudioBlock<float> block (buffer);
-  juce::dsp::ProcessContextReplacing<float> context (block);
+  juce::dsp::AudioBlock<float> block(buffer);
+  juce::dsp::ProcessContextReplacing<float> context(block);
 
   const auto totalNumInputChannels  = getTotalNumInputChannels();
   const auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -201,15 +207,13 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
     // Find the buffer's max magnitude
     const auto bufferMinMax = buffer.findMinMax(channel, 0, numSamples);
-    const auto minMag       = abs(bufferMinMax.getStart());
-    const auto maxMag       = abs(bufferMinMax.getEnd());
-    const auto bufferMaxVal = juce::jmax(minMag, maxMag);
 
     // DSP Processing
     //    compressor_->process(channelData, channelData, buffer.getNumSamples()); // comp -> ok
     //    overdrive_->process(channelData, channelData, buffer.getNumSamples());
 
-    tubeDistortion_->process(channelData, bufferMaxVal, 1.0f, -0.2f, 8.0f, channelData, buffer.getNumSamples());
+    tubeDistortion_->process(channelData, bufferMinMax.getStart(), bufferMinMax.getEnd(), 1.0f, -0.2f, 8.0f, channelData,
+                             buffer.getNumSamples());
 
     // Makeup
     //    for (int sample = 0; sample < numSamples; ++sample)
@@ -218,7 +222,8 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     //    }
   }
 
-  postHighPass_->process (context);
+  postHighPass_->process(context);
+  postLowPass_->process(context);
 
   meterLocalMaxVal = sumMaxVal / static_cast<float>(numChannels);
 }

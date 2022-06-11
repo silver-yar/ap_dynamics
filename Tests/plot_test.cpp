@@ -193,10 +193,15 @@ juce::Image generatePlots(const juce::String& file_path, ProcessType type)
 {
   juce::ScopedJuceInitialiser_GUI myInit;
 
-  juce::Image plot_image(juce::Image::PixelFormat::ARGB, 500, 500, true);
+  auto imageWidth = 1200;
+  auto imageHeight = imageWidth;
+  auto plotWidth = imageWidth - (imageWidth * 0.1f);
+  auto plotHeight = imageHeight / 2 - (imageHeight * 0.1f);
+
+  juce::Image plot_image(juce::Image::PixelFormat::ARGB, imageWidth, imageHeight, true);
   auto plot_graphics      = juce::Graphics(plot_image);
-  auto top_plot_bounds    = juce::Rectangle<int>(30, 30, 440, 205);
-  auto bottom_plot_bounds = juce::Rectangle<int>(30, 265, 440, 205);
+  auto top_plot_bounds    = juce::Rectangle<int>(30, 30, plotWidth, plotHeight);
+  auto bottom_plot_bounds = juce::Rectangle<int>(30, 30 + plotHeight, plotWidth, plotHeight);
 
   auto audio_buffer = loadFile(file_path);
 
