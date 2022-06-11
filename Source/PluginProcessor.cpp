@@ -209,9 +209,8 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     const auto bufferMinMax = buffer.findMinMax(channel, 0, numSamples);
 
     // DSP Processing
-    //    compressor_->process(channelData, channelData, buffer.getNumSamples()); // comp -> ok
-    //    overdrive_->process(channelData, channelData, buffer.getNumSamples());
-
+    compressor_->process(channelData, channelData, buffer.getNumSamples());  // comp -> ok
+    overdrive_->process(channelData, channelData, buffer.getNumSamples());
     tubeDistortion_->process(channelData, bufferMinMax.getStart(), bufferMinMax.getEnd(), 1.0f, -0.2f, 8.0f, channelData,
                              buffer.getNumSamples());
 
