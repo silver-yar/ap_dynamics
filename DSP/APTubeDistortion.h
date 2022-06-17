@@ -18,10 +18,6 @@ class APTubeDistortion
   APTubeDistortion();
   ~APTubeDistortion();
 
-  void prepare (juce::dsp::ProcessSpec spec) {
-//    postHighPass_->prepare(spec);
-//    *postHighPass_->coefficients = *juce::dsp::IIR::Coefficients<float>::makeLowPass(spec.sampleRate, 20000);
-  };
   // Based off DAFX 2nd edition pg. 123
   void process(const float* audioIn, float minBufferVal, float maxBufferVal,
                    float distGain,  // distortion amount
@@ -30,6 +26,4 @@ class APTubeDistortion
                    float* audioOut, int numSamplesToRender) const;
 
  private:
-//  std::unique_ptr<juce::dsp::IIR::Filter<float>> postHighPass_, postLowPass_;
-
 };

@@ -87,6 +87,14 @@ namespace APParameters
   inline constexpr auto DISTQ_INTERVAL = 0.1f;
   inline constexpr auto DISTQ_DEFAULT  = 0.0f;
 
+  inline constexpr auto DIST_CHAR_ID       = "DSC";
+  inline constexpr auto DIST_CHAR_NAME     = "Distortion Characteristic";
+  inline constexpr auto DIST_CHAR_SUFFIX   = "";
+  inline constexpr auto DIST_CHAR_START    = 0.0f;
+  inline constexpr auto DIST_CHAR_END      = 10.0f;
+  inline constexpr auto DIST_CHAR_INTERVAL = 0.1f;
+  inline constexpr auto DIST_CHAR_DEFAULT  = 2.0f;
+
   inline constexpr auto MAKEUP_ID       = "MUP";
   inline constexpr auto MAKEUP_NAME     = "Makeup";
   inline constexpr auto MAKEUP_SUFFIX   = "dB";
