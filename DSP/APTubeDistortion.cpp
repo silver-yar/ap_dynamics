@@ -21,6 +21,8 @@ APTubeDistortion::~APTubeDistortion() = default;
 void APTubeDistortion::process(const float* audioIn, const float minBufferVal, const float maxBufferVal, const float distGain, const float Q,
                                const float distChar, float* audioOut, const int numSamplesToRender) const
 {
+
+//  auto sampleSmoothed = 0.0f;
 //  postHighPass_->snapToZero();
   // Calculate z
   for (auto i = 0; i < numSamplesToRender; ++i)
@@ -54,6 +56,7 @@ void APTubeDistortion::process(const float* audioIn, const float minBufferVal, c
         }
       }
 
+//      sampleSmoothed = sampleSmoothed - 0.004f * (sampleSmoothed - static_cast<float>(z));
       audioOut[i] = juce::jlimit(minBufferVal, maxBufferVal, static_cast<float>(z));
     }
   }

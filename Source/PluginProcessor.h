@@ -78,7 +78,7 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   std::atomic<float> makeupSmoothed_ {0.0f};
 
   // Mixing
-  juce::LinearSmoothedValue<float> dryGain_, wetGain_; // consider make unique_ptr
+  juce::LinearSmoothedValue<float> dryGain_, wetGain_, makeup_; // consider make unique_ptr
   juce::AudioBuffer<float> mixBuffer_;
 
   // Post-Processing Filters

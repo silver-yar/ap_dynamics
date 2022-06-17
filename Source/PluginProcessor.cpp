@@ -219,7 +219,6 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
     tubeDistortion_->process(channelData, bufferMinMax.getStart(), bufferMinMax.getEnd(), 1.0f, distQ_, distChar_,
                              channelData, buffer.getNumSamples());
-
   }
 
   // Post-Filtering
@@ -233,6 +232,9 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
   // -- Convolution
   for (auto channel = 0; channel < numChannels; channel++)
     buffer.addFrom(channel, 0, mixBuffer_,  channel, 0, numSamples);
+
+  // Makeup
+  makeup_.applyGain(buffer, numSamples);
 
   meterLocalMaxVal = sumMaxVal / static_cast<float>(numChannels);
 }
@@ -275,8 +277,9 @@ void Ap_dynamicsAudioProcessor::update()
   distChar_.store(apvts.getRawParameterValue(APParameters::DIST_CHAR_ID)->load());
 
   const auto makeup =
-      juce::Decibels::decibelsToGain(apvts.getRawParameterValue("MUP")->load(), APConstants::Math::MINUS_INF_DB);
+      juce::Decibels::decibelsToGain(apvts.getRawParameterValue(APParameters::MAKEUP_ID)->load(), APConstants::Math::MINUS_INF_DB);
   makeupSmoothed_ = makeupSmoothed_ - 0.004f * (makeupSmoothed_ - makeup);
+  makeup_.setCurrentAndTargetValue(makeupSmoothed_);
 }
 
 void Ap_dynamicsAudioProcessor::reset()
@@ -292,6 +295,7 @@ void Ap_dynamicsAudioProcessor::reset()
   mixBuffer_.applyGain(0.0f);
   dryGain_.reset(getSampleRate(), 0.05);
   wetGain_.reset(getSampleRate(), 0.05);
+  makeup_.reset(getSampleRate(), 0.05);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::createParameters()
