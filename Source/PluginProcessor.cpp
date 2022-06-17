@@ -118,8 +118,8 @@ void Ap_dynamicsAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
 
   *postHighPass_->state = dsp::IIR::Coefficients<float>(1.0f, -2.0f, 1.0f, 1.0f, -2.0f * rh, powf(rh, 2.0f));
   *postLowPass_->state  = dsp::IIR::Coefficients<float>(1.0f - r1, 0.0f, 0.0f, 1.0f, -r1, 0.0f);
-  //  *postHighPass_->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 20.0f);
 
+  mixBuffer_.setSize(static_cast<int>(channels), samplesPerBlock);
   compressor_->setSampleRate(static_cast<float>(sampleRate));
   update();
   reset();
@@ -183,6 +183,10 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     buffer.clear(i, 0, numSamples);
   }
 
+  // Mix Buffer Feeding
+//  for (auto channel = 0; channel < numChannels; channel++)
+//    mixBuffer_.copyFrom(channel, 0, buffer, channel, 0, numSamples);
+
   for (int channel = 0; channel < totalNumInputChannels; ++channel)
   {
     auto* channelData = buffer.getWritePointer(channel);
@@ -210,19 +214,25 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
     // DSP Processing
     compressor_->process(channelData, channelData, buffer.getNumSamples());  // comp -> ok
-    overdrive_->process(channelData, channelData, buffer.getNumSamples());
-    tubeDistortion_->process(channelData, bufferMinMax.getStart(), bufferMinMax.getEnd(), 1.0f, -0.2f, 8.0f, channelData,
-                             buffer.getNumSamples());
+    //    overdrive_->process(channelData, channelData, buffer.getNumSamples());
+    mixBuffer_.copyFrom(channel, 0, buffer, channel, 0, numSamples);
 
-    // Makeup
-    //    for (int sample = 0; sample < numSamples; ++sample)
-    //    {
-    //      channelData[sample] *= makeupSmoothed_;
-    //    }
+    tubeDistortion_->process(channelData, bufferMinMax.getStart(), bufferMinMax.getEnd(), 1.0f, distQ_, distChar_,
+                             channelData, buffer.getNumSamples());
+
   }
 
+  // Post-Filtering
   postHighPass_->process(context);
   postLowPass_->process(context);
+
+  // Mix Processing
+  dryGain_.applyGain(mixBuffer_, numSamples);
+  wetGain_.applyGain(buffer, numSamples);
+
+  // -- Convolution
+  for (auto channel = 0; channel < numChannels; channel++)
+    buffer.addFrom(channel, 0, mixBuffer_,  channel, 0, numSamples);
 
   meterLocalMaxVal = sumMaxVal / static_cast<float>(numChannels);
 }
@@ -255,9 +265,14 @@ void Ap_dynamicsAudioProcessor::update()
 {
   mustUpdateProcessing_ = false;
   const auto mix        = apvts.getRawParameterValue("MIX")->load();
+  dryGain_.setCurrentAndTargetValue(1.0f - mix);
+  wetGain_.setCurrentAndTargetValue(mix);
 
   compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(), apvts.getRawParameterValue("RAT")->load());
   overdrive_->updateParameters(mix);
+
+  distQ_.store(apvts.getRawParameterValue(APParameters::DISTQ_ID)->load());
+  distChar_.store(apvts.getRawParameterValue(APParameters::DIST_CHAR_ID)->load());
 
   const auto makeup =
       juce::Decibels::decibelsToGain(apvts.getRawParameterValue("MUP")->load(), APConstants::Math::MINUS_INF_DB);
@@ -272,6 +287,11 @@ void Ap_dynamicsAudioProcessor::reset()
   meterLocalMaxVal.store(zero_f);
   meterGlobalMaxVal.store(zero_f);
   makeupSmoothed_.store(zero_f);
+  distQ_.store(zero_f);
+  distChar_.store(zero_f);
+  mixBuffer_.applyGain(0.0f);
+  dryGain_.reset(getSampleRate(), 0.05);
+  wetGain_.reset(getSampleRate(), 0.05);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::createParameters()
@@ -307,6 +327,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout Ap_dynamicsAudioProcessor::c
       APParameters::DISTQ_ID, APParameters::DISTQ_NAME,
       juce::NormalisableRange<float>(APParameters::DISTQ_START, APParameters::DISTQ_END, APParameters::DISTQ_INTERVAL),
       APParameters::DISTQ_DEFAULT, APParameters::DISTQ_SUFFIX, juce::AudioProcessorParameter::genericParameter,
+      valueToTextFunction, textToValueFunction));
+  // Distortion Characteristic
+  parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(
+      APParameters::DIST_CHAR_ID, APParameters::DIST_CHAR_NAME,
+      juce::NormalisableRange<float>(APParameters::DIST_CHAR_START, APParameters::DIST_CHAR_END,
+                                     APParameters::DIST_CHAR_INTERVAL),
+      APParameters::DIST_CHAR_DEFAULT, APParameters::DIST_CHAR_SUFFIX, juce::AudioProcessorParameter::genericParameter,
       valueToTextFunction, textToValueFunction));
   // Makeup
   parameters.emplace_back(std::make_unique<juce::AudioParameterFloat>(

@@ -77,14 +77,21 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   std::atomic<bool> mustUpdateProcessing_{ false }, isActive_{ false }; // TODO: Consider making std::atomic<bool>
   std::atomic<float> makeupSmoothed_ {0.0f};
 
+  // Mixing
+  juce::LinearSmoothedValue<float> dryGain_, wetGain_; // consider make unique_ptr
+  juce::AudioBuffer<float> mixBuffer_;
+
   // Post-Processing Filters
   using Filter = juce::dsp::ProcessorDuplicator<dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>;
   std::unique_ptr<Filter> postHighPass_; // post high pass
   std::unique_ptr<Filter> postLowPass_; // post low pass
 
   std::unique_ptr<APCompressor> compressor_;
-  std::unique_ptr<APTubeDistortion> tubeDistortion_;
   std::unique_ptr<APOverdrive> overdrive_;
+
+  std::atomic<float> distQ_ {0.0f };
+  std::atomic<float> distChar_ {0.0f };
+  std::unique_ptr<APTubeDistortion> tubeDistortion_;
 
   // Callback for DSP parameter changes
   void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyChanged, const juce::Identifier& property) override
