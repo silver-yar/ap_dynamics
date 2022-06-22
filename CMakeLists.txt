@@ -74,6 +74,7 @@ target_sources(
         PRIVATE DSP/APCompressor.cpp
         DSP/APOverdrive.cpp
         DSP/APTubeDistortion.cpp
+        DSP/APConvolution.cpp
         Helpers/APDefines.h
         Source/APParameterMenu.cpp
         Source/APSlider.cpp
@@ -113,6 +114,7 @@ juce_add_binary_data(
         Resources/shadow.png
         Resources/tune_black.png
         Resources/tune_white.png
+        Resources/mdcone.wav
         Resources/close_white.png
         Resources/glass.jpeg
         Resources/apdlogo.png

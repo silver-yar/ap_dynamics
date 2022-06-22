@@ -14,6 +14,7 @@
 #include "../DSP/APCompressor.h"
 #include "../DSP/APOverdrive.h"
 #include "../DSP/APTubeDistortion.h"
+#include "../DSP/APConvolution.h"
 
 //==============================================================================
 /**
@@ -87,11 +88,12 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   std::unique_ptr<Filter> postLowPass_; // post low pass
 
   std::unique_ptr<APCompressor> compressor_;
-  std::unique_ptr<APOverdrive> overdrive_;
+  std::unique_ptr<APConvolution> ampConvolution_;
+//  std::unique_ptr<APOverdrive> overdrive_;
 
   std::atomic<float> distQ_ {0.0f };
   std::atomic<float> distChar_ {0.0f };
-  std::unique_ptr<APTubeDistortion> tubeDistortion_;
+//  std::unique_ptr<APTubeDistortion> tubeDistortion_;
 
   // Callback for DSP parameter changes
   void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyChanged, const juce::Identifier& property) override
