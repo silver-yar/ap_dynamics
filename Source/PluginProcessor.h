@@ -13,7 +13,6 @@
 
 #include "../DSP/APCompressor.h"
 #include "../DSP/APOverdrive.h"
-#include "../DSP/APTubeDistortion.h"
 #include "../DSP/APConvolution.h"
 
 //==============================================================================
@@ -75,11 +74,11 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   static juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
 
  private:
-  std::atomic<bool> mustUpdateProcessing_{ false }, isActive_{ false }; // TODO: Consider making std::atomic<bool>
+  std::atomic<bool> mustUpdateProcessing_{ false }, isActive_{ false };
   std::atomic<float> makeupSmoothed_ {0.0f};
 
   // Mixing
-  juce::LinearSmoothedValue<float> dryGain_, wetGain_, makeup_; // consider make unique_ptr
+  juce::LinearSmoothedValue<float> drive_, dryGain_, wetGain_, makeup_; // consider make unique_ptr
   juce::AudioBuffer<float> mixBuffer_;
 
   // Post-Processing Filters
@@ -88,12 +87,8 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
   std::unique_ptr<Filter> postLowPass_; // post low pass
 
   std::unique_ptr<APCompressor> compressor_;
+  std::unique_ptr<APOverdrive> overdrive_;
   std::unique_ptr<APConvolution> ampConvolution_;
-//  std::unique_ptr<APOverdrive> overdrive_;
-
-  std::atomic<float> distQ_ {0.0f };
-  std::atomic<float> distChar_ {0.0f };
-//  std::unique_ptr<APTubeDistortion> tubeDistortion_;
 
   // Callback for DSP parameter changes
   void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyChanged, const juce::Identifier& property) override

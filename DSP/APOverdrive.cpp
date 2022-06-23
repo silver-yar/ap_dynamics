@@ -23,32 +23,7 @@ void APOverdrive::process(const float* audioIn, float* audioOut, const int numSa
     const auto& sample = audioIn[i];
     const auto out     = [&]()
     {
-      float result = 0.0f;
-      if (mix_ >= 0.0f && mix_ <= 0.3f)
-      {  // No Clipping
-        result = sample;
-      }
-      if (mix_ > 0.3f && mix_ < 0.34f)
-      {
-        result = mix_ * softClipping(sample) + (1 - mix_) * sample;
-      }
-      if (mix_ >= 0.34f && mix_ <= 0.6f)
-      {  // Soft Clipping
-        // Dirtier
-        result = softClipping(sample);
-        result = mix_ * result + (1.0f - mix_) * sample;
-      }
-      if (mix_ > 0.6f && mix_ < 0.64f)
-      {
-        result = mix_ * softClipping(sample) + (1.0f - mix_) * hardClipping(sample);
-      }
-      if (mix_ >= 0.64f && mix_ <= 1.0f)
-      {  // Hard Clipping
-        // Dirty
-        result = hardClipping(sample);
-        result = mix_ * result + (1.0f - mix_) * softClipping(sample);
-      }
-      return result;
+      return softClipping(sample);
     }();
     audioOut[i] = out;
   }

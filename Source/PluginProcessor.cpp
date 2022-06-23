@@ -27,8 +27,8 @@ Ap_dynamicsAudioProcessor::Ap_dynamicsAudioProcessor()
       apvts(*this, nullptr, "Parameters", createParameters())
 {
   compressor_     = std::make_unique<APCompressor>();
+  overdrive_      = std::make_unique<APOverdrive>();
   ampConvolution_ = std::make_unique<APConvolution>();
-//  tubeDistortion_ = std::make_unique<APTubeDistortion>();
   postHighPass_   = std::make_unique<Filter>();
   postLowPass_    = std::make_unique<Filter>();
 
@@ -183,8 +183,8 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
   }
 
   // Mix Buffer Feeding
-//  for (auto channel = 0; channel < numChannels; channel++)
-//    mixBuffer_.copyFrom(channel, 0, buffer, channel, 0, numSamples);
+  for (auto channel = 0; channel < numChannels; channel++)
+    mixBuffer_.copyFrom(channel, 0, buffer, channel, 0, numSamples);
 
   for (int channel = 0; channel < totalNumInputChannels; ++channel)
   {
@@ -208,29 +208,22 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
       meterGlobalMaxVal = currentMaxVal;
     }
 
-    // Find the buffer's max magnitude
-//    const auto bufferMinMax = buffer.findMinMax(channel, 0, numSamples);
-
     compressor_->process(channelData, channelData, buffer.getNumSamples());  // comp -> ok
-    //    overdrive_->process(channelData, channelData, buffer.getNumSamples());
-//    mixBuffer_.copyFrom(channel, 0, buffer, channel, 0, numSamples);
-
-//    tubeDistortion_->process(channelData, bufferMinMax.getStart(), bufferMinMax.getEnd(), 1.0f, distQ_, distChar_,
-//                             channelData, buffer.getNumSamples());
+    overdrive_->process(channelData, channelData, buffer.getNumSamples());
   }
-  ampConvolution_->process (context);
+  ampConvolution_->process(context);
 
   // Post-Filtering
   postHighPass_->process(context);
   postLowPass_->process(context);
 
   // Mix Processing
-//  dryGain_.applyGain(mixBuffer_, numSamples);
-//  wetGain_.applyGain(buffer, numSamples);
+  dryGain_.applyGain(mixBuffer_, numSamples);
+  wetGain_.applyGain(buffer, numSamples);
 
   // -- MixBuffer Convolution
-//  for (auto channel = 0; channel < numChannels; channel++)
-//    buffer.addFrom(channel, 0, mixBuffer_,  channel, 0, numSamples);
+  for (auto channel = 0; channel < numChannels; channel++)
+    buffer.addFrom(channel, 0, mixBuffer_, channel, 0, numSamples);
 
   // Makeup
   makeup_.applyGain(buffer, numSamples);
@@ -265,18 +258,15 @@ void Ap_dynamicsAudioProcessor::setStateInformation(const void* data, int sizeIn
 void Ap_dynamicsAudioProcessor::update()
 {
   mustUpdateProcessing_ = false;
-  const auto mix        = apvts.getRawParameterValue("MIX")->load();
+  const auto mix        = apvts.getRawParameterValue(APParameters::MIX_ID)->load();
   dryGain_.setCurrentAndTargetValue(1.0f - mix);
   wetGain_.setCurrentAndTargetValue(mix);
 
   compressor_->updateParameters(apvts.getRawParameterValue("THR")->load(), apvts.getRawParameterValue("RAT")->load());
 
-  distQ_.store(apvts.getRawParameterValue(APParameters::DISTQ_ID)->load());
-  distChar_.store(apvts.getRawParameterValue(APParameters::DIST_CHAR_ID)->load());
-
-  const auto makeup =
-      juce::Decibels::decibelsToGain(apvts.getRawParameterValue(APParameters::MAKEUP_ID)->load(), APConstants::Math::MINUS_INF_DB);
-  makeupSmoothed_ = makeupSmoothed_ - 0.004f * (makeupSmoothed_ - makeup);
+  const auto makeup = juce::Decibels::decibelsToGain(apvts.getRawParameterValue(APParameters::MAKEUP_ID)->load(),
+                                                     APConstants::Math::MINUS_INF_DB);
+  makeupSmoothed_   = makeupSmoothed_ - 0.004f * (makeupSmoothed_ - makeup);
   makeup_.setCurrentAndTargetValue(makeupSmoothed_);
 }
 
@@ -288,8 +278,6 @@ void Ap_dynamicsAudioProcessor::reset()
   meterLocalMaxVal.store(zero_f);
   meterGlobalMaxVal.store(zero_f);
   makeupSmoothed_.store(zero_f);
-  distQ_.store(zero_f);
-  distChar_.store(zero_f);
   mixBuffer_.applyGain(0.0f);
   dryGain_.reset(getSampleRate(), 0.05);
   wetGain_.reset(getSampleRate(), 0.05);

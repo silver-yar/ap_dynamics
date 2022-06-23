@@ -108,5 +108,5 @@ void MixerButton::mapMouseToValue(const juce::Point<int>& mPoint)
 
   const auto mappedVal  = juce::jmap(static_cast<float>(mPoint.getY()), yMin, yMax, 1.0f, 0.0f);
   const auto limitedVal = juce::jlimit(0.0f, 1.0f, mappedVal);
-  audioProcessor_.apvts.getParameterAsValue("MIX").setValue(limitedVal);
+  audioProcessor_.apvts.getParameterAsValue(APParameters::MIX_ID).setValue(limitedVal);
 }
