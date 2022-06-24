@@ -75,7 +75,6 @@ class Ap_dynamicsAudioProcessor : public juce::AudioProcessor, public juce::Valu
 
  private:
   std::atomic<bool> mustUpdateProcessing_{ false }, isActive_{ false };
-  std::atomic<float> makeupSmoothed_ {0.0f};
 
   // Mixing
   juce::LinearSmoothedValue<float> drive_, dryGain_, wetGain_, makeup_; // consider make unique_ptr
