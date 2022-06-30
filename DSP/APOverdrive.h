@@ -17,6 +17,7 @@ class APOverdrive
   ~APOverdrive();
 
   void process(const float* audioIn, float* audioOut, int numSamplesToRender) const;
+  void dynamicProcess(const float* audioIn, float* audioOut, int numSamplesToRender, float mix) const;
 
   static float softClipping(float sample);
   static float hardClipping(float sample);

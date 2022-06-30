@@ -29,6 +29,21 @@ void APOverdrive::process(const float* audioIn, float* audioOut, const int numSa
   }
 }
 
+void APOverdrive::dynamicProcess(const float* audioIn, float* audioOut, int numSamplesToRender, float mix) const
+{
+  for (auto i = 0; i < numSamplesToRender; ++i)
+  {
+    const auto& sample = audioIn[i];
+    const auto out     = [&]()
+    {
+      if (mix > 0.8f)
+        return hardClipping(sample);
+      return softClipping(sample);
+    }();
+    audioOut[i] = out;
+  }
+}
+
 float APOverdrive::softClipping(const float sample)
 {
   const auto alpha = 5.0f;

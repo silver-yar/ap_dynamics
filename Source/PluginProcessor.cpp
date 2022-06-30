@@ -209,7 +209,7 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     }
 
     compressor_->process(channelData, channelData, buffer.getNumSamples());  // comp -> ok
-    overdrive_->process(channelData, channelData, buffer.getNumSamples());
+    overdrive_->dynamicProcess(channelData, channelData, buffer.getNumSamples(), apvts.getRawParameterValue(APParameters::MIX_ID)->load());
   }
   ampConvolution_->process(context);
 
@@ -224,8 +224,6 @@ void Ap_dynamicsAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
   // -- MixBuffer Convolution
   for (auto channel = 0; channel < numChannels; channel++)
     buffer.addFrom(channel, 0, mixBuffer_, channel, 0, numSamples);
-  //  for (auto channel = 0; channel < numChannels; channel++)
-  //    buffer.copyFrom(channel, 0, mixBuffer_, channel, 0, numSamples);
 
   // Makeup
   makeup_.applyGain(buffer, numSamples);
